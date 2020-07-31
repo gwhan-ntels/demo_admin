@@ -227,7 +227,7 @@ function chkValidation(){
     var isNotChanged = 0;
     var isChanged = 0;
     
- 	var isNotChanged = false;
+ 	var changed = false;
  	
     //요금조정금액이 전부0원인 경우  
     $.each(reqAdjIds, function(index, value){
@@ -239,13 +239,13 @@ function chkValidation(){
         }       
         if(isNotChanged == reqAdjIds.length){
        	  alert('조정신청금액을 입력하세요.');
-     	  isNotChanged = true;
+       	  changed = true;
        	  return false; 
        	  
         }        
     });       
 
-    if(isNotChanged){
+    if(changed){
     	return;
     }
     
