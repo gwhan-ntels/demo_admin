@@ -64,6 +64,7 @@ public class NewBillingInfoItemServiceImpl implements NewBillingInfoItemService 
 	@Override
 	public int insertNewBillingInfoItemInfo(NewBillingInfoItemVO newBillingInfoItemVO) {
 		String setItmCd = newBillingInfoItemVO.getSetItmCd();
+		
 		int dupSetItmCount = newBillingInfoItemMapper.getBillSetupItemInsertValidate(newBillingInfoItemVO);
 		int dupSetCount = newBillingInfoItemMapper.getBillSetupItemAddValidate(newBillingInfoItemVO);
 		

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.charge.calculationSearch.UseSearchMapper">
+<!--
+/* 현재 사용량 테이블은 KB 테이블 확인이 필요하여
+   기존 쿼리 주석 처리 후 화면 조회시 에러가 발생하지 않게 임시로 만들었으며 참고 불가하며 기존 쿼리 참조해야함
+
+   INPUT 항목
+   사업, 사용년월, 계약ID, 사용유형, 사용기간(일자 FROM TO)
+   OUTPUT 항목
+   고객명, 계약ID, 상품명, 사용일자, 사용량, 사용유형, 이용금액, 공제금액, 할인금액, 과금금액, 과금항목
+
+   => KB 사용량 테이블에 사용유형, 사용일자, 사용량, 이용금액, 공제금액, 할인금액, 과금금액, 과금항목 정보 필요함
+   위 정보 확인 후 관리하지 않는다면 IN/OUTPUT 변경 해야함 */ 
+ -->
+<select id="getUsgListByCtrt" resultType = "java.util.HashMap">
+/*UseSearchMapper.getUsgListByCtrt*/
+<include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
+	SELECT 
+		   B.CUST_NM                               /* 고객명  */
+	      ,A.CTRT_ID                               /* 계약번호 */
+	      ,(SELECT PROD_NM
+	          FROM TPMPD_PROD
+	         WHERE PROD_CD = A.PROD_CD) AS PROD_NM /* 상품명 */
+	      ,'' AS USG_STRT_DTM                      /* 사용일자 */
+	      ,'' AS TOTAL_USG_NOU                     /* 사용도수 */
+	      ,'' AS USG_TYP                           /* 사용유형 */
+	      ,'' AS USG_TYP_NM                        /* 사용유형명 */
+	      ,0  AS TOTAL_USG_CHRG                    /* 이용금액 */
+	      ,0  AS DEDUCTED_CHARGE                   /* 공제금액 */
+	      ,0  AS DISC_CHRG                         /* 할인금액 */
+	      ,'' AS TOTAL_RATED_CHRG                  /* 과금금액 */
+	      ,'' AS CHRG_C                            /* 과금코드 */
+	      ,'' AS CHRG_CD_NM                        /* 과금항목명 */
+	  FROM TCMCT_CTRT_INFO A
+	      ,TCMCU_CUST_INFO B
+	 WHERE 1=1
+	 <if test='soId != null and soId != "SEL"'>
+	 	AND A.SO_ID = #{soId} /* INPUT 사업 */
+	 </if>
+	 <if test='ctrtId != null and ctrtId != ""'>
+	 	AND A.CTRT_ID = #{ctrtId} /* INPUT 계약ID 'C000000341'*/
+	 </if>
+	 <if test='useYymm != null and useYymm != "" '>
+	 	 AND SUBSTR(A.RATE_STRT_DT, 1, 6) = #{useYymm} /* INPUT 사용년월 임시INPUT '202002'*/
+	 </if>
+	 <if test='orderTp != null and orderTp != "SEL"'>
+	 	AND A.ORDER_TP   = #{orderTp} /* INPUT 사용유형 임시INPUT '101'*/
+	 </if>
+	 <if test='useStDt != null and useStDt != "" and useEdDt != null and useEdDt != ""'>
+	 	AND A.OPEN_DD BETWEEN #{useStDt} AND #{useEdDt} /* INPUT 사용기간 FROM TO 임시INPUT '20200201'  '20200210'*/
+	 </if>
+	   AND A.INACT_DTTM = '99991231235959'
+	   AND A.CUST_ID     = B.CUST_ID
+<include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
+</select>
+
+<select id="totalCount" resultType = "int">
+/*UseSearchMapper.getUsgListByCtrt*/
+	SELECT 
+		   COUNT(A.CTRT_ID) AS CNT
+	  FROM TCMCT_CTRT_INFO A
+	      ,TCMCU_CUST_INFO B
+	 WHERE 1=1
+	<if test='soId != null and soId != "SEL"'>
+	 	AND A.SO_ID = #{soId} /* INPUT 사업 */
+	 </if>
+	 <if test='ctrtId != null and ctrtId != ""'>
+	 	AND A.CTRT_ID = #{ctrtId} /* INPUT 계약ID 'C000000341'*/
+	 </if>
+	 <if test='useYymm != null and useYymm != "" '>
+	 	 AND SUBSTR(A.RATE_STRT_DT, 1, 6) = #{useYymm} /* INPUT 사용년월 임시INPUT '202002'*/
+	 </if>
+	 <if test='orderTp != null and orderTp != "SEL"'>
+	 	AND A.ORDER_TP   = #{orderTp} /* INPUT 사용유형 임시INPUT '101'*/
+	 </if>
+	 <if test='useStDt != null and useStDt != "" and useEdDt != null and useEdDt != ""'>
+	 	AND A.OPEN_DD BETWEEN #{useStDt} AND #{useEdDt} /* INPUT 사용기간 FROM TO 임시INPUT '20200201'  '20200210'*/
+	 </if>
+	   AND A.INACT_DTTM = '99991231235959'
+	   AND A.CUST_ID     = B.CUST_ID
+</select>
+
+<select id="listExcel" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+	SELECT 
+		   B.CUST_NM                               /* 고객명  */
+	      ,A.CTRT_ID                               /* 계약번호 */
+	      ,(SELECT PROD_NM
+	          FROM TPMPD_PROD
+	         WHERE PROD_CD = A.PROD_CD) AS PROD_NM /* 상품명 */
+	      ,'' AS USG_STRT_DTM                      /* 사용일자 */
+	      ,'' AS TOTAL_USG_NOU                     /* 사용도수 */
+	      ,'' AS USG_TYP                           /* 사용유형 */
+	      ,'' AS USG_TYP_NM                        /* 사용유형명 */
+	      ,0  AS TOTAL_USG_CHRG                    /* 이용금액 */
+	      ,0  AS DEDUCTED_CHARGE                   /* 공제금액 */
+	      ,0  AS DISC_CHRG                         /* 할인금액 */
+	      ,'' AS TOTAL_RATED_CHRG                  /* 과금금액 */
+	      ,'' AS CHRG_C                            /* 과금코드 */
+	      ,'' AS CHRG_CD_NM                        /* 과금항목명 */
+	  FROM TCMCT_CTRT_INFO A
+	      ,TCMCU_CUST_INFO B
+	 WHERE 1=1
+	 <if test='soId != null and soId != "SEL"'>
+	 	AND A.SO_ID = #{soId} /* INPUT 사업 */
+	 </if>
+	 <if test='ctrtId != null and ctrtId != ""'>
+	 	AND A.CTRT_ID = #{ctrtId} /* INPUT 계약ID 'C000000341'*/
+	 </if>
+	 <if test='useYymm != null and useYymm != "" '>
+	 	 AND SUBSTR(A.RATE_STRT_DT, 1, 6) = #{useYymm} /* INPUT 사용년월 임시INPUT '202002'*/
+	 </if>
+	 <if test='orderTp != null and orderTp != "SEL"'>
+	 	AND A.ORDER_TP   = #{orderTp} /* INPUT 사용유형 임시INPUT '101'*/
+	 </if>
+	 <if test='useStDt != null and useStDt != "" and useEdDt != null and useEdDt != ""'>
+	 	AND A.OPEN_DD BETWEEN #{useStDt} AND #{useEdDt} /* INPUT 사용기간 FROM TO 임시INPUT '20200201'  '20200210'*/
+	 </if>
+	   AND A.INACT_DTTM = '99991231235959'
+	   AND A.CUST_ID     = B.CUST_ID
+</select>
+</mapper>

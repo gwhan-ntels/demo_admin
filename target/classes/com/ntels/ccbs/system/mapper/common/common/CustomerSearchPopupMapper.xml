@@ -507,4 +507,71 @@
             <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
             ) RESULT
     </select>
+    
+    <select id="getCustCtrtList" resultType = "java.util.HashMap">
+    /*CustomerSearchPopupMapper.getCustCtrtList*/
+    <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
+    SELECT 
+		CTRT.SO_ID
+		,(SELECT SO_NM FROM TSYCO_SO_MAST WHERE SO_ID=CUST.SO_ID) AS SO_NM
+		,CTRT.CTRT_ID
+		,(SELECT NAME.CODE_NM
+                      FROM TSYCO_CODE_MAST MAST
+                            , TSYCO_CODE_MAST_NAME MNAME
+                            , TSYCO_CODE_DETAIL DETAIL
+                            , TSYCO_CODE_DETAIL_NAME NAME
+                      WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                            AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                            AND MNAME.LNG_TYP     =#{lng}
+                            AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                            AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                            AND NAME.LNG_TYP      = #{lng}
+                            AND MAST.COMMON_GRP   ='CM00023'
+                            AND DETAIL.USE_YN     ='Y'
+                            AND MAST.USE_YN       ='Y'
+                            AND DETAIL.COMMON_CD = CTRT.CTRT_STAT) AS CTRT_STAT
+         ,CUST.CUST_NM
+         ,CUST.TEL_NO
+         ,CUST.MTEL_NO
+         ,PYM.PYM_ACNT_ID
+         ,PYM.ACNT_NM
+	FROM TCMCT_CTRT_INFO CTRT, 
+		 TCMCU_CUST_INFO CUST, 
+		 TCMCU_PYM_ACNT_INFO PYM
+	WHERE 1=1
+	AND CTRT.SO_ID = CUST.SO_ID
+	AND CTRT.CUST_ID = CUST.CUST_ID
+	AND CTRT.INACT_DTTM='99991231235959'
+	AND PYM.SO_ID = CUST.SO_ID
+	AND PYM.CUST_ID = CUST.CUST_ID
+	AND CTRT.PYM_ACNT_ID = PYM.PYM_ACNT_ID
+	<if test='custNm != null and custNm != ""'>
+		AND CUST.CUST_NM LIKE '${custNm}%'
+	</if>
+	<if test='soId != null and soId != "SEL"'>
+		AND CTRT.SO_ID = #{soId}
+	</if>
+	ORDER BY CTRT.CTRT_ID
+    <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
+    </select>
+    
+    <select id="getCustCtrtListCnt" resultType="int">
+    	SELECT COUNT(*)
+		FROM TCMCT_CTRT_INFO CTRT, 
+		 	 TCMCU_CUST_INFO CUST, 
+		 	 TCMCU_PYM_ACNT_INFO PYM
+		WHERE 1=1
+		AND CTRT.SO_ID = CUST.SO_ID
+		AND CTRT.CUST_ID = CUST.CUST_ID
+		AND CTRT.INACT_DTTM='99991231235959'
+		AND PYM.SO_ID = CUST.SO_ID
+		AND PYM.CUST_ID = CUST.CUST_ID
+		AND CTRT.PYM_ACNT_ID = PYM.PYM_ACNT_ID
+		<if test='custNm != null and custNm != ""'>
+			AND CUST.CUST_NM LIKE '${custNm}%'
+		</if>
+		<if test='soId != null and soId != "SEL"'>
+			AND CTRT.SO_ID = #{soId}
+		</if>
+    </select>
 </mapper>

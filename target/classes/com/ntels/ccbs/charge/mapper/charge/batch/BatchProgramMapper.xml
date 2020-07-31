@@ -41,7 +41,7 @@
 	
 	<sql id="whereBatchProgramList">
 		<where>
-			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(pgmNm)">AND PGM_NM LIKE '%'||#{pgmNm}||'%'</if>
+			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(pgmNm)">AND PGM_NM LIKE CONCAT('%',#{pgmNm},'%')</if>
 			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(batPgmId)">AND BAT_PGM_ID = #{batPgmId}</if>
 		</where>
 	</sql>

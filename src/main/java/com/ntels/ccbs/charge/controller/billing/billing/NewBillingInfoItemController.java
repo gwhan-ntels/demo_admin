@@ -169,6 +169,7 @@ public class NewBillingInfoItemController {
 		SessionUser session = (SessionUser) request.getSession().getAttribute("session_user");
 		String lngTyp = request.getSession().getAttribute("sessionLanguage").toString();
 		
+		System.out.println("##setVal: " + newBillingInfoItemVO.getSetVal());
 		newBillingInfoItemVO.setRegId(session.getUserId());
 		newBillingInfoItemVO.setChgId(session.getUserId());
 		newBillingInfoItemVO.setRegDate(DateUtil.sysdate());

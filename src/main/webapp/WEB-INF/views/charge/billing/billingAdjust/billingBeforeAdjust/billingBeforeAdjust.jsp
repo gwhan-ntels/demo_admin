@@ -150,12 +150,13 @@ function searchPymInfo(){
     
     var url = '/charge/billing/billingAdjust/billingBeforeAdjust/getPymList.json'
     
+    console.info(custNm);
     $.ajax({
           url:url,
           type:'POST',
           data : {
             soId : soId,
-            custNm : custNm
+           custNm : custNm
             },
           dataType: 'json',
           success: function(data){

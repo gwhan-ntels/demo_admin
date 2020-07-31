@@ -8,6 +8,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
+	init();
+	
 	//그리드 선언
 	$("#custPopupGrid").jqGrid({
 		url : '/system/common/common/customerSearch/getCustomerCtrtListAction.json',
@@ -152,8 +154,23 @@ function selectCustInfo(rowid){
 		customerSearchCallback();  
 	}
 }
-</script>
 
+/*
+ * 화면 초기화
+ */
+function init(){
+	var soId = "<c:out value='${INPUT_SO_ID}'/>";
+	var custNm = "<c:out value='${INPUT_CUST_NM}'/>";
+	var pymAcntId = "<c:out value='${INPUT_PYM_ACNT_ID}'/>";
+	$('#selCustSearchCondSoId').val(soId);
+	$('#selCustSearchCondSoId').selectmenu({});
+	$('#selCustSearchCondSoId').selectmenu("refresh");
+	$('#txtPymSearchCustNm').val(custNm);
+	$('#txtPymSearchAcntId').val(pymAcntId);
+}
+
+</script>
+<div style="width:1200px; height:550px;" >
 <!-- title -->
 <div class="layer_top">
 	<div class="title"><spring:message code="LAB.M01.LAB00047"/></div>
@@ -213,6 +230,7 @@ function selectCustInfo(rowid){
 	      <a class="grey-btn" id="btnCustSearchSelect" href="#" ><span class="confirm_icon"><spring:message code="LAB.M07.LAB00195" /></span></a>
 	      <a class="grey-btn close" id="btnCustSearchClose" href="#"><span class="cancel_icon"><spring:message code="LAB.M03.LAB00027" /></span></a>
 	</div>
+</div>
 </div>
 
 <input id="popupInputIsUnmaskYn" value="${INPUT_IS_UNMASK_YN}" hidden /> 

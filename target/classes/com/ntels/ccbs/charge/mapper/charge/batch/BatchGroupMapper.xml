@@ -48,7 +48,7 @@
 			, BAT_GRP.REG_DATE
 			, BAT_GRP.CHG_DATE
 			, BAT_GRP.CHGR_ID
-			, BAT_GRP.SO_ID
+			-- , BAT_GRP.SO_ID
 			, GRP_TP_CODE.CODE_NM AS BAT_GRP_TP_NM
 			, PROC_TP_CODE.CODE_NM AS BAT_PROC_TP_NM
 		<include refid="fromBatchGroupList"/>
@@ -67,7 +67,6 @@
 			, REG_DATE
 			, CHG_DATE
 			, CHGR_ID
-			, SO_ID
 		)
 		VALUES
 		(
@@ -79,7 +78,6 @@
 			, #{regDate}
 			, #{chgDate}
 			, #{chgrId}
-			, #{soId}
 		)
 	</insert>
 	
@@ -107,5 +105,78 @@
 		DELETE FROM TBLIV_BAT_GRP
 		WHERE BAT_GRP_ID = #{batGrpId}
 	</delete>
+	
+	<select id="finishInfoListCount" resultType="Integer" parameterType="com.ntels.ccbs.charge.domain.charge.batch.BatchJobMngVO">
+    	SELECT 
+			COUNT(*)
+        FROM TBLIV_CLS_INFO   A                               
+        WHERE BILL_YYMM    = #{batchJobMngVO.condBillYymm} 
+        <if test="batchJobMngVO.comdSoId != null and batchJobMngVO.comdSoId != 'SEL'">          
+           AND A.SO_ID      = #{batchJobMngVO.comdSoId}  
+        </if>
+         <if test="batchJobMngVO.condEndCd != null and batchJobMngVO.condEndCd != 'SEL'">
+           AND CLS_TSK_CL   = #{batchJobMngVO.condEndCd}   
+        </if>
+	</select>
+	
+	<select id="finishInfoList" resultType="java.util.HashMap" parameterType="com.ntels.ccbs.charge.domain.charge.batch.BatchJobMngVO">	
+    	<include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
+	     SELECT CLS_TSK_CL  /* 마감업무 */
+	   		, (SELECT NAME.CODE_NM AS COMMON_CD_NM
+	           FROM TSYCO_CODE_MAST MAST
+	              ,TSYCO_CODE_MAST_NAME MNAME
+	              ,TSYCO_CODE_DETAIL DETAIL
+	              ,TSYCO_CODE_DETAIL_NAME NAME
+	            WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+	              AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+	              AND MNAME.LNG_TYP     = #{batchJobMngVO.lng}  /* INPUT */
+	              AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+	              AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+	              AND NAME.LNG_TYP      = #{batchJobMngVO.lng}  /* INPUT */
+	              AND MAST.COMMON_GRP   ='BL00039'
+	              AND DETAIL.COMMON_CD  =CLS_TSK_CL
+	           ) AS CLS_TSK_CL_NM
+	           , BILL_YYMM   /* 청구년월 */
+	           , BILL_CYCL   /* 청구주기 */
+	           , CLS_YN      /* 마감상태 */
+	           , CLS_DT      /* 마감일자 */
+	           , SO_ID
+	           ,  (
+	              SELECT SO_NM
+	              FROM TSYCO_SO_MAST X /* SO 마스타*/
+	              WHERE X.SO_ID = A.SO_ID ) SO_NM
+	           , ( SELECT X.USER_NAME
+	                 FROM TSYCO_USER      X                   		/* 사용자정보 */
+	                WHERE X.USER_ID            = A.REGR_ID
+	             )                             AS REGR_NM
+	           , CHG_DATE
+	           , REG_DATE
+	           , ( SELECT X.USER_NAME
+	                 FROM TSYCO_USER      X                   		/* 사용자정보 */
+	                WHERE X.USER_ID            = A.CHGR_ID
+	             )                             AS CHGR_NM
+	        FROM TBLIV_CLS_INFO   A                               	/* 마감정보 */
+	        WHERE BILL_YYMM    = #{batchJobMngVO.condBillYymm} 
+				<if test="batchJobMngVO.comdSoId != null and batchJobMngVO.comdSoId != 'SEL'">          
+	           		AND A.SO_ID      = #{batchJobMngVO.comdSoId}  
+	       		</if>
+	        	<if test="batchJobMngVO.condEndCd != null and batchJobMngVO.condEndCd != 'SEL'">
+	           		AND CLS_TSK_CL   = #{batchJobMngVO.condEndCd}   
+	        	</if>
+         	ORDER BY SO_ID, BILL_CYCL, CLS_TSK_CL
+         <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
+	</select>
+	
+	<update id="updatefinishInfoMng" parameterType="com.ntels.ccbs.charge.domain.charge.batch.BatchJobMngVO">
+		 UPDATE TBLIV_CLS_INFO           /* 마감정보 */
+           SET CLS_YN       = #{batchJobMngVO.clsYn}
+             , CLS_DT       = #{batchJobMngVO.clsDt}
+             , CHGR_ID      = #{batchJobMngVO.chgrId}
+             , CHG_DATE     = #{batchJobMngVO.chgDate}
+         WHERE CLS_TSK_CL   = #{batchJobMngVO.clsTskCl}
+           AND BILL_YYMM    = #{batchJobMngVO.billYymm}
+           AND BILL_CYCL    = #{batchJobMngVO.billCycl}
+           AND SO_ID        = #{batchJobMngVO.soId}
+	</update>
 	
 </mapper>

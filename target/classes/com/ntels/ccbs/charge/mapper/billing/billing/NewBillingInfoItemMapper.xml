@@ -114,7 +114,7 @@
 				AND  #{newBillingInfoItemVO.searchYymm} BETWEEN B.EFT_BGN_YYMM AND B.EFT_END_YYMM
 			</if>
 			<if test="newBillingInfoItemVO.searchSetItmNm != null and newBillingInfoItemVO.searchSetItmNm != ''">
-				AND  UPPER(B.SET_ITM_NM)  LIKE '%' || UPPER(#{newBillingInfoItemVO.searchSetItmNm}) || '%'
+				AND  UPPER(B.SET_ITM_NM)  LIKE CONCAT('%',UPPER(#{newBillingInfoItemVO.searchSetItmNm}), '%')
 			</if>
 			<if test="newBillingInfoItemVO.searchReferenceType != null and newBillingInfoItemVO.searchReferenceType != ''">
 				AND  B.SET_LOC = #{newBillingInfoItemVO.searchReferenceType}
@@ -208,7 +208,7 @@
 				AND  #{newBillingInfoItemVO.searchYymm} BETWEEN B.EFT_BGN_YYMM AND B.EFT_END_YYMM
 			</if>
 			<if test="newBillingInfoItemVO.searchSetItmNm != null and newBillingInfoItemVO.searchSetItmNm != ''">
-				AND  UPPER(B.SET_ITM_NM)  LIKE '%' || UPPER(#{newBillingInfoItemVO.searchSetItmNm}) || '%'
+				AND  UPPER(B.SET_ITM_NM)  LIKE CONCAT('%',UPPER(#{newBillingInfoItemVO.searchSetItmNm}), '%')
 			</if>
 			<if test="newBillingInfoItemVO.searchReferenceType != null and newBillingInfoItemVO.searchReferenceType != ''">
 				AND  B.SET_LOC = #{newBillingInfoItemVO.searchReferenceType}
@@ -276,10 +276,10 @@
     
     <select id="getBillSetupItemMaxId" parameterType="com.ntels.ccbs.charge.domain.billing.billing.NewBillingInfoItemVO" resultType="String">	
         SELECT CASE
-                WHEN ( SELECT LPAD(MAX(TO_NUMBER(SET_ITM_ID))+1, 5, '0')
+                WHEN ( SELECT LPAD(MAX(SET_ITM_ID)+1, 5, '0')
                               FROM TBLIV_BILL_STP_ITM             /* 빌링설정항목 */
                          ) IS NULL THEN '00001'
-                ELSE  ( SELECT LPAD(MAX(TO_NUMBER(SET_ITM_ID))+1, 5, '0')
+                ELSE  ( SELECT LPAD(MAX(SET_ITM_ID)+1, 5, '0')
                               FROM TBLIV_BILL_STP_ITM             /* 빌링설정항목 */
                          )
                 END AS SET_ITM_CD
@@ -337,7 +337,7 @@
               	   ,TBLIV_BILL_STP B
         WHERE  A.SET_ITM_ID      = #{newBillingInfoItemVO.setItmCd}
            AND   A.EFT_BGN_YYMM   != #{newBillingInfoItemVO.eftBgnYymm}
-           AND   A.EFT_END_YYMM   != #{newBillingInfoItemVO.eftEndYymm}
+           AND   A.EFT_END_YYMM   != #{newBillingInfoItemVO.eftEndYymm} 
            AND  (A.EFT_BGN_YYMM  BETWEEN #{newBillingInfoItemVO.eftBgnYymm} AND #{newBillingInfoItemVO.eftEndYymm}
             OR    A.EFT_END_YYMM  BETWEEN #{newBillingInfoItemVO.eftBgnYymm} AND #{newBillingInfoItemVO.eftEndYymm}
             OR    #{newBillingInfoItemVO.eftBgnYymm} BETWEEN A.EFT_BGN_YYMM   AND A.EFT_END_YYMM
@@ -351,7 +351,7 @@
            		SET  BS_SET_VAL   = #{newBillingInfoItemVO.setVal, jdbcType=VARCHAR}
               		 , SET_VAL        = #{newBillingInfoItemVO.setVal, jdbcType=VARCHAR}
 		             , CHGR_ID         = #{newBillingInfoItemVO.regId, jdbcType=VARCHAR}
-		             , CHG_DATE      =  SYSDATE
+		             , CHG_DATE      =  NOW()
              WHERE 1=1
 	             AND BILL_YYMM     = #{newBillingInfoItemVO.searchYymm, jdbcType=VARCHAR}
 	             AND BILL_CYCL      = '01'
@@ -363,7 +363,7 @@
                UPDATE  TBLIV_BILL_STP                           /* 빌링설정정보 */
                     SET  SET_VAL      = #{newBillingInfoItemVO.setVal, jdbcType=VARCHAR}
                          , CHGR_ID       = #{newBillingInfoItemVO.regId, jdbcType=VARCHAR}
-                         , CHG_DATE    = SYSDATE
+                         , CHG_DATE    = NOW()
                 WHERE 1=1
                     AND SET_ITM_ID      = #{newBillingInfoItemVO.setItmCd, jdbcType=VARCHAR}
                     AND EFT_BGN_YYMM = #{newBillingInfoItemVO.eftBgnYymm, jdbcType=VARCHAR}
@@ -380,7 +380,7 @@
 			              ,FLD_STRUCT      = #{newBillingInfoItemVO.fieldStructure, jdbcType=VARCHAR}
 			              ,FLD_CNT            = #{newBillingInfoItemVO.fieldDigit, jdbcType=VARCHAR}
 			              ,CHGR_ID            = #{newBillingInfoItemVO.chgId, jdbcType=VARCHAR}
-			              ,CHG_DATE          = SYSDATE
+			              ,CHG_DATE          = NOW()
 			     WHERE SET_ITM_ID        = #{newBillingInfoItemVO.setItmCd, jdbcType=VARCHAR}
 			         AND EFT_BGN_YYMM   = #{newBillingInfoItemVO.eftBgnYymm, jdbcType=VARCHAR}
 	</update>

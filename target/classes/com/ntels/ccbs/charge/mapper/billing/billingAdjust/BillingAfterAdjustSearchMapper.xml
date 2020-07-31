@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.billing.billingAdjust.BillingAfterAdjustSearchMapper">
+
+<select id ="getBillChargeAdjustReportList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAfterAdjustSearchVO"
+											resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAfterAdjustSearchVO">
+/* BillingAfterAdjustSearchMapper.getBillChargeAdjustReportList*/
+<include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
+	SELECT A.*
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_PRV_BILL_AMT + A.ADJ_AMT-A.ADJ_APPL_AMT,A.ADJ_PRV_BILL_AMT + A.ADJ_AMT) AS ADJ_PRV_BILL_AMT_A /* 조정 전 청구금액 */
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_APPL_AMT,0) AS ADJ_AMT_A /* 조정금액 */
+             ,NVL((SELECT SUM(ADJ_PRV_BILL_AMT) AS AMT
+                     FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD NOT IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0)
+             + NVL((SELECT SUM(ADJ_PRV_BILL_AMT) + SUM(ADJ_AMT) AS AMT
+                      FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0) 
+             + A.ADJ_AMT     AS BILL_AMT                          /* 청구금액 */                         
+          FROM (
+                  SELECT '0'                            AS CHK_JOB
+                       , A.ADJ_NO	/*신청번호*/
+                       , IF(A.BILL_SEQ_NO = '0', NULL, A.BILL_SEQ_NO)  AS BILL_SEQ_NO
+                       , IF(A.BILL_YYMM = '0', NULL, A.BILL_YYMM)    AS BILL_YYMM
+                       , IF(A.BILL_DT = '0', NULL, A.BILL_DT)      AS BILL_DT
+                       , A.APPL_SO_ID
+                       , A.BILL_APLY_DT
+                       , SUBSTR(A.APPL_DTTM, 1, 8)      AS APPL_DTTM_DT	/*신청일자*/
+                       , A.DCSN_PROC_STAT	/* 진행상태 */
+                       , A.DCSN_PROC_STAT_NM
+                       , A.ADJ_PT
+                       , A.PYM_ACNT_ID	/*납부계정ID*/
+                       , A.CTRT_ID
+                       , A.APPNT_NM
+                       , A.RCPT_PSN_ID
+                       , A.RCPT_DTTM
+                       , A.ADJ_RESN_CD
+                       , A.HOPE_APLY_YYMM	/*적용년월*/
+                       , ( SELECT PAY_DUE_DT
+                             FROM TBLIV_BILL_TGT_CUST    X
+                            WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                              AND A.BILL_YYMM   = X.BILL_YYMM)     AS PAY_DUE_DT /*납부일자*/
+                       , ROUND(NVL((SELECT SUM(ADJ_PRV_BILL_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                                 AND A.BILL_YYMM   = X.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                             , 0))                   AS ADJ_PRV_BILL_AMT /*최초조정전청구금액*/                          /* 기조정금액 */
+                       , NVL(A.ADJ_APPL_AMT,0)      AS ADJ_APPL_AMT                               /* 신청금액 */
+                       , NVL(A.PRE_ADJ_APPL_AMT,0)  AS PRE_ADJ_APPL_AMT                           /* 조정반영예상금액 */
+                       ,CASE DCSN_PROC_STAT
+                             WHEN '05' THEN 
+		                       NVL(( SELECT SUM(Y.ADJ_APPL_AMT)
+		                                 FROM TBLIV_CHRG_ADJ_APLY     X
+		                                    , TBLIV_CHRG_ADJ_APLY_DTL Y
+		                                WHERE X.ADJ_NO         = Y.ADJ_NO
+		                                  <![CDATA[ AND X.ADJ_NO         <= A.ADJ_NO  ]]>
+		                                  AND X.BILL_SEQ_NO    = A.BILL_SEQ_NO
+		                                  AND X.DCSN_PROC_STAT IN ('05', '11', '10', '81', '06')
+                                          AND Y.CTRT_ID = A.CTRT_ID
+		                         ),0)
+		                       ELSE 
+		                       NVL((SELECT SUM(X.ADJ_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                                 AND X.BILL_YYMM   = A.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                              , 0)     
+		                END AS ADJ_AMT                                          /* 조정누적금액 */
+                       , (SELECT Y.CUST_NM
+                            FROM TCMCU_PYM_ACNT_INFO  X                         /* 납부계정정보 */
+                               , TCMCU_CUST_INFO      Y                         /* 고객정보 */
+                           WHERE X.CUST_ID       = Y.CUST_ID
+                             AND x.so_id = y.so_id
+                             AND X.PYM_ACNT_ID   = A.PYM_ACNT_ID
+                             AND x.so_id = a.appl_so_id
+                         )                        AS PYM_ACNT_NM	/*납부자명*/
+                       , A.CTRT_ID AS SVC_TEL_NO           /* 이동전화번호*/    
+                       , (SELECT SO_NM
+                            FROM TSYCO_SO_MAST   X                             /* SO 마스타*/
+                           WHERE X.SO_ID         = A.APPL_SO_ID
+                         )                        AS APPL_SO_NM
+--                        , (SELECT RTRIM(SUBSTR(MAX(TO_CHAR(LEVEL,'FM00')||REVERSE(SYS_CONNECT_BY_PATH(REVERSE(Y.ORG_NM),'/'))),3),'/') AS ORG_NM_PATH
+--                             FROM TDNDI_ORG_REL_HIST X,
+--                                  TDNDI_ORG_INFO Y
+--                            WHERE X.ORG_ID = Y.ORG_ID              
+--                            START WITH X.ORG_ID = (SELECT CRR_ID 
+--                                                     FROM TSYUM_USR_MAST Z
+--                                                    WHERE Z.USR_ID = A.RCPT_PSN_ID) 
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231'
+--                            CONNECT BY PRIOR X.PART_ORG_ID = Y.ORG_ID
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231' 
+--                              AND LEVEL &lt;= 3 
+--                          )                        AS ORG_NM_PATH                                  /* 조직명(상위조직포함) */  
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.RCPT_PSN_ID
+                         )                        AS RCPT_PSN_NM     /*신청자명*/                             /* 접수자명 */
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.CHGR_ID
+                         )                        AS CHGR_ID_NM                                   /* 수정자명 */
+                       , CHG_DTTM                                                                 /* 수정일시 */
+--                        , ROWNUM RNUM
+                       , ADJ_APPL_CONTS
+                       ,(SELECT COMMON_CD_NM 
+                         FROM TSYCO_CODE_DETAIL 
+                         WHERE  COMMON_GRP='BL00024'
+                         AND COMMON_CD = A.ADJ_RESN_CD)	AS ADJ_RESN_NM /*조정사유*/
+--                        , FN_CODENAME_NEW('BLIV012', ADJ_RESN_CD, 'ko') AS ADJ_RESN_NM
+                    FROM (
+                              SELECT  B.ADJ_NO
+                                    , C.CTRT_ID
+                                    , MAX(B.APPL_SO_ID) AS APPL_SO_ID
+                                    , MAX(B.BILL_APLY_DT) AS BILL_APLY_DT	/* 청구반영일자 */
+                                    , MAX(B.APPL_DTTM) AS APPL_DTTM
+                                    , SUM(C.ADJ_APPL_AMT) AS ADJ_APPL_AMT
+                                    , SUM(IF(D.SVC_RATE_ITM_TYP_CD = NULL, C.ADJ_APPL_AMT, ROUND(C.ADJ_APPL_AMT*1.1))) AS PRE_ADJ_APPL_AMT   
+                                    , MAX(B.DCSN_PROC_STAT) AS DCSN_PROC_STAT
+                                    ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
+								      FROM  TSYCO_CODE_MAST MAST
+									   ,TSYCO_CODE_MAST_NAME MNAME
+									   ,TSYCO_CODE_DETAIL DETAIL
+									   ,TSYCO_CODE_DETAIL_NAME NAME
+								      WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+								      AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+								      AND MNAME.LNG_TYP     ='ko' /* INPUT */
+								      AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+								      AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+								      AND NAME.LNG_TYP      ='ko' /* INPUT */
+								      AND MAST.COMMON_GRP   ='BL00055'
+								      AND DETAIL.COMMON_CD = B.DCSN_PROC_STAT) AS DCSN_PROC_STAT_NM 
+                                    , MAX(B.APPNT_NM) AS APPNT_NM
+                                    , MAX(B.RCPT_PSN_ID) AS RCPT_PSN_ID
+                                    , MAX(B.RCPT_DTTM) AS RCPT_DTTM
+                                    , MAX(B.ADJ_RESN_CD) AS ADJ_RESN_CD
+                                    , MAX(B.BILL_SEQ_NO) AS BILL_SEQ_NO
+                                    , MAX(B.BILL_YYMM) AS BILL_YYMM
+                                    , MAX(B.BILL_DT) AS BILL_DT	/*청구일자*/
+                                    , MAX(B.ADJ_PT) AS ADJ_PT
+                                    , MAX(B.PYM_ACNT_ID) AS PYM_ACNT_ID
+                                    , MAX(B.HOPE_APLY_YYMM) AS HOPE_APLY_YYMM
+                                    , MAX(B.CHGR_ID) AS CHGR_ID
+--                                     , TO_CHAR(MAX(B.CHG_DATE),'YYYYMMDDHH24MISS')  AS CHG_DTTM
+				    , MAX(B.CHG_DATE) AS CHG_DTTM
+                                    , MAX(ADJ_APPL_CONTS) AS ADJ_APPL_CONTS	/*신청사유*/
+                                 FROM TBLIV_CHRG_ADJ_APLY  B
+                                    , TBLIV_CHRG_ADJ_APLY_DTL C
+                                    /*RIGHT -> LEFT로 수정*/
+                                    LEFT OUTER JOIN  (SELECT SVC_RATE_ITM_TYP_CD
+                                         FROM IFNBRM_SVC_RATE_ITM_ATTR_INFO
+                                         /* AT00000041 -> AT086 수정*/
+                                        WHERE ATTR_CD  = 'AT086'
+                                          AND ATTR_VAL = '1'    
+                                          AND SVC_RATE_ITM_TYP_CD NOT IN (SELECT SVC_RATE_ITM_TYP_CD
+                                                                            FROM IFNBRM_SVC_RATE_ITM_INFO 
+                                                                           WHERE SALE_ITM_CD IN ('SI00010000','SI00030000','SI00030002','SI00000254',
+                                                                                                 'SI00000263','SI20000727','SI20000726','SI90000011')) ) D   
+                                     ON D.SVC_RATE_ITM_TYP_CD = C.CHRG_ITM_CD                          
+                                WHERE 1=1
+                                	<if test='billingSearch.condSoId != null and billingSearch.condSoId != "SEL"'>
+                                		AND B.APPL_SO_ID = #{billingSearch.condSoId} /*'01'*/
+                                	</if>
+                                	<if test='billingSearch.condStDt != null and billingSearch.condStDt != "" and billingSearch.condEdDt != null and billingSearch.condEdDt != ""'>
+                                		AND SUBSTR(B.APPL_DTTM,1,8)  BETWEEN #{billingSearch.condStDt} AND #{billingSearch.condEdDt} /*'20200210'*/
+                                	</if>
+                                	<!-- <if test='condBillYymm != null and condBillYymm != ""'>
+                                		AND B.BILL_YYMM       = #{condBillYymm}  /* '202003' */
+                                	</if> -->
+                                	<if test='billingSearch.condPymAcntId != null and billingSearch.condPymAcntId != ""'>
+                                		AND B.PYM_ACNT_ID     = #{billingSearch.condPymAcntId} /* 'P000000071' */
+                                	</if>
+                                	<if test='billingSearch.condRcptPsnId != null and billingSearch.condRcptPsnId != ""'>
+                                		AND B.RCPT_PSN_ID     = #{billingSearch.condRcptPsnId} /*'admin'*/
+                                	</if>
+                                	<if test='billingSearch.condDcsnProcStat != null and billingSearch.condDcsnProcStat != "SEL"'>
+                                		AND B.DCSN_PROC_STAT  = #{billingSearch.condDcsnProcStat} /* '05' */
+                                	</if>
+	                                AND B.ADJ_NO = C.ADJ_NO                            
+                                  	AND B.ADJ_PT          = '2'                                       /* 청구후요금조정 */
+                                GROUP BY B.ADJ_NO, C.CTRT_ID
+                           ) A
+                ) A
+<include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
+</select>
+
+<select id = "totalCount" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAfterAdjustSearchVO"
+						  resultType ="int">
+		SELECT COUNT(*)
+        FROM(SELECT A.*
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_PRV_BILL_AMT + A.ADJ_AMT-A.ADJ_APPL_AMT,A.ADJ_PRV_BILL_AMT + A.ADJ_AMT) AS ADJ_PRV_BILL_AMT_A /* 조정 전 청구금액 */
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_APPL_AMT,0) AS ADJ_AMT_A /* 조정금액 */
+             ,NVL((SELECT SUM(ADJ_PRV_BILL_AMT) AS AMT
+                     FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD NOT IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0)
+             + NVL((SELECT SUM(ADJ_PRV_BILL_AMT) + SUM(ADJ_AMT) AS AMT
+                      FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0) 
+             + A.ADJ_AMT     AS BILL_AMT                          /* 청구금액 */                         
+          FROM (
+                  SELECT '0'                            AS CHK_JOB
+                       , A.ADJ_NO	/*신청번호*/
+                       , IF(A.BILL_SEQ_NO = '0', NULL, A.BILL_SEQ_NO)  AS BILL_SEQ_NO
+                       , IF(A.BILL_YYMM = '0', NULL, A.BILL_YYMM)    AS BILL_YYMM
+                       , IF(A.BILL_DT = '0', NULL, A.BILL_DT)      AS BILL_DT
+                       , A.APPL_SO_ID
+                       , A.BILL_APLY_DT
+                       , SUBSTR(A.APPL_DTTM, 1, 8)      AS APPL_DTTM_DT	/*신청일자*/
+                       , A.DCSN_PROC_STAT	/* 진행상태 */
+                       , A.ADJ_PT
+                       , A.PYM_ACNT_ID	/*납부계정ID*/
+                       , A.CTRT_ID
+                       , A.APPNT_NM
+                       , A.RCPT_PSN_ID
+                       , A.RCPT_DTTM
+                       , A.ADJ_RESN_CD
+                       , A.HOPE_APLY_YYMM	/*적용년월*/
+                       , ( SELECT PAY_DUE_DT
+                             FROM TBLIV_BILL_TGT_CUST    X
+                            WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                              AND A.BILL_YYMM   = X.BILL_YYMM)     AS PAY_DUE_DT /*납부일자*/
+                       , ROUND(NVL((SELECT SUM(ADJ_PRV_BILL_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                                 AND A.BILL_YYMM   = X.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                             , 0))                   AS ADJ_PRV_BILL_AMT /*최초조정전청구금액*/                          /* 기조정금액 */
+                       , NVL(A.ADJ_APPL_AMT,0)      AS ADJ_APPL_AMT                               /* 신청금액 */
+                       , NVL(A.PRE_ADJ_APPL_AMT,0)  AS PRE_ADJ_APPL_AMT                           /* 조정반영예상금액 */
+                       ,CASE DCSN_PROC_STAT
+                             WHEN '05' THEN 
+		                       NVL(( SELECT SUM(Y.ADJ_APPL_AMT)
+		                                 FROM TBLIV_CHRG_ADJ_APLY     X
+		                                    , TBLIV_CHRG_ADJ_APLY_DTL Y
+		                                WHERE X.ADJ_NO         = Y.ADJ_NO
+		                                  <![CDATA[ AND X.ADJ_NO         <= A.ADJ_NO ]]>
+		                                  AND X.BILL_SEQ_NO    = A.BILL_SEQ_NO
+		                                  AND X.DCSN_PROC_STAT IN ('05', '11', '10', '81', '06')
+                                          AND Y.CTRT_ID = A.CTRT_ID
+		                         ),0)
+		                       ELSE 
+		                       NVL((SELECT SUM(X.ADJ_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                                 AND X.BILL_YYMM   = A.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                              , 0)     
+		                END AS ADJ_AMT                                          /* 조정누적금액 */
+                       , (SELECT Y.CUST_NM
+                            FROM TCMCU_PYM_ACNT_INFO  X                         /* 납부계정정보 */
+                               , TCMCU_CUST_INFO      Y                         /* 고객정보 */
+                           WHERE X.CUST_ID       = Y.CUST_ID
+                             AND x.so_id = y.so_id
+                             AND X.PYM_ACNT_ID   = A.PYM_ACNT_ID
+                             AND x.so_id = a.appl_so_id
+                         )                        AS PYM_ACNT_NM	/*납부자명*/
+                       , A.CTRT_ID AS SVC_TEL_NO           /* 이동전화번호*/    
+                       , (SELECT SO_NM
+                            FROM TSYCO_SO_MAST   X                             /* SO 마스타*/
+                           WHERE X.SO_ID         = A.APPL_SO_ID
+                         )                        AS APPL_SO_NM
+--                        , (SELECT RTRIM(SUBSTR(MAX(TO_CHAR(LEVEL,'FM00')||REVERSE(SYS_CONNECT_BY_PATH(REVERSE(Y.ORG_NM),'/'))),3),'/') AS ORG_NM_PATH
+--                             FROM TDNDI_ORG_REL_HIST X,
+--                                  TDNDI_ORG_INFO Y
+--                            WHERE X.ORG_ID = Y.ORG_ID              
+--                            START WITH X.ORG_ID = (SELECT CRR_ID 
+--                                                     FROM TSYUM_USR_MAST Z
+--                                                    WHERE Z.USR_ID = A.RCPT_PSN_ID) 
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231'
+--                            CONNECT BY PRIOR X.PART_ORG_ID = Y.ORG_ID
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231' 
+--                              AND LEVEL &lt;= 3 
+--                          )                        AS ORG_NM_PATH                                  /* 조직명(상위조직포함) */  
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.RCPT_PSN_ID
+                         )                        AS RCPT_PSN_NM     /*신청자명*/                             /* 접수자명 */
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.CHGR_ID
+                         )                        AS CHGR_ID_NM                                   /* 수정자명 */
+                       , CHG_DTTM                                                                 /* 수정일시 */
+--                        , ROWNUM RNUM
+                       , ADJ_APPL_CONTS
+                       ,(SELECT COMMON_CD_NM 
+                         FROM TSYCO_CODE_DETAIL 
+                         WHERE  COMMON_GRP='BL00024'
+                         AND COMMON_CD = A.ADJ_RESN_CD)	AS ADJ_RESN_NM /*조정사유*/
+--                        , FN_CODENAME_NEW('BLIV012', ADJ_RESN_CD, 'ko') AS ADJ_RESN_NM
+                    FROM (
+                              SELECT  B.ADJ_NO
+                                    , C.CTRT_ID
+                                    , MAX(B.APPL_SO_ID) AS APPL_SO_ID
+                                    , MAX(B.BILL_APLY_DT) AS BILL_APLY_DT	/* 청구반영일자 */
+                                    , MAX(B.APPL_DTTM) AS APPL_DTTM
+                                    , SUM(C.ADJ_APPL_AMT) AS ADJ_APPL_AMT
+                                    , SUM(IF(D.SVC_RATE_ITM_TYP_CD = NULL, C.ADJ_APPL_AMT, ROUND(C.ADJ_APPL_AMT*1.1))) AS PRE_ADJ_APPL_AMT   
+                                    , MAX(B.DCSN_PROC_STAT) AS DCSN_PROC_STAT
+                                    , MAX(B.APPNT_NM) AS APPNT_NM
+                                    , MAX(B.RCPT_PSN_ID) AS RCPT_PSN_ID
+                                    , MAX(B.RCPT_DTTM) AS RCPT_DTTM
+                                    , MAX(B.ADJ_RESN_CD) AS ADJ_RESN_CD
+                                    , MAX(B.BILL_SEQ_NO) AS BILL_SEQ_NO
+                                    , MAX(B.BILL_YYMM) AS BILL_YYMM
+                                    , MAX(B.BILL_DT) AS BILL_DT	/*청구일자*/
+                                    , MAX(B.ADJ_PT) AS ADJ_PT
+                                    , MAX(B.PYM_ACNT_ID) AS PYM_ACNT_ID
+                                    , MAX(B.HOPE_APLY_YYMM) AS HOPE_APLY_YYMM
+                                    , MAX(B.CHGR_ID) AS CHGR_ID
+--                                     , TO_CHAR(MAX(B.CHG_DATE),'YYYYMMDDHH24MISS')  AS CHG_DTTM
+				    , MAX(B.CHG_DATE) AS CHG_DTTM
+                                    , MAX(ADJ_APPL_CONTS) AS ADJ_APPL_CONTS	/*신청사유*/
+                                 FROM TBLIV_CHRG_ADJ_APLY  B
+                                    , TBLIV_CHRG_ADJ_APLY_DTL C
+                                    /*RIGHT -> LEFT로 수정*/
+                                    LEFT OUTER JOIN  (SELECT SVC_RATE_ITM_TYP_CD
+                                         FROM IFNBRM_SVC_RATE_ITM_ATTR_INFO
+                                         /* AT00000041 -> AT086 수정*/
+                                        WHERE ATTR_CD  = 'AT086'
+                                          AND ATTR_VAL = '1'    
+                                          AND SVC_RATE_ITM_TYP_CD NOT IN (SELECT SVC_RATE_ITM_TYP_CD
+                                                                            FROM IFNBRM_SVC_RATE_ITM_INFO 
+                                                                           WHERE SALE_ITM_CD IN ('SI00010000','SI00030000','SI00030002','SI00000254',
+                                                                                                 'SI00000263','SI20000727','SI20000726','SI90000011')) ) D   
+                                     ON D.SVC_RATE_ITM_TYP_CD = C.CHRG_ITM_CD                          
+                                WHERE 1=1
+                                	<if test='billingSearch.condSoId != null and billingSearch.condSoId != "SEL"'>
+                                		AND B.APPL_SO_ID = #{billingSearch.condSoId} /*'01'*/
+                                	</if>
+                                	<if test='billingSearch.condStDt != null and billingSearch.condStDt != "" and billingSearch.condEdDt != null and billingSearch.condEdDt != ""'>
+                                		AND SUBSTR(B.APPL_DTTM,1,8)  BETWEEN #{billingSearch.condStDt} AND #{billingSearch.condEdDt} /*'20200210'*/
+                                	</if>
+                                	<!-- <if test='condBillYymm != null and condBillYymm != ""'>
+                                		AND B.BILL_YYMM       = #{condBillYymm}  /* '202003' */
+                                	</if> -->
+                                	<if test='billingSearch.condPymAcntId != null and billingSearch.condPymAcntId != ""'>
+                                		AND B.PYM_ACNT_ID     = #{billingSearch.condPymAcntId} /* 'P000000071' */
+                                	</if>
+                                	<if test='billingSearch.condRcptPsnId != null and billingSearch.condRcptPsnId != ""'>
+                                		AND B.RCPT_PSN_ID     = #{billingSearch.condRcptPsnId} /*'admin'*/
+                                	</if>
+                                	<if test='billingSearch.condDcsnProcStat != null and billingSearch.condDcsnProcStat != "SEL"'>
+                                		AND B.DCSN_PROC_STAT  = #{billingSearch.condDcsnProcStat} /* '05' */
+                                	</if>                          
+                                  	AND B.ADJ_PT          = '2'                                                                /* 청구후요금조정 */
+                                  	AND B.ADJ_NO = C.ADJ_NO 
+                                GROUP BY B.ADJ_NO, C.CTRT_ID
+                           ) A
+                ) A ) TT
+</select>
+
+<select id="billingAfterSearchPopupDtlList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+       <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
+        SELECT /*+ ORDERED USE_NL(A B) INDEX(A PK_TBLIV_BILL) INDEX(B IX_TP_SVC_RATE_ITM_TYP_04) */
+               C.ADJ_NO
+             , A.USE_YYMM
+             , A.PROD_CMPS_ID
+             , A.SVC_CMPS_ID
+             , A.CHRG_ITM_CD
+             , A.BILL_SEQ_NO
+             , A.ADJ_PRV_BILL_AMT
+--              , DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) AS ADJ_AMT
+             , CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                    ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+               END AS ADJ_AMT
+--              , (A.ADJ_PRV_BILL_AMT      +  DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) ) AS ADJ_AFT_BILL_AMT
+             , (A.ADJ_PRV_BILL_AMT + CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                                          ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+                                          END
+                ) AS ADJ_AFT_BILL_AMT
+             /*, NVL(C.PRE_ADJ_AMT,0) + NVL(D.ADJ_AMT,0)                         AS ADJ_AMT*/
+             /*, (A.ADJ_PRV_BILL_AMT + NVL(D.ADJ_AMT,0) + NVL(C.PRE_ADJ_AMT,0))  AS ADJ_AFT_BILL_AMT*/
+             , IFNULL(C.ADJ_APPL_AMT,0)                                             AS ADJ_APPL_AMT
+             , IFNULL(C.PRE_ADJ_APPL_AMT,0)                                         AS PRE_ADJ_APPL_AMT
+             , A.CUST_ID
+             , A.SO_ID
+             , A.CTRT_ID
+             , (SELECT y.CUST_NM
+                  FROM TCMCT_CTRT_INFO      X                               /* 계약정보 */
+                     , TCMCU_CUST_INFO      Y                               /* 고객정보 */
+                 WHERE X.CUST_ID            = Y.CUST_ID
+                   AND x.so_id = y.so_id
+                   AND X.CTRT_ID            = A.CTRT_ID
+                   AND X.INACT_DTTM        = '99991231235959'
+                   AND x.so_id = a.so_id
+               )                            AS CUST_NM
+             , (SELECT PROD_NM
+                  FROM TPMPD_PROD              X                            /* 상품정보 */
+                 WHERE X.PROD_CD            = A.PROD_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS PROD_NM
+             , (SELECT SVC_NM
+                  FROM TPMSV_SVC               X                            /* 서비스정보 */
+                 WHERE X.SVC_CD             = A.SVC_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS SVC_NM
+             , B.SVC_RATE_ITM_TYP_NM        AS CHRG_ITM_NM                  /* 요금항목명 */
+             , (SELECT SO_NM
+                  FROM TSYCO_SO_MAST        X                               /* SO 마스타*/
+                 WHERE X.SO_ID              = A.SO_ID
+               )                            AS SO_NM
+             , A.CTRT_ID AS SVC_TEL_NO
+          FROM TBLIV_BILL               A                                   /* 청구내역 */
+               LEFT OUTER JOIN
+               (  /* 조정신청금액 */
+                  SELECT /*+ INDEX (C1 PK_TBLIV_CHRG_ADJ_APLY) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , C1.ADJ_NO
+                       , C2.ADJ_AMT
+                       , CASE DCSN_PROC_STAT WHEN '05' THEN C2.ADJ_APPL_AMT
+                         ELSE 0
+                         END AS PRE_ADJ_AMT
+                       , C2.ADJ_APPL_AMT
+                       , C2.ADJ_APPL_AMT AS PRE_ADJ_APPL_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.ADJ_NO               = #{billingAdVO.adjNo}  /* INPUT */
+                     <if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId}  /* INPUT */
+                     </if>
+               ) C ON A.BILL_SEQ_NO = C.BILL_SEQ_NO AND A.USE_YYMM = C.USE_YYMM AND A.PROD_CMPS_ID = C.PROD_CMPS_ID AND A.SVC_CMPS_ID = C.SVC_CMPS_ID AND A.CHRG_ITM_CD = C.CHRG_ITM_CD
+               LEFT OUTER JOIN
+              (  /* 조정반영금액 완료건 */
+                  SELECT /*+ INDEX (C1 IX_TBLIV_CHRG_ADJ_APLY_03) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , SUM(C2.ADJ_APPL_AMT)       AS ADJ_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.BILL_SEQ_NO          = #{billingAdVO.billSeqNo}  /* INPUT */
+                     <![CDATA[ AND C1.ADJ_NO     < #{billingAdVO.adjNo} ]]> /* INPUT */
+                     AND C1.ADJ_PT               = #{billingAdVO.adjPt}   /* INPUT */
+                     AND C1.DCSN_PROC_STAT       = '05'                 /* 완료건 */
+					<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId} /* INPUT */
+                   	</if>
+                   GROUP BY C1.BILL_SEQ_NO, C2.USE_YYMM, C2.PROD_CMPS_ID, C2.SVC_CMPS_ID, C2.CHRG_ITM_CD
+               ) D ON A.BILL_SEQ_NO = D.BILL_SEQ_NO AND A.USE_YYMM = D.USE_YYMM AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.SVC_CMPS_ID = D.SVC_CMPS_ID AND A.CHRG_ITM_CD = D.CHRG_ITM_CD
+              , TPMPD_SVC_RATE_ITM_TYP      B                                   /* 서비스과금항목유형*/
+         WHERE A.SO_ID = B.SO_ID
+           AND A.BILL_SEQ_NO        = #{billingAdVO.billSeqNo}   /* INPUT */
+           AND A.CHRG_ITM_CD        = B.SVC_RATE_ITM_TYP_CD
+			<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+           		AND A.CTRT_ID            = #{billingAdVO.ctrtId}  /* INPUT */
+			</if>
+			<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+           		AND A.BILL_YYMM          = #{billingAdVO.billYymm}   /* INPUT */
+           	</if>
+           AND B.MSTR_FL            = '1'
+         ORDER BY SO_NM, CUST_NM, A.USE_YYMM, PROD_NM, SVC_NM, B.DISP_PRI_NO
+         <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
+</select>
+
+<select id="dtTotalCount" resultType="int">
+	SELECT COUNT(*)
+       FROM( SELECT /*+ ORDERED USE_NL(A B) INDEX(A PK_TBLIV_BILL) INDEX(B IX_TP_SVC_RATE_ITM_TYP_04) */
+               C.ADJ_NO
+             , A.USE_YYMM
+             , A.PROD_CMPS_ID
+             , A.SVC_CMPS_ID
+             , A.CHRG_ITM_CD
+             , A.BILL_SEQ_NO
+             , A.ADJ_PRV_BILL_AMT
+--              , DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) AS ADJ_AMT
+             , CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                    ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+               END AS ADJ_AMT
+--              , (A.ADJ_PRV_BILL_AMT      +  DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) ) AS ADJ_AFT_BILL_AMT
+             , (A.ADJ_PRV_BILL_AMT + CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                                          ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+                                          END
+                ) AS ADJ_AFT_BILL_AMT
+             /*, NVL(C.PRE_ADJ_AMT,0) + NVL(D.ADJ_AMT,0)                         AS ADJ_AMT*/
+             /*, (A.ADJ_PRV_BILL_AMT + NVL(D.ADJ_AMT,0) + NVL(C.PRE_ADJ_AMT,0))  AS ADJ_AFT_BILL_AMT*/
+             , IFNULL(C.ADJ_APPL_AMT,0)                                             AS ADJ_APPL_AMT
+             , IFNULL(C.PRE_ADJ_APPL_AMT,0)                                         AS PRE_ADJ_APPL_AMT
+             , A.CUST_ID
+             , A.SO_ID
+             , A.CTRT_ID
+             , (SELECT y.CUST_NM
+                  FROM TCMCT_CTRT_INFO      X                               /* 계약정보 */
+                     , TCMCU_CUST_INFO      Y                               /* 고객정보 */
+                 WHERE X.CUST_ID            = Y.CUST_ID
+                   AND x.so_id = y.so_id
+                   AND X.CTRT_ID            = A.CTRT_ID
+                   AND X.INACT_DTTM        = '99991231235959'
+                   AND x.so_id = a.so_id
+               )                            AS CUST_NM
+             , (SELECT PROD_NM
+                  FROM TPMPD_PROD              X                            /* 상품정보 */
+                 WHERE X.PROD_CD            = A.PROD_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS PROD_NM
+             , (SELECT SVC_NM
+                  FROM TPMSV_SVC               X                            /* 서비스정보 */
+                 WHERE X.SVC_CD             = A.SVC_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS SVC_NM
+             , B.SVC_RATE_ITM_TYP_NM        AS CHRG_ITM_NM                  /* 요금항목명 */
+             , (SELECT SO_NM
+                  FROM TSYCO_SO_MAST        X                               /* SO 마스타*/
+                 WHERE X.SO_ID              = A.SO_ID
+               )                            AS SO_NM
+             , A.CTRT_ID AS SVC_TEL_NO
+          FROM TBLIV_BILL               A                                   /* 청구내역 */
+               LEFT OUTER JOIN
+               (  /* 조정신청금액 */
+                  SELECT /*+ INDEX (C1 PK_TBLIV_CHRG_ADJ_APLY) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , C1.ADJ_NO
+                       , C2.ADJ_AMT
+                       , CASE DCSN_PROC_STAT WHEN '05' THEN C2.ADJ_APPL_AMT
+                         ELSE 0
+                         END AS PRE_ADJ_AMT
+                       , C2.ADJ_APPL_AMT
+                       , C2.ADJ_APPL_AMT AS PRE_ADJ_APPL_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.ADJ_NO               = #{billingAdVO.adjNo}  /* INPUT */
+                   <if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId}  /* INPUT */
+                     </if>
+               ) C ON A.BILL_SEQ_NO = C.BILL_SEQ_NO AND A.USE_YYMM = C.USE_YYMM AND A.PROD_CMPS_ID = C.PROD_CMPS_ID AND A.SVC_CMPS_ID = C.SVC_CMPS_ID AND A.CHRG_ITM_CD = C.CHRG_ITM_CD
+               LEFT OUTER JOIN
+              (  /* 조정반영금액 완료건 */
+                  SELECT /*+ INDEX (C1 IX_TBLIV_CHRG_ADJ_APLY_03) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , SUM(C2.ADJ_APPL_AMT)       AS ADJ_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.BILL_SEQ_NO          = #{billingAdVO.billSeqNo}  /* INPUT */
+                    <![CDATA[ AND C1.ADJ_NO       < #{billingAdVO.adjNo}  ]]> /* INPUT */
+                     AND C1.ADJ_PT               = #{billingAdVO.adjPt}   /* INPUT */
+                     AND C1.DCSN_PROC_STAT       = '05'                 /* 완료건 */
+                  	<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId}  /* INPUT */
+                     </if>
+                   GROUP BY C1.BILL_SEQ_NO, C2.USE_YYMM, C2.PROD_CMPS_ID, C2.SVC_CMPS_ID, C2.CHRG_ITM_CD
+               ) D ON A.BILL_SEQ_NO = D.BILL_SEQ_NO AND A.USE_YYMM = D.USE_YYMM AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.SVC_CMPS_ID = D.SVC_CMPS_ID AND A.CHRG_ITM_CD = D.CHRG_ITM_CD
+              , TPMPD_SVC_RATE_ITM_TYP      B                                   /* 서비스과금항목유형*/
+         WHERE A.SO_ID = B.SO_ID
+           AND A.BILL_SEQ_NO        = #{billingAdVO.billSeqNo}   /* INPUT */
+           AND A.CHRG_ITM_CD        = B.SVC_RATE_ITM_TYP_CD
+         	<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+           		AND A.CTRT_ID            = #{billingAdVO.ctrtId}  /* INPUT */
+			</if>
+			<if test='billingAdVO.billYymm != null and billingAdVO.billYymm != ""'>
+           		AND A.BILL_YYMM          = #{billingAdVO.billYymm}   /* INPUT */
+           	</if>
+           AND B.MSTR_FL            = '1')TT
+</select>
+<select id="listExcel" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+	SELECT A.*
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_PRV_BILL_AMT + A.ADJ_AMT-A.ADJ_APPL_AMT,A.ADJ_PRV_BILL_AMT + A.ADJ_AMT) AS ADJ_PRV_BILL_AMT_A /* 조정 전 청구금액 */
+             ,IF(A.DCSN_PROC_STAT='05',A.ADJ_APPL_AMT,0) AS ADJ_AMT_A /* 조정금액 */
+             ,NVL((SELECT SUM(ADJ_PRV_BILL_AMT) AS AMT
+                     FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD NOT IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0)
+             + NVL((SELECT SUM(ADJ_PRV_BILL_AMT) + SUM(ADJ_AMT) AS AMT
+                      FROM TBLIV_BILL    X
+                    WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                      AND X.BILL_YYMM   = A.BILL_YYMM
+                      AND X.CTRT_ID = A.CTRT_ID
+                      AND X.CHRG_ITM_CD IN ('SR00000263','SR00000254', 'SR90000011')) /*특소세 추가*/
+                  , 0) 
+             + A.ADJ_AMT     AS BILL_AMT                          /* 청구금액 */                         
+          FROM (
+                  SELECT '0'                            AS CHK_JOB
+                       , A.ADJ_NO	/*신청번호*/
+                       , IF(A.BILL_SEQ_NO = '0', NULL, A.BILL_SEQ_NO)  AS BILL_SEQ_NO
+                       , IF(A.BILL_YYMM = '0', NULL, A.BILL_YYMM)    AS BILL_YYMM
+                       , IF(A.BILL_DT = '0', NULL, A.BILL_DT)      AS BILL_DT
+                       , A.APPL_SO_ID
+                       , A.BILL_APLY_DT
+                       , SUBSTR(A.APPL_DTTM, 1, 8)      AS APPL_DTTM_DT	/*신청일자*/
+                       , A.DCSN_PROC_STAT	/* 진행상태 */
+                       , A.DCSN_PROC_STAT_NM
+                       , A.ADJ_PT
+                       , A.PYM_ACNT_ID	/*납부계정ID*/
+                       , A.CTRT_ID
+                       , A.APPNT_NM
+                       , A.RCPT_PSN_ID
+                       , A.RCPT_DTTM
+                       , A.ADJ_RESN_CD
+                       , A.HOPE_APLY_YYMM	/*적용년월*/
+                       , ( SELECT PAY_DUE_DT
+                             FROM TBLIV_BILL_TGT_CUST    X
+                            WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                              AND A.BILL_YYMM   = X.BILL_YYMM)     AS PAY_DUE_DT /*납부일자*/
+                       , ROUND(NVL((SELECT SUM(ADJ_PRV_BILL_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE A.BILL_SEQ_NO = X.BILL_SEQ_NO
+                                 AND A.BILL_YYMM   = X.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                             , 0))                   AS ADJ_PRV_BILL_AMT /*최초조정전청구금액*/                          /* 기조정금액 */
+                       , NVL(A.ADJ_APPL_AMT,0)      AS ADJ_APPL_AMT                               /* 신청금액 */
+                       , NVL(A.PRE_ADJ_APPL_AMT,0)  AS PRE_ADJ_APPL_AMT                           /* 조정반영예상금액 */
+                       ,CASE DCSN_PROC_STAT
+                             WHEN '05' THEN 
+		                       NVL(( SELECT SUM(Y.ADJ_APPL_AMT)
+		                                 FROM TBLIV_CHRG_ADJ_APLY     X
+		                                    , TBLIV_CHRG_ADJ_APLY_DTL Y
+		                                WHERE X.ADJ_NO         = Y.ADJ_NO
+		                                  <![CDATA[ AND X.ADJ_NO         <= A.ADJ_NO  ]]>
+		                                  AND X.BILL_SEQ_NO    = A.BILL_SEQ_NO
+		                                  AND X.DCSN_PROC_STAT IN ('05', '11', '10', '81', '06')
+                                          AND Y.CTRT_ID = A.CTRT_ID
+		                         ),0)
+		                       ELSE 
+		                       NVL((SELECT SUM(X.ADJ_AMT)
+                                FROM TBLIV_BILL    X
+                               WHERE X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                                 AND X.BILL_YYMM   = A.BILL_YYMM
+                                 AND X.CTRT_ID     = A.CTRT_ID)
+                              , 0)     
+		                END AS ADJ_AMT                                          /* 조정누적금액 */
+                       , (SELECT Y.CUST_NM
+                            FROM TCMCU_PYM_ACNT_INFO  X                         /* 납부계정정보 */
+                               , TCMCU_CUST_INFO      Y                         /* 고객정보 */
+                           WHERE X.CUST_ID       = Y.CUST_ID
+                             AND x.so_id = y.so_id
+                             AND X.PYM_ACNT_ID   = A.PYM_ACNT_ID
+                             AND x.so_id = a.appl_so_id
+                         )                        AS PYM_ACNT_NM	/*납부자명*/
+                       , A.CTRT_ID AS SVC_TEL_NO           /* 이동전화번호*/    
+                       , (SELECT SO_NM
+                            FROM TSYCO_SO_MAST   X                             /* SO 마스타*/
+                           WHERE X.SO_ID         = A.APPL_SO_ID
+                         )                        AS APPL_SO_NM
+--                        , (SELECT RTRIM(SUBSTR(MAX(TO_CHAR(LEVEL,'FM00')||REVERSE(SYS_CONNECT_BY_PATH(REVERSE(Y.ORG_NM),'/'))),3),'/') AS ORG_NM_PATH
+--                             FROM TDNDI_ORG_REL_HIST X,
+--                                  TDNDI_ORG_INFO Y
+--                            WHERE X.ORG_ID = Y.ORG_ID              
+--                            START WITH X.ORG_ID = (SELECT CRR_ID 
+--                                                     FROM TSYUM_USR_MAST Z
+--                                                    WHERE Z.USR_ID = A.RCPT_PSN_ID) 
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231'
+--                            CONNECT BY PRIOR X.PART_ORG_ID = Y.ORG_ID
+--                              AND X.REL_TP_CD   = '101'
+--                              AND X.APPY_END_DT = '99991231' 
+--                              AND LEVEL &lt;= 3 
+--                          )                        AS ORG_NM_PATH                                  /* 조직명(상위조직포함) */  
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.RCPT_PSN_ID
+                         )                        AS RCPT_PSN_NM     /*신청자명*/                             /* 접수자명 */
+                       , (SELECT USER_NAME
+                            FROM TSYCO_USER   X                                               /* 사용자*/
+                           WHERE X.USER_ID         = A.CHGR_ID
+                         )                        AS CHGR_ID_NM                                   /* 수정자명 */
+                       , CHG_DTTM                                                                 /* 수정일시 */
+--                        , ROWNUM RNUM
+                       , ADJ_APPL_CONTS
+                       ,(SELECT COMMON_CD_NM 
+                         FROM TSYCO_CODE_DETAIL 
+                         WHERE  COMMON_GRP='BL00024'
+                         AND COMMON_CD = A.ADJ_RESN_CD)	AS ADJ_RESN_NM /*조정사유*/
+--                        , FN_CODENAME_NEW('BLIV012', ADJ_RESN_CD, 'ko') AS ADJ_RESN_NM
+                    FROM (
+                              SELECT  B.ADJ_NO
+                                    , C.CTRT_ID
+                                    , MAX(B.APPL_SO_ID) AS APPL_SO_ID
+                                    , MAX(B.BILL_APLY_DT) AS BILL_APLY_DT	/* 청구반영일자 */
+                                    , MAX(B.APPL_DTTM) AS APPL_DTTM
+                                    , SUM(C.ADJ_APPL_AMT) AS ADJ_APPL_AMT
+                                    , SUM(IF(D.SVC_RATE_ITM_TYP_CD = NULL, C.ADJ_APPL_AMT, ROUND(C.ADJ_APPL_AMT*1.1))) AS PRE_ADJ_APPL_AMT   
+                                    , MAX(B.DCSN_PROC_STAT) AS DCSN_PROC_STAT
+                                    ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
+								      FROM  TSYCO_CODE_MAST MAST
+									   ,TSYCO_CODE_MAST_NAME MNAME
+									   ,TSYCO_CODE_DETAIL DETAIL
+									   ,TSYCO_CODE_DETAIL_NAME NAME
+								      WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+								      AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+								      AND MNAME.LNG_TYP     ='ko' /* INPUT */
+								      AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+								      AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+								      AND NAME.LNG_TYP      ='ko' /* INPUT */
+								      AND MAST.COMMON_GRP   ='BL00055'
+								      AND DETAIL.COMMON_CD = B.DCSN_PROC_STAT) AS DCSN_PROC_STAT_NM 
+                                    , MAX(B.APPNT_NM) AS APPNT_NM
+                                    , MAX(B.RCPT_PSN_ID) AS RCPT_PSN_ID
+                                    , MAX(B.RCPT_DTTM) AS RCPT_DTTM
+                                    , MAX(B.ADJ_RESN_CD) AS ADJ_RESN_CD
+                                    , MAX(B.BILL_SEQ_NO) AS BILL_SEQ_NO
+                                    , MAX(B.BILL_YYMM) AS BILL_YYMM
+                                    , MAX(B.BILL_DT) AS BILL_DT	/*청구일자*/
+                                    , MAX(B.ADJ_PT) AS ADJ_PT
+                                    , MAX(B.PYM_ACNT_ID) AS PYM_ACNT_ID
+                                    , MAX(B.HOPE_APLY_YYMM) AS HOPE_APLY_YYMM
+                                    , MAX(B.CHGR_ID) AS CHGR_ID
+--                                     , TO_CHAR(MAX(B.CHG_DATE),'YYYYMMDDHH24MISS')  AS CHG_DTTM
+				    , MAX(B.CHG_DATE) AS CHG_DTTM
+                                    , MAX(ADJ_APPL_CONTS) AS ADJ_APPL_CONTS	/*신청사유*/
+                                 FROM TBLIV_CHRG_ADJ_APLY  B
+                                    , TBLIV_CHRG_ADJ_APLY_DTL C
+                                    /*RIGHT -> LEFT로 수정*/
+                                    LEFT OUTER JOIN  (SELECT SVC_RATE_ITM_TYP_CD
+                                         FROM IFNBRM_SVC_RATE_ITM_ATTR_INFO
+                                         /* AT00000041 -> AT086 수정*/
+                                        WHERE ATTR_CD  = 'AT086'
+                                          AND ATTR_VAL = '1'    
+                                          AND SVC_RATE_ITM_TYP_CD NOT IN (SELECT SVC_RATE_ITM_TYP_CD
+                                                                            FROM IFNBRM_SVC_RATE_ITM_INFO 
+                                                                           WHERE SALE_ITM_CD IN ('SI00010000','SI00030000','SI00030002','SI00000254',
+                                                                                                 'SI00000263','SI20000727','SI20000726','SI90000011')) ) D   
+                                     ON D.SVC_RATE_ITM_TYP_CD = C.CHRG_ITM_CD                          
+                                WHERE 1=1
+                                	<if test='billingSearch.condSoId != null and billingSearch.condSoId != "SEL"'>
+                                		AND B.APPL_SO_ID = #{billingSearch.condSoId} /*'01'*/
+                                	</if>
+                                	<if test='billingSearch.condStDt != null and billingSearch.condStDt != "" and billingSearch.condEdDt != null and billingSearch.condEdDt != ""'>
+                                		AND SUBSTR(B.APPL_DTTM,1,8)  BETWEEN #{billingSearch.condStDt} AND #{billingSearch.condEdDt} /*'20200210'*/
+                                	</if>
+                                	<!-- <if test='condBillYymm != null and condBillYymm != ""'>
+                                		AND B.BILL_YYMM       = #{condBillYymm}  /* '202003' */
+                                	</if> -->
+                                	<if test='billingSearch.condPymAcntId != null and billingSearch.condPymAcntId != ""'>
+                                		AND B.PYM_ACNT_ID     = #{billingSearch.condPymAcntId} /* 'P000000071' */
+                                	</if>
+                                	<if test='billingSearch.condRcptPsnId != null and billingSearch.condRcptPsnId != ""'>
+                                		AND B.RCPT_PSN_ID     = #{billingSearch.condRcptPsnId} /*'admin'*/
+                                	</if>
+                                	<if test='billingSearch.condDcsnProcStat != null and billingSearch.condDcsnProcStat != "SEL"'>
+                                		AND B.DCSN_PROC_STAT  = #{billingSearch.condDcsnProcStat} /* '05' */
+                                	</if>
+	                                AND B.ADJ_NO = C.ADJ_NO                            
+                                  	AND B.ADJ_PT          = '2'                                       /* 청구후요금조정 */
+                                GROUP BY B.ADJ_NO, C.CTRT_ID
+                           ) A
+                ) A
+</select>
+
+<select id="popUpListExcel" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+SELECT /*+ ORDERED USE_NL(A B) INDEX(A PK_TBLIV_BILL) INDEX(B IX_TP_SVC_RATE_ITM_TYP_04) */
+               C.ADJ_NO
+             , A.USE_YYMM
+             , A.PROD_CMPS_ID
+             , A.SVC_CMPS_ID
+             , A.CHRG_ITM_CD
+             , A.BILL_SEQ_NO
+             , A.ADJ_PRV_BILL_AMT
+--              , DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) AS ADJ_AMT
+             , CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                    ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+               END AS ADJ_AMT
+--              , (A.ADJ_PRV_BILL_AMT      +  DECODE(NVL(C.ADJ_APPL_AMT,0),0,A.ADJ_AMT,DECODE(NVL(C.PRE_ADJ_AMT,0),0, C.ADJ_AMT, C.ADJ_AMT  + C.PRE_ADJ_AMT) ) ) AS ADJ_AFT_BILL_AMT
+             , (A.ADJ_PRV_BILL_AMT + CASE WHEN IFNULL(C.ADJ_APPL_AMT,0) = 0 THEN A.ADJ_AMT
+                                          ELSE CASE WHEN IFNULL(C.PRE_ADJ_AMT,0) = 0 THEN C.ADJ_AMT ELSE C.ADJ_AMT + C.PRE_ADJ_AMT END
+                                          END
+                ) AS ADJ_AFT_BILL_AMT
+             /*, NVL(C.PRE_ADJ_AMT,0) + NVL(D.ADJ_AMT,0)                         AS ADJ_AMT*/
+             /*, (A.ADJ_PRV_BILL_AMT + NVL(D.ADJ_AMT,0) + NVL(C.PRE_ADJ_AMT,0))  AS ADJ_AFT_BILL_AMT*/
+             , IFNULL(C.ADJ_APPL_AMT,0)                                             AS ADJ_APPL_AMT
+             , IFNULL(C.PRE_ADJ_APPL_AMT,0)                                         AS PRE_ADJ_APPL_AMT
+             , A.CUST_ID
+             , A.SO_ID
+             , A.CTRT_ID
+             , (SELECT y.CUST_NM
+                  FROM TCMCT_CTRT_INFO      X                               /* 계약정보 */
+                     , TCMCU_CUST_INFO      Y                               /* 고객정보 */
+                 WHERE X.CUST_ID            = Y.CUST_ID
+                   AND x.so_id = y.so_id
+                   AND X.CTRT_ID            = A.CTRT_ID
+                   AND X.INACT_DTTM        = '99991231235959'
+                   AND x.so_id = a.so_id
+               )                            AS CUST_NM
+             , (SELECT PROD_NM
+                  FROM TPMPD_PROD              X                            /* 상품정보 */
+                 WHERE X.PROD_CD            = A.PROD_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS PROD_NM
+             , (SELECT SVC_NM
+                  FROM TPMSV_SVC               X                            /* 서비스정보 */
+                 WHERE X.SVC_CD             = A.SVC_CD
+                   AND X.MSTR_FL            = '1'
+                   AND X.SO_ID 				= A.SO_ID
+               )                            AS SVC_NM
+             , B.SVC_RATE_ITM_TYP_NM        AS CHRG_ITM_NM                  /* 요금항목명 */
+             , (SELECT SO_NM
+                  FROM TSYCO_SO_MAST        X                               /* SO 마스타*/
+                 WHERE X.SO_ID              = A.SO_ID
+               )                            AS SO_NM
+             , A.CTRT_ID AS SVC_TEL_NO
+          FROM TBLIV_BILL               A                                   /* 청구내역 */
+               LEFT OUTER JOIN
+               (  /* 조정신청금액 */
+                  SELECT /*+ INDEX (C1 PK_TBLIV_CHRG_ADJ_APLY) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , C1.ADJ_NO
+                       , C2.ADJ_AMT
+                       , CASE DCSN_PROC_STAT WHEN '05' THEN C2.ADJ_APPL_AMT
+                         ELSE 0
+                         END AS PRE_ADJ_AMT
+                       , C2.ADJ_APPL_AMT
+                       , C2.ADJ_APPL_AMT AS PRE_ADJ_APPL_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.ADJ_NO               = #{billingAdVO.adjNo}  /* INPUT */
+                     <if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId}  /* INPUT */
+                     </if>
+               ) C ON A.BILL_SEQ_NO = C.BILL_SEQ_NO AND A.USE_YYMM = C.USE_YYMM AND A.PROD_CMPS_ID = C.PROD_CMPS_ID AND A.SVC_CMPS_ID = C.SVC_CMPS_ID AND A.CHRG_ITM_CD = C.CHRG_ITM_CD
+               LEFT OUTER JOIN
+              (  /* 조정반영금액 완료건 */
+                  SELECT /*+ INDEX (C1 IX_TBLIV_CHRG_ADJ_APLY_03) INDEX(C2 PK_TBLIV_CHRG_ADJ_APLY_DTL) */
+                         C1.BILL_SEQ_NO
+                       , C2.USE_YYMM
+                       , C2.PROD_CMPS_ID
+                       , C2.SVC_CMPS_ID
+                       , C2.CHRG_ITM_CD
+                       , SUM(C2.ADJ_APPL_AMT)       AS ADJ_AMT
+                    FROM TBLIV_CHRG_ADJ_APLY     C1                         /* 요금조정신청 */
+                       , TBLIV_CHRG_ADJ_APLY_DTL C2                         /* 요금조정신청상세 */
+                   WHERE C1.ADJ_NO               = C2.ADJ_NO
+                     AND C1.BILL_SEQ_NO          = #{billingAdVO.billSeqNo}  /* INPUT */
+                     <![CDATA[ AND C1.ADJ_NO     < #{billingAdVO.adjNo} ]]> /* INPUT */
+                     AND C1.ADJ_PT               = #{billingAdVO.adjPt}   /* INPUT */
+                     AND C1.DCSN_PROC_STAT       = '05'                 /* 완료건 */
+					<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+                     	AND C2.CTRT_ID              = #{billingAdVO.ctrtId} /* INPUT */
+                   	</if>
+                   GROUP BY C1.BILL_SEQ_NO, C2.USE_YYMM, C2.PROD_CMPS_ID, C2.SVC_CMPS_ID, C2.CHRG_ITM_CD
+               ) D ON A.BILL_SEQ_NO = D.BILL_SEQ_NO AND A.USE_YYMM = D.USE_YYMM AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.PROD_CMPS_ID = D.PROD_CMPS_ID AND A.SVC_CMPS_ID = D.SVC_CMPS_ID AND A.CHRG_ITM_CD = D.CHRG_ITM_CD
+              , TPMPD_SVC_RATE_ITM_TYP      B                                   /* 서비스과금항목유형*/
+         WHERE A.SO_ID = B.SO_ID
+           AND A.BILL_SEQ_NO        = #{billingAdVO.billSeqNo}   /* INPUT */
+           AND A.CHRG_ITM_CD        = B.SVC_RATE_ITM_TYP_CD
+			<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+           		AND A.CTRT_ID            = #{billingAdVO.ctrtId}  /* INPUT */
+			</if>
+			<if test='billingAdVO.ctrtId != null and billingAdVO.ctrtId != ""'>
+           		AND A.BILL_YYMM          = #{billingAdVO.billYymm}   /* INPUT */
+           	</if>
+           AND B.MSTR_FL            = '1'
+         ORDER BY SO_NM, CUST_NM, A.USE_YYMM, PROD_NM, SVC_NM, B.DISP_PRI_NO
+</select>
+</mapper>

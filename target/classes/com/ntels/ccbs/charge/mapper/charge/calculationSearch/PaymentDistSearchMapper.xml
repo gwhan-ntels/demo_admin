@@ -1,313 +1,215 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <!DOCTYPE mapper
- PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
- "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ntels.ccbs.charge.mapper.charge.calculationSearch.PaymentDistSearchMapper">
 
 <select id = "getChargeDiscountInfoList" resultType = "java.util.HashMap">
 /*PaymentDistSearchMapper.getChargeDiscountInfoList*/
 <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
-		SELECT
-               A.CLC_WRK_NO
-             , A.SO_ID
+ SELECT A.SO_ID
+     , A.BILL_YYMM
+     , A.BILL_CYCL
+     , A.PYM_ACNT_ID /* 납부계정ID */
+     , (SELECT ACNT_NM
+          FROM TCMCU_PYM_ACNT_INFO
+         WHERE 1=1
+           AND PYM_ACNT_ID = A.PYM_ACNT_ID) AS ACNT_NM /* 납부계정명 */
+     , A.CUST_ID /* 고객ID */
+     , (SELECT CUST_NM
+          FROM TCMCU_CUST_INFO
+         WHERE SO_ID = A.SO_ID
+           AND CUST_ID = A.CUST_ID) AS CUST_NM /* 고객명 */
+     , A.CTRT_ID /* 계약ID */
+     , (SELECT SVC_TEL_NO
+          FROM TCMCT_CTRT_INFO
+         WHERE SO_ID = A.SO_ID
+           AND CTRT_ID = A.CTRT_ID
+           AND ACT_DTTM = (SELECT MIN(ACT_DTTM)
+        	                 FROM TCMCT_CTRT_INFO
+        	                WHERE CTRT_ID = A.CTRT_ID
+        	                  <![CDATA[ AND DATE_FORMAT(ACT_DTTM,'%Y%m%d')   < DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d')),'%Y%m%d') ]]>
+        	                 <![CDATA[  AND DATE_FORMAT(INACT_DTTM,'%Y%m%d') > DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d'))) AS SVC_TEL_NO /* 서비스번호 */ ]]>
+     , (SELECT PROD_NM
+          FROM TCMCT_CTRT_INFO B
+              ,TPMPD_PROD C
+         WHERE B.SO_ID = A.SO_ID
+           AND B.CTRT_ID = A.CTRT_ID
+           AND B.ACT_DTTM = (SELECT MIN(ACT_DTTM)
+        	                   FROM TCMCT_CTRT_INFO
+        	                  WHERE CTRT_ID = A.CTRT_ID
+        	                    <![CDATA[ AND DATE_FORMAT(ACT_DTTM,'%Y%m%d')   < DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d')),'%Y%m%d') ]]>
+        	                   <![CDATA[  AND DATE_FORMAT(INACT_DTTM,'%Y%m%d') > DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d'))]]>
+           AND B.PROD_CD = C.PROD_CD) AS PROD_NM /* 상품명 */
+     , SUM(A.USE_AMT) AS TOT_USE_AMT /* 이용금액 */
+     , SUM(A.DC_AMT) AS TOT_DC_AMT /* 할인금액 */
+  FROM (
+        SELECT A.SO_ID
              , A.BILL_YYMM
              , A.BILL_CYCL
              , A.PYM_ACNT_ID
              , A.CUST_ID
              , A.CTRT_ID
-             , A.PROD_CD
-             , A.SVC_CD
-             , A.RATE_ITM_CD
-             , (A.TOT_USE_AMT / A.CNT) AS TOT_USE_AMT
-             , A.TOT_DC_AMT
-             , (SELECT SVC_NM
-                  FROM TPMSV_SVC               X                   
-                 WHERE X.SVC_CD             = A.SVC_CD
-                   AND X.MSTR_FL            = '1'
-               )                            AS SVC_NM
-             , (SELECT RATE_ITM_NM
-                  FROM TPMPD_RATE_ITM          X                   
-                 WHERE X.RATE_ITM_CD        = A.RATE_ITM_CD
-                   AND X.MSTR_FL            = '1'
-               )                            AS RATE_ITM_NM      
-             , C.CUST_NM                    AS PYM_ACNT_NM
-             , D.CUST_NM                    AS CUST_NM
-             , (SELECT PROD_NM
-                  FROM TPMPD_PROD              X                  
-                 WHERE X.PROD_CD            = A.PROD_CD
-                   AND X.MSTR_FL            = '1'
-               )                            AS PROD_NM
-             , (SELECT SO_NM
-                  FROM TSYCO_SO_MAST        X                   
-                 WHERE X.SO_ID              = A.SO_ID
-               )                            AS SO_NM
-          FROM (
-                SELECT /*+ ORDERED */
-                       A.CLC_WRK_NO
-                     , A.SO_ID
-                     , A.BILL_YYMM
-                     , A.BILL_CYCL
-                     , A.PYM_ACNT_ID
-                     , A.CUST_ID
-                     , COUNT(*) AS CNT
-                     , A.CTRT_ID
-                     , C.PROD_CD
-                     , D.SVC_CD
-                     , A.RATE_ITM_CD
-                     , TRUNCATE(SUM(A.USE_AMT), 0)    AS TOT_USE_AMT
-                     , TRUNCATE(SUM(B.DC_AMT), 0)     AS TOT_DC_AMT
-                  FROM TBLCH_CHRG  A
-                     , TBLCH_DC    B
-                     , TCMCT_PROD_CMPS_INFO C
-                     , TCMCT_SVC_CMPS_INFO  D
-                     , TBLCH_CLC_MAIN E
-                 WHERE A.CLC_WRK_NO         = B.CLC_WRK_NO
-                   AND A.CLC_WRK_NO         = E.CLC_WRK_NO
-                   AND E.CLC_WRK_CL         = '0' 
-                   AND A.BILL_YYMM          = B.BILL_YYMM
-                   AND A.BILL_CYCL          = B.BILL_CYCL
-                   AND A.USE_YYMM           = B.USE_YYMM
-                   AND A.SVC_CMPS_ID        = B.SVC_CMPS_ID
-                   AND A.RATE_ITM_CD        = B.RATE_ITM_CD
-                   AND A.PROD_CMPS_ID       = C.PROD_CMPS_ID
-                   AND A.SVC_CMPS_ID        = D.SVC_CMPS_ID
-                   <if test = 'billYymm != null and billYymm != ""'>
-                   		AND A.BILL_YYMM          = #{billYymm}
-                   </if>
-                   <if test = 'billCycl != null and billCycl != ""'>
-                   		AND A.BILL_CYCL          = #{billCycl}
-                   </if>
-                   <if test = 'pymAcntId != null and pymAcntId != ""'>
-                   		AND A.PYM_ACNT_ID        = #{pymAcntId}
-                   </if>
-                   <if test = 'soId != "SEL" and soId != "%"'>
-						AND A.SO_ID   = #{soId}
-				   </if>
-				   <if test = 'soId == "SEL" or soId == "%"'>
-						AND A.SO_ID  IN (IF(A.SO_ID = #{soId}, #{soId}, '%'))
-				   </if>
-				   <if test = 'custId != "" and custId != null'>
-				   		AND A.CUST_ID            = #{custId}
-				   </if>
-				   <if test = 'ctrtId != "" and ctrtId != null'>
-				   		AND A.CTRT_ID            = #{ctrtId}
-				   </if>
-                   AND B.DC_AMT             != 0
-                   AND B.APLY_YN            != 'Z'
-                   AND C.INACT_DTTM       = '99991231235959'
-                   AND D.INACT_DTTM       = '99991231235959'
-                GROUP BY A.CLC_WRK_NO, A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID
-                       , A.CTRT_ID, C.PROD_CD, D.SVC_CD, A.RATE_ITM_CD
-              ) A
-             , TCMCU_PYM_ACNT_INFO  B                   /* 납부계정정보 */
-             , TCMCU_CUST_INFO      C                   /* 고객정보 */
-             , TCMCU_CUST_INFO      D                   /* 고객정보 */
-         WHERE A.PYM_ACNT_ID        = B.PYM_ACNT_ID
-           AND A.SO_ID = B.SO_ID
-           AND B.CUST_ID            = C.CUST_ID
-           AND B.SO_ID = C.SO_ID
-           AND A.CUST_ID            = D.CUST_ID
-           AND A.SO_ID = D.SO_ID
-         ORDER BY SO_NM, A.PYM_ACNT_ID, A.CUST_ID, A.CTRT_ID
+             , B.CHRG_CTGRY
+            <![CDATA[ , CASE WHEN B.CHRG_CTGRY <> 'D' THEN SUM(A.USE_AMT) ELSE 0 END AS USE_AMT ]]>
+            ,A.USE_YYMM
+             , CASE WHEN B.CHRG_CTGRY = 'D' THEN SUM(A.USE_AMT) ELSE 0 END AS DC_AMT
+          FROM TBLCH_CHRG A
+              ,TPMPD_RATE_ITM B
+         WHERE 1=1 
+         <if test='soId != null and soId != "SEL" '>
+				AND A.SO_ID       = #{soId} /*INPUT*/
+           </if>
+           <if test='billYymm != null and billYymm != "" '>
+           		AND A.BILL_YYMM   = #{billYymm} /*INPUT*/
+           </if>
+           <if test='pymAcntId != null and pymAcntId != "" '>
+           		AND A.PYM_ACNT_ID = #{pymAcntId} /*INPUT*/
+           </if>
+           <if test='custId != null and custId != "" '>
+           		AND A.CUST_ID     = #{custId} /*INPUT*/
+           </if>
+           AND A.RATE_ITM_CD = B.RATE_ITM_CD
+        GROUP BY A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID, A.CTRT_ID, B.CHRG_CTGRY
+       ) A
+   WHERE 1=1
+GROUP BY A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID, A.CTRT_ID
+ORDER BY A.CTRT_ID
 <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
 </select>
 
 <select id="chrgDistListCnt" resultType ="int">
 /*PaymentDistSearchMapper.totalCount*/
-		SELECT
-              COUNT(*)
-          FROM (
-                SELECT /*+ ORDERED */
-                       A.CLC_WRK_NO
-                     , A.SO_ID
-                     , A.BILL_YYMM
-                     , A.BILL_CYCL
-                     , A.PYM_ACNT_ID
-                     , A.CUST_ID
-                     , COUNT(*) AS CNT
-                     , A.CTRT_ID
-                     , C.PROD_CD
-                     , D.SVC_CD
-                     , A.RATE_ITM_CD
-                     , TRUNCATE(SUM(A.USE_AMT), 0)    AS TOT_USE_AMT
-                     , TRUNCATE(SUM(B.DC_AMT), 0)     AS TOT_DC_AMT
-                  FROM TBLCH_CHRG  A
-                     , TBLCH_DC    B
-                     , TCMCT_PROD_CMPS_INFO C
-                     , TCMCT_SVC_CMPS_INFO  D
-                     , TBLCH_CLC_MAIN E
-                 WHERE A.CLC_WRK_NO         = B.CLC_WRK_NO
-                   AND A.CLC_WRK_NO         = E.CLC_WRK_NO
-                   AND E.CLC_WRK_CL         = '0' 
-                   AND A.BILL_YYMM          = B.BILL_YYMM
-                   AND A.BILL_CYCL          = B.BILL_CYCL
-                   AND A.USE_YYMM           = B.USE_YYMM
-                   AND A.SVC_CMPS_ID        = B.SVC_CMPS_ID
-                   AND A.RATE_ITM_CD        = B.RATE_ITM_CD
-                   AND A.PROD_CMPS_ID       = C.PROD_CMPS_ID
-                   AND A.SVC_CMPS_ID        = D.SVC_CMPS_ID
-                  <if test = 'billYymm != null and billYymm != ""'>
-                   		AND A.BILL_YYMM          = #{billYymm}
-                   </if>
-                   <if test = 'billCycl != null and billCycl != ""'>
-                   		AND A.BILL_CYCL          = #{billCycl}
-                   </if>
-                   <if test = 'pymAcntId != null and pymAcntId != ""'>
-                   		AND A.PYM_ACNT_ID        = #{pymAcntId}
-                   </if>
-                   <if test = 'soId != "SEL" and soId != "%"'>
-						AND A.SO_ID   = #{soId}
-				   </if>
-				   <if test = 'soId == "SEL" or soId == "%"'>
-						AND A.SO_ID  IN (IF(A.SO_ID = #{soId}, #{soId}, '%'))
-				   </if>
-				   <if test = 'custId != "" and custId != null'>
-				   		AND A.CUST_ID            = #{custId}
-				   </if>
-				   <if test = 'ctrtId != "" and ctrtId != null'>
-				   		AND A.CTRT_ID            = #{ctrtId}
-				   </if>
-                   AND B.DC_AMT             != 0
-                   AND B.APLY_YN            != 'Z'
-                   AND C.INACT_DTTM       = '99991231235959'
-                   AND D.INACT_DTTM       = '99991231235959'
-                GROUP BY A.CLC_WRK_NO, A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID
-                       , A.CTRT_ID, C.PROD_CD, D.SVC_CD, A.RATE_ITM_CD
-              ) A
-             , TCMCU_PYM_ACNT_INFO  B                   /* 납부계정정보 */
-             , TCMCU_CUST_INFO      C                   /* 고객정보 */
-             , TCMCU_CUST_INFO      D                   /* 고객정보 */
-         WHERE A.PYM_ACNT_ID        = B.PYM_ACNT_ID
-           AND A.SO_ID = B.SO_ID
-           AND B.CUST_ID            = C.CUST_ID
-           AND B.SO_ID = C.SO_ID
-           AND A.CUST_ID            = D.CUST_ID
-           AND A.SO_ID = D.SO_ID
+	SELECT COUNT(*) FROM(SELECT A.SO_ID
+     , A.BILL_YYMM
+     , A.BILL_CYCL
+     , A.PYM_ACNT_ID /* 납부계정ID */
+     , (SELECT ACNT_NM
+          FROM TCMCU_PYM_ACNT_INFO
+         WHERE 1=1
+           AND PYM_ACNT_ID = A.PYM_ACNT_ID) AS ACNT_NM /* 납부계정명 */
+     , A.CUST_ID /* 고객ID */
+     , (SELECT CUST_NM
+          FROM TCMCU_CUST_INFO
+         WHERE SO_ID = A.SO_ID
+           AND CUST_ID = A.CUST_ID) AS CUST_NM /* 고객명 */
+     , A.CTRT_ID /* 계약ID */
+     , (SELECT SVC_TEL_NO
+          FROM TCMCT_CTRT_INFO
+         WHERE SO_ID = A.SO_ID
+           AND CTRT_ID = A.CTRT_ID
+           AND ACT_DTTM = (SELECT MIN(ACT_DTTM)
+        	                 FROM TCMCT_CTRT_INFO
+        	                WHERE CTRT_ID = A.CTRT_ID
+        	                  <![CDATA[ AND DATE_FORMAT(ACT_DTTM,'%Y%m%d')   < DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d')),'%Y%m%d') ]]>
+        	                  <![CDATA[ AND DATE_FORMAT(INACT_DTTM,'%Y%m%d') > DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d'))) AS SVC_TEL_NO /* 서비스번호 */ ]]>
+     , (SELECT PROD_NM
+          FROM TCMCT_CTRT_INFO B
+              ,TPMPD_PROD C
+         WHERE B.SO_ID = A.SO_ID
+           AND B.CTRT_ID = A.CTRT_ID
+           AND B.ACT_DTTM = (SELECT MIN(ACT_DTTM)
+        	                   FROM TCMCT_CTRT_INFO
+        	                  WHERE CTRT_ID = A.CTRT_ID
+        	                    <![CDATA[ AND DATE_FORMAT(ACT_DTTM,'%Y%m%d')   < DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d')),'%Y%m%d') ]]>
+        	                    <![CDATA[ AND DATE_FORMAT(INACT_DTTM,'%Y%m%d') > DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y%m%d')) ]]>
+           AND B.PROD_CD = C.PROD_CD) AS PROD_NM /* 상품명 */
+     , SUM(A.USE_AMT) AS TOT_USE_AMT /* 이용금액 */
+     , SUM(A.DC_AMT) AS TOT_DC_AMT /* 할인금액 */
+  FROM (
+        SELECT A.SO_ID
+             , A.BILL_YYMM
+             , A.BILL_CYCL
+             , A.PYM_ACNT_ID
+             , A.CUST_ID
+             , A.CTRT_ID
+             , B.CHRG_CTGRY
+             <![CDATA[ , CASE WHEN B.CHRG_CTGRY <> 'D' THEN SUM(A.USE_AMT) ELSE 0 END AS USE_AMT ]]>
+             ,A.USE_YYMM
+             , CASE WHEN B.CHRG_CTGRY = 'D' THEN SUM(A.USE_AMT) ELSE 0 END AS DC_AMT
+          FROM TBLCH_CHRG A
+              ,TPMPD_RATE_ITM B
+         WHERE 1=1 
+         <if test='soId != null and soId != "SEL" '>
+				AND A.SO_ID       = #{soId} /*INPUT*/
+           </if>
+           <if test='billYymm != null and billYymm != "" '>
+           		AND A.BILL_YYMM   = #{billYymm} /*INPUT*/
+           </if>
+           <if test='pymAcntId != null and pymAcntId != "" '>
+           		AND A.PYM_ACNT_ID = #{pymAcntId} /*INPUT*/
+           </if>
+           <if test='custId != null and custId != "" '>
+           		AND A.CUST_ID     = #{custId} /*INPUT*/
+           </if>
+           AND A.RATE_ITM_CD = B.RATE_ITM_CD
+        GROUP BY A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID, A.CTRT_ID, B.CHRG_CTGRY
+       ) A
+   WHERE 1=1
+GROUP BY A.SO_ID, A.BILL_YYMM, A.BILL_CYCL, A.PYM_ACNT_ID, A.CUST_ID, A.CTRT_ID
+)TT
 </select>
 
 <select id = "getChargeDiscountInfoDetList" resultType = "java.util.HashMap">
 /*PaymentDistSearchMapper.getChargeDiscountInfoDetList*/	
 <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
-	SELECT
-               A.SO_ID
-             , B.DC_RATE_ITM
-             , B.USE_YYMM
-             , B.DC_UNIT                      AS DC_APLY_MTHD
-             , B.DC_RATE_ITM
-             , TRUNCATE(SUM(B.USE_AMT), 0)          AS USE_AMT
-             , TRUNCATE(SUM(B.STD_DD_CNT), 0)       AS STD_DD_CNT
-             , TRUNCATE(SUM(B.USE_DD_CNT), 0)       AS USE_DD_CNT
-             , TRUNCATE(SUM(B.USE_AMT), 0)          AS USE_AMT
-             , TRUNCATE(SUM(B.PRE_ACUM_DC_AMT), 0)  AS PRE_ACUM_DC_AMT
-             , TRUNCATE(SUM(B.DC_VAL), 0)           AS DC_APLY_VAL
-             , TRUNCATE(SUM(B.DC_AMT), 0)           AS DC_AMT
-             , (SELECT RATE_ITM_NM
-                  FROM TPMPD_RATE_ITM      X                           /* 과금항목정보 TP_RATE_ITM -> VP_RATE_ITM 변경*/
-                 WHERE X.RATE_ITM_CD    = B.DC_RATE_ITM
-                   AND X.MSTR_FL        = '1'
-                   AND X.CHRG_CTGRY     IN ('A','M','D')            /* 요금영역(A:공제, M:감면 D:할인) */
-               )                        AS DC_RATE_ITM_NM           /* 과금항목 */
-          FROM TBLCH_CHRG  A
-             , TBLCH_DC    B
-             , TCMCT_PROD_CMPS_INFO C
-             , TCMCT_SVC_CMPS_INFO  D
-         WHERE A.CLC_WRK_NO         = B.CLC_WRK_NO
-          -- AND A.SO_ID              = B.SO_ID
-           AND A.BILL_YYMM          = B.BILL_YYMM
-           AND A.BILL_CYCL          = B.BILL_CYCL
-           AND A.USE_YYMM           = B.USE_YYMM
-           AND A.SVC_CMPS_ID        = B.SVC_CMPS_ID
-           AND A.RATE_ITM_CD        = B.RATE_ITM_CD
-           AND A.PROD_CMPS_ID       = C.PROD_CMPS_ID
-           AND A.SVC_CMPS_ID        = D.SVC_CMPS_ID
-           <if test = 'clcwrkNo != null and clcwrkNo != ""'>
-           		AND A.CLC_WRK_NO          = #{clcwrkNo}
-           </if>
-           <if test = 'billYymm != null and billYymm != ""'>
-           		AND A.BILL_YYMM          = #{billYymm}
-           </if>
-           <if test = 'billCycl != null and billCycl != ""'>
-				AND A.BILL_CYCL          = #{billCycl}
-		   </if>
-		   <if test = 'pymAcntId != null and pymAcntId != ""'>
-				AND A.PYM_ACNT_ID        = #{pymAcntId}
-		   </if>
-           <if test = 'custId != "" and custId != null'>
-				AND A.CUST_ID            = #{custId}
-		   </if>
-		   <if test = 'ctrtId != "" and ctrtId != null'>
-				AND A.CTRT_ID            = #{ctrtId}
-		   </if>
-		   <if test = 'soId != "SEL" and soId != "%"'>
-				AND A.SO_ID   = #{soId}
-			</if>
-			<if test = 'soId == "SEL" or soId == "%"'>
-				AND A.SO_ID  IN (IF(A.SO_ID = #{soId}, #{soId}, '%'))
-			</if>
-			<if test = 'rateItmCd != "" and rateItmCd != null'>
-				AND B.RATE_ITM_CD        = #{rateItmCd}
-			</if>
-           AND B.DC_AMT             != 0
-           AND B.APLY_YN            != 'Z'
-           AND C.PROD_CD            = #{prodCd}
-           AND C.INACT_DTTM         = '99991231235959'
-           AND D.SVC_CD             = #{svcCd}
-           AND D.INACT_DTTM         = '99991231235959'
-         GROUP BY A.SO_ID, B.DC_RATE_ITM, B.USE_YYMM, B.USE_AMT, B.DC_RATE_ITM, DC_UNIT
-         ORDER BY B.DC_RATE_ITM
+	SELECT 
+		A.USE_YYMM /*사용년월*/
+      	,C.PROD_CD
+      	,(SELECT PROD_NM
+          FROM TPMPD_PROD
+          WHERE SO_ID = A.SO_ID
+          AND PROD_CD = C.PROD_CD) AS PROD_NM /* 상품명 */
+      	,B.RATE_ITM_NM /*할인과금항목명*/
+      	,DATEDIFF(DATE_FORMAT(CONCAT(A.BILL_YYMM,'01'),'%Y-%m-%d'),DATE_FORMAT(CONCAT(A.USE_YYMM,'01'),'%Y-%m-%d')) AS STD_DD_CNT /*기준일수*/
+      	,TRUNCATE(A.USE_CNT, 0) AS USE_DD_CNT/*이용일수*/
+      	,TRUNCATE(A.USE_AMT, 0) AS DC_AMT/*할인금액*/
+  	FROM TBLCH_CHRG A
+      	,TPMPD_RATE_ITM B
+      	,TCMCT_PROD_CMPS_INFO C
+	WHERE 1=1
+	<if test='soId != null and soId != "SEL" '>
+		AND A.SO_ID      = #{soId} /*INPUT*/
+	</if>
+	<if test='billYymm != null and billYymm != "" '>
+		AND A.BILL_YYMM    = #{billYymm} /*INPUT*/
+	</if>
+	<if test='pymAcntId != null and pymAcntId != "" '>
+		AND A.PYM_ACNT_ID  = #{pymAcntId} /*INPUT*/
+	</if>
+	<if test='ctrtId != null and ctrtId != "" '>
+		AND A.CTRT_ID      = #{ctrtId}
+	</if>
+   	AND A.RATE_ITM_CD  = B.RATE_ITM_CD
+   	AND B.CHRG_CTGRY   = 'D' -- 할인항목
+   	AND A.CTRT_ID      = C.CTRT_ID
+   	AND C.INACT_DTTM   = '99991231235959'
+   	AND A.PROD_CMPS_ID = C.PROD_CMPS_ID
+ 	ORDER BY PROD_CD
 <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_foot"/>
 </select>
 
 <select id = "chrgDistDetListCnt" resultType = "int">
 /*PaymentDistSearchMapper.chrgDistDetListCnt*/
-		SELECT
-        	COUNT(*)
-        FROM TBLCH_CHRG  A
-             , TBLCH_DC    B
-             , TCMCT_PROD_CMPS_INFO C
-             , TCMCT_SVC_CMPS_INFO  D
-         WHERE A.CLC_WRK_NO         = B.CLC_WRK_NO
-          -- AND A.SO_ID              = B.SO_ID
-           AND A.BILL_YYMM          = B.BILL_YYMM
-           AND A.BILL_CYCL          = B.BILL_CYCL
-           AND A.USE_YYMM           = B.USE_YYMM
-           AND A.SVC_CMPS_ID        = B.SVC_CMPS_ID
-           AND A.RATE_ITM_CD        = B.RATE_ITM_CD
-           AND A.PROD_CMPS_ID       = C.PROD_CMPS_ID
-           AND A.SVC_CMPS_ID        = D.SVC_CMPS_ID
-		   <if test = 'clcwrkNo != null and clcwrkNo != ""'>
-           		AND A.CLC_WRK_NO          = #{clcwrkNo}
-           </if>
-           <if test = 'billYymm != null and billYymm != ""'>
-           		AND A.BILL_YYMM          = #{billYymm}
-           </if>
-           <if test = 'billCycl != null and billCycl != ""'>
-				AND A.BILL_CYCL          = #{billCycl}
-		   </if>
-		   <if test = 'pymAcntId != null and pymAcntId != ""'>
-				AND A.PYM_ACNT_ID        = #{pymAcntId}
-		   </if>
-           <if test = 'custId != "" and custId != null'>
-				AND A.CUST_ID            = #{custId}
-		   </if>
-		   <if test = 'ctrtId != "" and ctrtId != null'>
-				AND A.CTRT_ID            = #{ctrtId}
-		   </if>
-		   <if test = 'soId != "SEL" and soId != "%"'>
-				AND A.SO_ID   = #{soId}
-			</if>
-			<if test = 'soId == "SEL" or soId == "%"'>
-				AND A.SO_ID  IN (IF(A.SO_ID = #{soId}, #{soId}, '%'))
-			</if>
-			<if test = 'rateItmCd != "" and rateItmCd != null'>
-				AND B.RATE_ITM_CD        = #{rateItmCd}
-			</if>
-           AND B.DC_AMT             != 0
-           AND B.APLY_YN            != 'Z'
-           AND C.PROD_CD            = #{prodCd}
-           AND C.INACT_DTTM         = '99991231235959'
-           AND D.SVC_CD             = #{svcCd}
-           AND D.INACT_DTTM         = '99991231235959'
-         GROUP BY A.SO_ID, B.DC_RATE_ITM, B.USE_YYMM, B.USE_AMT, B.DC_RATE_ITM, DC_UNIT
+	SELECT COUNT(*)
+  	FROM TBLCH_CHRG A
+      	,TPMPD_RATE_ITM B
+      	,TCMCT_PROD_CMPS_INFO C
+	WHERE 1=1 
+	<if test='soId != null and soId != "SEL" '>
+		AND A.SO_ID      = #{soId} /*INPUT*/
+	</if>
+	<if test='billYymm != null and billYymm != "" '>
+		AND A.BILL_YYMM    = #{billYymm} /*INPUT*/
+	</if>
+	<if test='pymAcntId != null and pymAcntId != "" '>
+		AND A.PYM_ACNT_ID  = #{pymAcntId} /*INPUT*/
+	</if>
+	<if test='ctrtId != null and ctrtId != "" '>
+		AND A.CTRT_ID      = #{ctrtId}
+	</if>
+   	AND A.RATE_ITM_CD  = B.RATE_ITM_CD
+   	AND B.CHRG_CTGRY   = 'D' -- 할인항목
+   	AND A.CTRT_ID      = C.CTRT_ID
+   	AND C.INACT_DTTM   = '99991231235959'
+   	AND A.PROD_CMPS_ID = C.PROD_CMPS_ID
 </select>
 </mapper>

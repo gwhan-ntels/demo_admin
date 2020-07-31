@@ -64,7 +64,11 @@ $(document).ready(function() {
 	
 	//납부계정 조회
 	$('#btnSearchPym').on('click',function (e) {
-		var url="/system/common/common/pymAcntSearch/pymAcntPopup.ajax";
+		if($("#btnSearchPym").hasClass('not-active')){
+			return;
+		}
+		openCustPymSearchPopup();
+		/* var url="/system/common/common/pymAcntSearch/pymAcntPopup.ajax";
 		var param = new Object();
 		param.popType = "m";            //팝업타입 m:모달 o:일반
 		param.returnId1 = "searchAcntNm";
@@ -82,7 +86,7 @@ $(document).ready(function() {
 			complete : function(){
 				wrapWindowByMask(); // 팝업 오픈
 			}
-		}); 
+		});  */
 	});
 	
 	
@@ -211,10 +215,13 @@ function searchGridList(){
 		alert('<spring:message code="MSG.M02.MSG00013"/>');
 		return;
 	}
+	
+	var condYymm = caldate(31, $("#searchYyyyMm").val()+"01");
+	console.info("condYymm"+condYymm);
 		
 	var param = new Object();
 	param.soId = $("#searchSoId").val();
-	param.billYymm = dateFormatToStringYYYYMM($("#searchYyyyMm").val());
+	param.billYymm = dateFormatToStringYYYYMM(condYymm);
 	param.pymAcntId = $("#searchPymAcntId").val();
 	
 	console.log(JSON.stringify(param));
@@ -229,6 +236,61 @@ function searchGridList(){
 	$("#dtlGrid").clearGridData();
 	
 }
+
+/*
+ * 납부조회팝업
+ */
+function openCustPymSearchPopup(){
+	$.ajax({
+	    type : "post",
+	    url : '/system/common/common/pymAcntSearch/pymAcntSearchPopup.ajax',
+	    data : {
+	         inputSoId : $("#searchSoId").val()   //input SO Id
+	        ,inputCustNm : $('#searchAcntNm').val()   //input Customer Name
+	        ,inputPymAcntId : $('#searchPymAcntId').val()
+	        ,inputIsUnmaskYn : $('#isUnmaskYn').val() //마스크 처리 해제 Y
+	        ,outputSoId : 'searchSoId'            //output SO ID Select
+	        ,outputCustNm : 'condCustNm'            //output Customer Name Text
+	        ,outputCustId : 'condCustId'            //output Customer ID Text
+	        ,outputPymAcntId : 'searchPymAcntId'      //output Payment ID Text
+	        ,outputPymAcntNm : 'searchAcntNm'      //output Payment Nm Text
+        	,outputSoId : 'condSo'      		//output Payment Nm Text
+	    },
+	    async: true,
+	    success : function(data) {
+	        var html = data;
+	        $("#popup_dialog").html(html);
+	    },      
+	    complete : function(){
+	        wrapWindowByMask(); // 팝업 오픈
+	        $("#txtPymSearchCustNm").focus(); //오픈 후 focus위치
+	    }
+	});
+}
+
+/**
+ * conDate의 day만큼 전날의 날짜 return
+ */
+function caldate(day, condDate){
+	 
+	 var caledmonth, caledday, caledYear;
+	 var loadDt = new Date(condDate);
+	 var v = new Date(Date.parse(loadDt) - day*1000*60*60*24);
+	 
+	 caledYear = v.getFullYear();
+	 
+	 if( v.getMonth() < 9 ){
+	  caledmonth = '0'+(v.getMonth()+1);
+	 }else{
+	  caledmonth = v.getMonth()+1;
+	 }
+	 if( v.getDate() < 9 ){
+	  caledday = '0'+v.getDate();
+	 }else{
+	  caledday = v.getDate();
+	 }
+	 return caledYear+'-'+caledmonth+'-'+caledday;
+	}
 
 </script>
 

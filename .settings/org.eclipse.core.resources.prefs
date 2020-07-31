@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//src/main/java=UTF-8
 encoding//src/main/resources=UTF-8
+encoding//src/main/resources/message/messages_ko.properties=UTF-8
 encoding//src/main/webapp/WEB-INF/views/customer/contract/contract/orderManagement/terminationIOT.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/exception/exception.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/system/main/main.jsp=UTF-8

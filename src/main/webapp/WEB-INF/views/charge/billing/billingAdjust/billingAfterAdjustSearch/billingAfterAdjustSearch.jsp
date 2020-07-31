@@ -46,23 +46,23 @@ $(document).ready(function() {
 		    { label: '계약ID', name: 'ctrtId', width : 100, align:"center", hidden:true},
 		    { label: '납부계정ID', name: 'pymAcntId', width : 100, align:"center", hidden:true},
 		    { label: '<spring:message code="LAB.M02.LAB00018"/>', name: 'pymAcntNm', width : 100, align:"left", sortable:false},	//납부자명
-		    { label: '조정사유', name: 'adjResnNm', width : 200, align:"left", sortable:false},
-			{ label: '신청번호', name: 'adjNo', width : 100, align:"left", sortable:false},
-		    { label: '최초조정전청구금액', name: 'adjPrvBillAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter},
-		    { label: '조정누적금액', name: 'adjAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter},
-		    { label: '청구금액', name: 'billAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter},
-		    { label: '조정전청구금액', name: 'adjPrvBillAmtA', width : 150, align:"right", sortable:false, formatter:numberAutoFormatter},
-			{ label: '신청금액', name: 'adjApplAmt', width : 150, sortable:false, align:"right", formatter:numberAutoFormatter},
-		    { label: '조정금액', name: 'adjAmtA', width : 150, sortable:false, align:"right", formatter:numberAutoFormatter},
-		    { label: '진행상태코드', name: 'dcsnProcStat', sortable:false, hidden:true},
-		    { label: '진행상태', name: 'dcsnProcStatNm', width : 150, sortable:false},
-		    { label: '신청자명', name: 'rcptPsnNm', width : 150, sortable:false},
-		    { label: '청구일자', name: 'billDt', width : 150, align:"center",sortable:false, formatter:stringToDateformatYYYYMMDD},
+		    { label: '<spring:message code="LAB.M09.LAB00136"/>', name: 'adjResnNm', width : 200, align:"left", sortable:false},	//조정사유
+			{ label: '<spring:message code="LAB.M07.LAB00366"/>', name: 'adjNo', width : 100, align:"left", sortable:false},		//신청번호
+		    { label: '<spring:message code="LAB.M10.LAB00058"/>', name: 'adjPrvBillAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter}, //최초조정전청구금액
+		    { label: '<spring:message code="LAB.M09.LAB00254"/>', name: 'adjAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter},	//조정누적금액
+		    { label: '<spring:message code="LAB.M10.LAB00031"/>', name: 'billAmt', width : 100, align:"right", sortable:false, formatter:numberAutoFormatter}, //청구금액
+		    { label: '<spring:message code="LAB.M09.LAB00137"/>', name: 'adjPrvBillAmtA', width : 150, align:"right", sortable:false, formatter:numberAutoFormatter},// 조정전청구금액
+			{ label: '<spring:message code="LAB.M07.LAB00345"/>', name: 'adjApplAmt', width : 150, sortable:false, align:"right", formatter:numberAutoFormatter},//신청금액
+		    { label: '<spring:message code="LAB.M09.LAB00134"/>', name: 'adjAmtA', width : 150, sortable:false, align:"right", formatter:numberAutoFormatter},	//조정금액
+		    { label: '진행상태', name: 'dcsnProcStat', sortable:false, hidden:true},	
+		    { label: '<spring:message code="LAB.M09.LAB00215"/>', name: 'dcsnProcStatNm', width : 150, sortable:false},	//진행상태
+		    { label: '<spring:message code="LAB.M07.LAB00367"/>', name: 'rcptPsnNm', width : 150, sortable:false},	//신청자명
+		    { label: '<spring:message code="LAB.M10.LAB00040"/>', name: 'billDt', width : 150, align:"center",sortable:false, formatter:stringToDateformatYYYYMMDD},	//청구일자
 		    { label: '청구년월', name: 'billYymm', width : 150, align:"center",sortable:false, hidden:true},
-		    { label: '청구반영일자', name: 'billAplyDt', width : 150, align:"center",sortable:false, formatter:stringToDateformatYYYYMMDD},
-		    { label: '신청사유', name: 'adjApplConts', width : 150, sortable:false},
-		    { label: '수정자', name: 'chgrIdNm', width : 150, sortable:false},
-		    { label: '수정일시', name: 'chgDttm', width : 150, align:"center",sortable:false, formatter:dateTypeFormatterYYYYMMDDHH24MISS}
+		    { label: '<spring:message code="LAB.M10.LAB00107"/>', name: 'billAplyDt', width : 150, align:"center",sortable:false, formatter:stringToDateformatYYYYMMDD},	//청구반영일자
+		    { label: '<spring:message code="LAB.M07.LAB00368"/>', name: 'adjApplConts', width : 150, sortable:false}, //신청사유
+		    { label: '<spring:message code="LAB.M07.LAB00256"/>', name: 'chgrIdNm', width : 150, sortable:false},	//수정자
+		    { label: '<spring:message code="LAB.M07.LAB00254"/>', name: 'chgDttm', width : 150, align:"center",sortable:false, formatter:dateTypeFormatterYYYYMMDDHH24MISS} //수정일시
 		],
 		viewrecords: true,
 		shrinkToFit:false,
@@ -191,12 +191,14 @@ function searchWorkGrpList(){
 	}
 	
 	if(chkDate($('#searchStatDt').val(),$('#searchEndDt').val())){
-		alert("신청일자의 시작일이 종료일보다 큽니다.");
+		alert('<spring:message code="MSG.M07.MSG00140"/>');
+		//신청일자의 시작일이 종료일보다 큽니다.
 		return;
 	}
 	
 	if(chkDate(condDate, $('#searchStatDt').val())){
-		alert("신청기간을 1개월 이내로 입력해 주세요.");
+		alert('<spring:message code="MSG.M07.MSG00141"/>');
+		//신청기간을 1개월 이내로 입력해 주세요.
 		return;
 	}
 	
@@ -458,7 +460,7 @@ function caldate(day, condDate){
 					</c:forEach>
 				</select>
 			</td>
-			<th>신청일자<span class="dot">*</span></th>
+			<th><spring:message code="LAB.M07.LAB00365" /><span class="dot">*</span></th> <!-- 신청일자 -->
 			<td>
 				<div class="date_box">
 					<div class="inp_date w130">
@@ -486,7 +488,7 @@ function caldate(day, condDate){
 			</td>
 		</tr>
 		<tr>
-			<th>진행상태</th>
+			<th><spring:message code="LAB.M09.LAB00215" /></th><!-- 진행상태 -->
 			<td>
 				<select id="condDcsnProcStat" class="w100p">
 					<option value="SEL"><spring:message code="LAB.M15.LAB00002"/></option>
@@ -495,7 +497,7 @@ function caldate(day, condDate){
 					</c:forEach>
 				</select>
 			</td>
-			<th>신청자</th>
+			<th><spring:message code="LAB.M07.LAB00347" /></th><!-- 신청자 -->
 			<td>
 				<div class="inp_date w280">
 					<input id="condUserNm" type="text" class="w120" />
@@ -511,7 +513,7 @@ function caldate(day, condDate){
 
 <div class="main_btn_box">
 	<div class="fl">
-		<h4 class="sub_title">청구후요금조정내역</h4>
+		<h4 class="sub_title"><spring:message code="LAB.M10.LAB00101" /></h4><!-- 청구후요금조정내역 -->
 	</div>
 	<div class="fr mt10">
 		<a class="grey-btn" id="btn_print" href="javascript:init();"><span class="print_icon"><spring:message code="LAB.M08.LAB00015" /></span></a>

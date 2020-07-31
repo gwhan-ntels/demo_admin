@@ -7,159 +7,366 @@
 <!-- 수납 조회 -->
     <!-- 수납 통계조회 -->
     <select id="getPymList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
-        SELECT SO_ID
-              ,PYM_ACNT_ID ||'  '|| ACNT_NM AS PYM_ACNT
+     /*com.ntels.ccbs.charge.mapper.billing.billingAdjust.BillingBeforeAdjustMapper.getPymList*/
+	      SELECT SO_ID
+              ,CONCAT(PYM_ACNT_ID, '  ', ACNT_NM) AS PYM_ACNT
               ,PYM_ACNT_ID
-		      ,CUST_NM
-		      ,CUST_TP
-		      ,(SELECT  NAME.CODE_NM AS COMMON_CD_NM
-		                        FROM    TSYCO_CODE_MAST MAST
-		                                , TSYCO_CODE_MAST_NAME MNAME
-		                                , TSYCO_CODE_DETAIL DETAIL
-		                                , TSYCO_CODE_DETAIL_NAME NAME
-		                        WHERE   MAST.COMMON_GRP=DETAIL.COMMON_GRP
-		                                AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
-		                                AND MNAME.LNG_TYP     =#{billingBeforeAdjust.lngTyp}
-		                                AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
-		                                AND DETAIL.COMMON_CD  =NAME.COMMON_CD
-		                                AND NAME.LNG_TYP      =#{billingBeforeAdjust.lngTyp}
-		                                AND MAST.COMMON_GRP   ='CM00009'
-		                                AND DETAIL.COMMON_CD = CUST_TP
-		                    ) AS CUST_TP_NM
-		      ,PAY_ZIP_CD||' '||PAY_BASE_ADDR||' '||PAY_ADDR_DTL AS ADDR
-		  FROM IFNBRM_CUST_INFO
-		 WHERE SO_ID = #{billingBeforeAdjust.soId}
-		   AND CUST_NM = #{billingBeforeAdjust.custNm}
+              ,CUST_NM
+              ,CUST_TP
+              ,(SELECT  NAME.CODE_NM AS COMMON_CD_NM
+                                FROM    TSYCO_CODE_MAST MAST
+                                        , TSYCO_CODE_MAST_NAME MNAME
+                                        , TSYCO_CODE_DETAIL DETAIL
+                                        , TSYCO_CODE_DETAIL_NAME NAME
+                                WHERE   MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                                        AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                                        AND MNAME.LNG_TYP     =#{billingBeforeAdjust.lngTyp}
+                                        AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                                        AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                                        AND NAME.LNG_TYP      =#{billingBeforeAdjust.lngTyp}
+                                        AND MAST.COMMON_GRP   ='CM00009'
+                                        AND DETAIL.COMMON_CD = CUST_TP
+                            ) AS CUST_TP_NM
+              ,CONCAT(CONCAT(CONCAT(CONCAT(PZIP_CD,' '), PBASE_ADDR), ' '),PADDR_DTL) AS ADDR
+         FROM bss.IFNBRM_CUST_INFO
+         WHERE SO_ID = #{billingBeforeAdjust.soId}
+           AND ACNT_NM = #{billingBeforeAdjust.custNm}
     </select>
     
     <select id="getPymBillList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
-		SELECT A.PYM_ACNT_ID
-		      ,A.ACNT_NM
-		      ,A.CUST_NM
-		      ,A.CTRT_ID_CNT
-		      ,A.PROD_CD_CNT
-		      ,A.SVC_CD_CNT
-		      ,B.ADJ_NO
-		      ,B.BILL_SEQ_NO
-		      ,NVL(B.ADJ_PT,#{billingBeforeAdjust.adjPt}) AS ADJ_PT
-		      ,B.ADJ_PT_NM
-		      ,B.HOPE_APLY_YYMM
-		      ,B.DCSN_PROC_STAT
-		      ,B.DCSN_PROC_STAT_NM
-		      ,NVL(B.ADJ_APPL_AMT,0)  AS ADJ_APPL_AMT
-		      ,B.APPL_DTTM
-		      ,B.RCPT_PSN_NM
-		      ,B.APPL_SO_NM
-		      ,A.SO_ID
-		      ,(SELECT Z.SO_NM
-		                  FROM TSYCO_SO_MAST Z
-		         WHERE Z.SO_ID = A.SO_ID)     AS SO_NM
-		      ,B.APPRR_ID
-		      ,B.ADJ_RESN_CD
-		      ,B.ADJ_APPL_CONTS
-		  FROM (
-                SELECT PYM_ACNT_ID
-                      ,ACNT_NM
-                      ,CUST_NM
-                      ,COUNT(CTRT_ID)     AS CTRT_ID_CNT
-                      ,SUM(PROD_CD_CNT)   AS PROD_CD_CNT
-                      ,SUM(SVC_CD_CNT)    AS SVC_CD_CNT
-                      ,SO_ID
-                  FROM (
-                                SELECT A.PYM_ACNT_ID
-                                      ,B.ACNT_NM
-                                      ,B.CUST_NM
-                                      ,A.CTRT_ID
-                                      ,A.SO_ID
-                                      ,COUNT(A.PROD_CMPS_ID) AS PROD_CD_CNT
-                                      ,COUNT(A.SVC_CMPS_ID) AS SVC_CD_CNT
-                                  FROM IFNBRM_CTRT_INFO A
-                                      ,IFNBRM_CUST_INFO B
-                                 WHERE 1=1
-                                   AND A.SO_ID = #{billingBeforeAdjust.soId}
-                                   AND A.SO_ID = B.SO_ID
-                                   AND A.PYM_ACNT_ID = #{billingBeforeAdjust.pymAcntId}
-                                   AND A.PYM_ACNT_ID = B.PYM_ACNT_ID
-                                   AND A.CUST_ID	 = B.CUST_ID
-                                   AND A.INACT_DTTM = '99991231235959'
-                                   AND A.CTRT_STAT NOT IN ('10','90','50','90')
-                          GROUP BY A.PYM_ACNT_ID, B.ACNT_NM, B.CUST_NM, A.CTRT_ID, A.SO_ID
-                           ) A
-                GROUP BY A.PYM_ACNT_ID, ACNT_NM, A.CUST_NM, A.SO_ID
-                ) A
-		      ,(
-                SELECT ADJ_NO
-                      ,BILL_SEQ_NO
-                      ,ADJ_PT
-                      ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
-                          FROM TSYCO_CODE_MAST MAST
-                              ,TSYCO_CODE_MAST_NAME MNAME
-                              ,TSYCO_CODE_DETAIL DETAIL
-                              ,TSYCO_CODE_DETAIL_NAME NAME
-                         WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
-                           AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
-                           AND MNAME.LNG_TYP     = #{billingBeforeAdjust.lngTyp}
-                           AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
-                           AND DETAIL.COMMON_CD  =NAME.COMMON_CD
-                           AND NAME.LNG_TYP      = #{billingBeforeAdjust.lngTyp}
-                           AND MAST.COMMON_GRP   ='BL00027'
-                           AND DETAIL.COMMON_CD = ADJ_PT
-                       ) AS ADJ_PT_NM
-                      ,PYM_ACNT_ID
-                      ,HOPE_APLY_YYMM
-                      ,DCSN_PROC_STAT
-                      ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
-                          FROM TSYCO_CODE_MAST MAST
-                              ,TSYCO_CODE_MAST_NAME MNAME
-                              ,TSYCO_CODE_DETAIL DETAIL
-                              ,TSYCO_CODE_DETAIL_NAME NAME
-                         WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
-                           AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
-                           AND MNAME.LNG_TYP     = #{billingBeforeAdjust.lngTyp}
-                           AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
-                           AND DETAIL.COMMON_CD  =NAME.COMMON_CD
-                           AND NAME.LNG_TYP      = #{billingBeforeAdjust.lngTyp}
-                           AND MAST.COMMON_GRP   ='BL00025'
-                           AND DETAIL.COMMON_CD = DCSN_PROC_STAT
-                       ) AS DCSN_PROC_STAT_NM
-                      ,APPL_DTTM
-                      ,(SELECT USER_NAME
-                          FROM TSYCO_USER X                                 /* 사용자*/
-                         WHERE X.USER_ID = RCPT_PSN_ID)  AS RCPT_PSN_NM     /* 접수자명 */
-                      ,(SELECT SUM(ADJ_APPL_AMT)
-                          FROM TBLIV_CHRG_ADJ_APLY_DTL Y                    /* 요금조정신청상세 */
-                         WHERE Y.ADJ_NO = ADJ_NO)        AS ADJ_APPL_AMT    /* 신청금액 */
-                      ,(SELECT Z.SO_NM
-                          FROM TSYCO_SO_MAST Z                              /* SO 마스타*/
-                         WHERE Z.SO_ID = APPL_SO_ID)     AS APPL_SO_NM      /* 접수자소속 */
-                      ,APPRR_ID
-                      ,ADJ_RESN_CD
-                      ,ADJ_APPL_CONTS
-                  FROM TBLIV_CHRG_ADJ_APLY
-                 WHERE APPL_SO_ID  = #{billingBeforeAdjust.soId}
-                   AND PYM_ACNT_ID = #{billingBeforeAdjust.pymAcntId}
-                   AND ADJ_PT      = #{billingBeforeAdjust.adjPt}           /* 조정시점(BLIV015, 1:청구전,2:청구후) */
-                   AND ADJ_RESN_CD NOT IN ('01', '02')
-          UNION ALL
-                SELECT
-                       NULL AS ADJ_NO
-                     , NULL AS BILL_SEQ_NO
-                     , '1'  AS ADJ_PT
-                     , NULL AS ADJ_PT_NM
-                     , #{billingBeforeAdjust.pymAcntId} AS PYM_ACNT_ID
-                     , NULL AS HOPE_APLY_YYMM
-                     , NULL AS DCSN_PROC_STAT
-                     , NULL AS DCSN_PROC_STAT_NM
-                     , NULL AS APPL_DTTM
-                     , NULL AS RCPT_PSN_NM
-                     , NULL AS ADJ_APPL_AMT
-                     , NULL AS APPL_SO_NM
-                     , NULL AS APPRR_ID
-                     , NULL AS ADJ_RESN_CD
-                     , NULL AS ADJ_APPL_CONTS
-                  FROM DUAL
-		       ) B
-		 WHERE A.PYM_ACNT_ID = B.PYM_ACNT_ID(+)
-		ORDER BY HOPE_APLY_YYMM
+	/* com.ntels.ccbs.charge.mapper.billing.billingAdjust.BillingBeforeAdjustMapper.getPymBillList */
+		SELECT '0'                                 AS CHK_JOB
+	     , A.PYM_ACNT_ID                                            /* 납부계정ID */
+	     , A.PYM_ACNT_NM                                            /* 납부자명 */
+	     , A.CTRT_ID_CNT                                            /* 계약ID */
+	     , A.PROD_CD_CNT                                            /* 상품건수 */
+	     , A.SVC_CD_CNT                                             /* 서비스건수 */
+	     , B.ADJ_NO                                                 /* 조정일련번호 */
+	     , B.BILL_SEQ_NO                                            /* 청구일련번호 */
+	     , IFNULL(B.ADJ_PT, #{billingBeforeAdjust.adjPt}) AS ADJ_PT  /* 조정시점 1:청구전 2:청구후 */
+	     , B.HOPE_APLY_YYMM                                         /* 희망적용녀월 */
+	     , B.DCSN_PROC_STAT                                         /* 진행상태코드 */
+	     ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
+                  FROM TSYCO_CODE_MAST MAST
+                      ,TSYCO_CODE_MAST_NAME MNAME
+                      ,TSYCO_CODE_DETAIL DETAIL
+                      ,TSYCO_CODE_DETAIL_NAME NAME
+                 WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                   AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                   AND MNAME.LNG_TYP     ='ko' /* INPUT */
+                   AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                   AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                   AND NAME.LNG_TYP      ='ko' /* INPUT */
+                   AND MAST.COMMON_GRP   ='BL00055'
+                   AND DETAIL.COMMON_CD = B.DCSN_PROC_STAT
+               ) AS DCSN_PROC_STAT_NM                        		/* 진행상태 NM */
+	     , IFNULL(B.ADJ_APPL_AMT,0)            AS ADJ_APPL_AMT      /* 신청금액 */
+	     , IFNULL(B.HOPE_APLY_YYMM,'999999')   AS ORDER_NUM         /* ORDER BY */
+	     , APPL_DTTM                                                /* 신청일시 */
+	     , RCPT_PSN_NM                                              /* 접수자 */
+	     , APPL_SO_NM                                               /* 접수자소속 */
+	     , A.SO_ID
+	     ,(SELECT SO_NM
+	         FROM TSYCO_SO_MAST
+	        WHERE SO_ID = A.SO_ID) AS SO_NM 
+	     , B.APPRR_ID
+   		 , B.ADJ_RESN_CD
+   		 , B.ADJ_APPL_CONTS
+  		FROM (
+        	SELECT PYM_ACNT_ID
+	             , PYM_ACNT_NM
+	             , COUNT(CTRT_ID)     AS CTRT_ID_CNT
+	             , SUM(PROD_CD_CNT)   AS PROD_CD_CNT
+	             , SUM(SVC_CD_CNT)    AS SVC_CD_CNT
+	             , SO_ID
+          	FROM (
+                SELECT A1.PYM_ACNT_ID
+                     , A2.CUST_NM           AS PYM_ACNT_NM
+                     , A3.CTRT_ID
+                     , A3.SO_ID
+                     , ( SELECT COUNT(Z.PROD_CMPS_ID)
+                           FROM TCMCT_PROD_CMPS_INFO Z
+                          WHERE 1=1
+                            AND Z.SO_ID      = A3.SO_ID
+                            AND Z.CTRT_ID    = A3.CTRT_ID
+                            AND Z.INACT_DTTM = '99991231235959'
+                       )                        AS PROD_CD_CNT
+                     , ( SELECT COUNT(Z.SVC_CMPS_ID)
+                           FROM TCMCT_SVC_CMPS_INFO Z
+                          WHERE 1=1
+                            AND Z.SO_ID      = A3.SO_ID
+                            AND Z.CTRT_ID    = A3.CTRT_ID
+                            AND Z.INACT_DTTM = '99991231235959'
+                       )                        AS SVC_CD_CNT
+                  FROM TCMCU_PYM_ACNT_INFO  A1
+                     , TCMCU_CUST_INFO      A2
+                     , TCMCT_CTRT_INFO      A3
+                 WHERE 1=1
+                   AND A1.SO_ID           = #{billingBeforeAdjust.soId}           /* INPUT */
+                   AND A1.PYM_ACNT_ID     = #{billingBeforeAdjust.pymAcntId}    /* INPUT */
+                   AND A1.PYM_ACNT_ID     = A3.PYM_ACNT_ID
+                   AND A1.CUST_ID         = A2.CUST_ID
+                   AND A1.SO_ID           = A2.SO_ID
+                   AND A2.SO_ID           = A3.SO_ID
+                   AND A3.CTRT_STAT       NOT IN ('10', '99' , '50', '90')
+                   AND A3.INACT_DTTM      = '99991231235959'
+               ) A
+	        GROUP BY PYM_ACNT_ID, PYM_ACNT_NM, SO_ID
+	       ) A LEFT JOIN
+	      (
+	       SELECT X.ADJ_NO
+	            , X.BILL_SEQ_NO
+	            , X.ADJ_PT
+	            , X.PYM_ACNT_ID
+	            , X.HOPE_APLY_YYMM
+	            , X.DCSN_PROC_STAT
+	            , X.APPL_DTTM
+	            , (SELECT USER_NAME
+	                 FROM TSYCO_USER X                                           /* 사용자*/
+	                WHERE X.USER_ID         = X.RCPT_PSN_ID)  AS RCPT_PSN_NM     /* 접수자명 */
+	            , (SELECT SUM(ADJ_APPL_AMT)
+	                 FROM TBLIV_CHRG_ADJ_APLY_DTL                                /* 요금조정신청상세 */
+	                WHERE ADJ_NO           = X.ADJ_NO)       AS ADJ_APPL_AMT     /* 신청금액 */
+	            , ( SELECT Y.SO_NM
+	                  FROM TSYCO_SO_MAST   Y                                     /* SO 마스타*/
+	                 WHERE Y.SO_ID        = X.APPL_SO_ID
+	              )                        AS APPL_SO_NM                         /* 접수자소속 */
+	            , X.APPRR_ID
+	            , X.ADJ_RESN_CD
+	            , X.ADJ_APPL_CONTS
+	         FROM TBLIV_CHRG_ADJ_APLY      X                                     /* 요금조정신청 */
+       		 WHERE 1=1
+	          AND X.ADJ_PT         = #{billingBeforeAdjust.adjPt}          /* 조정시점(BLIV015, 1:청구전,2:청구후) */
+       UNION ALL
+       SELECT NULL AS ADJ_NO
+            , NULL AS BILL_SEQ_NO
+            , #{billingBeforeAdjust.adjPt}  AS ADJ_PT					  /* 조정시점(BLIV015, 1:청구전,2:청구후) */
+            , #{billingBeforeAdjust.pymAcntId} AS PYM_ACNT_ID     /* INPUT */
+            , NULL AS HOPE_APLY_YYMM
+            , NULL AS DCSN_PROC_STAT
+            , NULL AS APPL_DTTM
+            , NULL AS RCPT_PSN_NM
+            , NULL AS ADJ_APPL_AMT
+            , NULL AS APPL_SO_NM
+            , NULL AS APPRR_ID
+            , NULL AS ADJ_RESN_CD
+            , NULL AS ADJ_APPL_CONTS
+         FROM DUAL
+      ) B ON A.PYM_ACNT_ID = B.PYM_ACNT_ID
+ 	WHERE 1=1
+	ORDER BY HOPE_APLY_YYMM DESC
     </select>
+    
+    <select id="getPymRcpt" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+        SELECT (SELECT IFNULL(SUM(RCPT_AMT),0)
+                FROM   TBLIV_BILL   A
+                WHERE  BILL_SEQ_NO      = #{billingAdjust.billSeqNo}
+                AND    A.BILL_YYMM      = #{billingAdjust.billYymm}
+               )                                            AS BILL_RCPT_AMT
+             , (SELECT /*+ INDEX(A IX_TBLPY_RCPT_05) */
+                       IFNULL(SUM(B.RCPT_AMT),0)
+                FROM   TBLPY_RCPT       A                                           /* 수납내역 */
+                     , TBLPY_RCPT_DTL   B
+                WHERE  A.PYM_SEQ_NO     = B.PYM_SEQ_NO
+                AND    A.BILL_SEQ_NO    = #{billingAdjust.billSeqNo}
+                AND    A.CNCL_YN        = 'N'
+                AND    A.PAY_TP         != '7'                                     /* (-)매출수납  */
+                AND    A.BILL_YYMM      = #{billingAdjust.billYymm}
+               )                                            AS PYM_RCPT_AMT
+             , (SELECT /*+ INDEX(A IX_TBLIV_TAX_BILL_02) */
+                       (CASE  COUNT(*) WHEN 0 THEN 'N' ELSE 'Y' END) AS TAX_BILL_YN
+                FROM   TBLIV_TAX_BILL   A                                           /* 세금계산서내역 */
+                WHERE  BILL_SEQ_NO      = #{billingAdjust.billSeqNo}
+                AND    TAX_DCLR_CL      &gt; '0'                                    /* 신고구분(0:신고전, 1:예정신고, 2:확정신고) */
+                AND    A.BILL_YYMM      = #{billingAdjust.billYymm}
+               )                                            AS TAX_BILL_YN
+        FROM   DUAL
+    </select>
+    
+    <select id="getApplHopeYymm"  resultType="integer" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+	   /*신규신청시 해당 청구년월 계약 확인 com.ntels.ccbs.charge.mapper.billing.billingAdjust.BillingBeforeAdjustMapper.getApplHopeYymm*/
+	    SELECT COUNT(*)
+	  	FROM TBLIV_CHRG_ADJ_APLY
+	 	WHERE 	HOPE_APLY_YYMM = #{billingAdjust.hopeAplyYymm}  /* 희망청구년월 */
+	 		AND PYM_ACNT_ID    = #{billingAdjust.pymAcntId}		/* 납부자 */
+    </select>
+    
+    <select id="getApplYymmCount" resultType="integer" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+    	/*해당계약 청구진행상태 확인  com.ntels.ccbs.charge.mapper.billing.billingAdjust.BillingBeforeAdjustMapper.getApplYymmCount*/
+    	SELECT COUNT(*)
+	  	FROM TBLIV_CLS_INFO
+ 		WHERE SO_ID = #{billingAdjust.soId}  
+	   		AND BILL_YYMM = #{billingAdjust.hopeAplyYymm}  /* 청구일 */
+    </select>
+    
+    <select id="getApplCount" resultType="integer" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+	    SELECT COUNT(*)
+	  	FROM TBLIV_CHRG_ADJ_APLY A
+	      ,TBLIV_CHRG_ADJ_APLY_DTL B
+		 WHERE A.APPL_SO_ID      = #{billingAdjust.soId}
+			AND A.PYM_ACNT_ID    = #{billingAdjust.pymAcntId}
+			AND A.HOPE_APLY_YYMM = #{billingAdjust.hopeAplyYymm}
+			AND A.ADJ_NO         = #{billingAdjust.adjNo}
+			AND A.ADJ_NO = B.ADJ_NO
+			AND B.USE_YYMM       = #{billingAdjust.useYymm}
+			AND B.PROD_CMPS_ID   = #{billingAdjust.prodCmpsId}
+			AND B.SVC_CMPS_ID    = #{billingAdjust.svcCmpsId}
+			AND B.CHRG_ITM_CD    = #{billingAdjust.chrgItmCd}
+    </select>
+    
+    <update id="updateReqAppl" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+		UPDATE TBLIV_CHRG_ADJ_APLY
+		     SET RCPT_ID            = #{billingAdjust.chgrId}      
+		       , ADJ_RESN_CD        = #{billingAdjust.adjResnCd}         
+		       , ADJ_APPL_CONTS     = #{billingAdjust.adjApplConts}   
+		       , CHGR_ID            = #{billingAdjust.chgrId}         
+		       , CHG_DATE           = #{billingAdjust.chgDate}       
+	   	WHERE ADJ_NO             = #{billingAdjust.adjNo}
+    </update>
+    <insert id="insertReqAppl" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+    	INSERT INTO TBLIV_CHRG_ADJ_APLY
+            (ADJ_NO,
+             BILL_YYMM,
+             BILL_CYCL,
+             BILL_DT,
+             BILL_SEQ_NO,
+             PYM_ACNT_ID,
+             RCPT_ID,
+             APPL_SO_ID,
+             APPL_DTTM,
+             APPNT_NM,
+             APPNT_TEL_NO,
+             ADJ_PT,
+             ADJ_RESN_CD,
+             ADJ_APPL_CONTS,
+             ADJ_BILL_DT,
+             HOPE_APLY_YYMM,
+             BILL_RE_ISS_YN,
+             RCPT_PSN_ID,
+             APPR_REQR_ID,
+             APPR_REQ_DTTM,
+             DCSN_PROC_STAT,
+             APPRR_ID,
+             APPR_DTTM,
+             BILL_APLY_DT,
+             ADJ_SBT_DD_CNT,
+             ADJ_PRV_BILL_AMT,
+             ADJ_AMT,
+             BILL_AMT,
+             ADJ_APPL_AMT,
+             SALE_APLY_YN,
+             SALE_APLY_DT,
+             INPT_MENU_ID,
+             REGR_ID,
+             REG_DATE,
+             CHGR_ID,
+             CHG_DATE
+        )VALUES(
+	      	#{billingAdjust.adjNo},																		
+			#{billingAdjust.billYymm},
+			#{billingAdjust.billCycl},
+			#{billingAdjust.billDt},
+			#{billingAdjust.billSeqNo},
+			#{billingAdjust.pymAcntId},
+			#{billingAdjust.chgrId},
+			#{billingAdjust.soId},
+			#{billingAdjust.applDttm},
+			#{billingAdjust.pymAcntNm},
+			#{billingAdjust.appntTelNo},
+			#{billingAdjust.adjPt},
+			#{billingAdjust.adjResnCd},
+			#{billingAdjust.adjApplConts},
+			#{billingAdjust.adjBillDt},
+			#{billingAdjust.hopeAplyYymm},
+			#{billingAdjust.billReIssYn},
+			#{billingAdjust.chgrId},
+			#{billingAdjust.apprReqrId},
+			#{billingAdjust.apprReqDttm},
+			#{billingAdjust.dcsnProcStat},
+			#{billingAdjust.apprrId},
+			#{billingAdjust.apprDttm},
+			#{billingAdjust.billAplyDt},
+			#{billingAdjust.adjSbtDdCnt},
+			#{billingAdjust.adjPrvBillAmt},
+			#{billingAdjust.adjAmt},
+			#{billingAdjust.billAmt},
+			#{billingAdjust.adjApplAmt},
+			#{billingAdjust.saleAplyYn},
+			#{billingAdjust.saleAplyDt},
+			#{billingAdjust.inptMenuId},
+			#{billingAdjust.chgrId},
+			#{billingAdjust.chgDate},
+			#{billingAdjust.chgrId},
+			#{billingAdjust.chgDate}
+		)
+    </insert>
+    
+    <update id="updateReqDtlAppl" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+		UPDATE TBLIV_CHRG_ADJ_APLY_DTL
+		    SET ADJ_APPL_AMT       = #{billingAdjust.adjApplAmt}
+		      , CHGR_ID            = #{billingAdjust.chgrId}         /* 수정자 */
+		      , CHG_DATE		   = #{billingAdjust.chgDate}  
+		  
+		WHERE ADJ_NO               = #{billingAdjust.adjNo}
+		    AND USE_YYMM           = #{billingAdjust.useYymm, jdbcType=VARCHAR}
+		    AND PROD_CMPS_ID       = #{billingAdjust.prodCmpsId, jdbcType=VARCHAR}
+		    AND SVC_CMPS_ID        = #{billingAdjust.svcCmpsId, jdbcType=VARCHAR}
+		    AND CHRG_ITM_CD        = #{billingAdjust.chrgItmCd, jdbcType=VARCHAR}
+    </update>
+    
+    <insert id="insertReqDtlAppl" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
+   	/*com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO.insertReqAppl*/
+    	INSERT INTO TBLIV_CHRG_ADJ_APLY_DTL
+            (
+                        SO_ID,
+                        ADJ_NO,
+                        USE_YYMM,
+                        PROD_CMPS_ID,
+                        SVC_CMPS_ID,
+                        CHRG_ITM_CD,
+                        CUST_ID,
+                        CTRT_ID,
+                        ADJ_PRV_BILL_AMT,
+                        ADJ_AMT,
+                        ADJ_AFT_BILL_AMT ,
+                        ADJ_APPL_AMT,
+                        CRNCY_CD,
+                        EXRATE,
+                        EXRATE_APLY_DT,                       
+                        REGR_ID ,
+                        REG_DATE,
+                        CHGR_ID,
+                        CHG_DATE
+            )
+            VALUES
+            (
+						#{billingAdjust.soId},
+						#{billingAdjust.adjNo},
+						#{billingAdjust.useYymm},
+						#{billingAdjust.prodCmpsId},
+						#{billingAdjust.svcCmpsId},
+						#{billingAdjust.chrgItmCd},
+						#{billingAdjust.custId},
+						#{billingAdjust.ctrtId},
+						#{billingAdjust.adjPrvBillAmt},
+						#{billingAdjust.adjAmt},
+						#{billingAdjust.adjAftBillAmt},
+						#{billingAdjust.adjApplAmt},
+						#{billingAdjust.crncyCd},
+						#{billingAdjust.exrate},
+						#{billingAdjust.exrateAplyDt},						 
+						#{billingAdjust.regrId},
+						#{billingAdjust.regDate},
+						#{billingAdjust.regrId},
+						#{billingAdjust.regDate}
+            )
+    </insert>
+    <delete id="deleteReqAppl">       
+        DELETE FROM TBLIV_CHRG_ADJ_APLY
+         WHERE ADJ_NO             = #{billingAdjust.adjNo}
+    </delete>
+    <delete id="deleteReqDtlAppl">
+    	DELETE FROM TBLIV_CHRG_ADJ_APLY_DTL
+         WHERE ADJ_NO             = #{billingAdjust.adjNo}
+    </delete>
 </mapper>

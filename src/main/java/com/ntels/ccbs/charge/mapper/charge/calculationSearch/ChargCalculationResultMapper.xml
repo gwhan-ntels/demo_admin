@@ -14,7 +14,8 @@
           WHERE SO_ID = A.SO_ID)    AS SO_NM    /* 사업 */
      	,(SELECT PROD_NM
           FROM TPMPD_PROD
-          WHERE PROD_CD = A.PROD_CD) AS PROD_NM   /* 상품명 */
+          WHERE PROD_CD = A.PROD_CD
+          AND SO_ID = A.SO_ID) AS PROD_NM   /* 상품명 */
      	,A.CUST_CNT                               /* 고객수 */
      	,A.CTRT_CNT                               /* 계약건수 */
      	,A.PROD_CMPS_CNT                        /* 계약상품건수 */

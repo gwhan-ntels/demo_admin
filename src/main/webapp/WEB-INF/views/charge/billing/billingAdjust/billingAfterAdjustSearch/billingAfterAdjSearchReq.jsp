@@ -33,8 +33,8 @@ $(document).ready(function() {
             { label: '<spring:message code="LAB.M09.LAB00134" />', name: 'adjAmt', formatter:'integer', width : 120, align:"right", summaryType:'sum'},
             //{ label: '<spring:message code="LAB.M05.LAB00048" />', name: 'unpayAmt', formatter:'integer', width : 100, align:"right"},
             { label: '<spring:message code="LAB.M10.LAB00031" />', name: 'adjAftBillAmt', formatter:'integer', width : 90, align:"right", summaryType:'sum'},
-            { label: '신청금액', name: 'adjApplAmt', formatter:"integer", width : 90, align:"right", summaryType:'sum'},
-            { label: '조정반영예상금액', name: 'preAdjApplAmt', formatter:"integer", width : 100, align:"right", summaryType:'sum'}
+            { label: '<spring:message code="LAB.M07.LAB00345" />', name: 'adjApplAmt', formatter:"integer", width : 90, align:"right", summaryType:'sum'},	//신청금액
+            { label: '<spring:message code="LAB.M09.LAB00257" />', name: 'preAdjApplAmt', formatter:"integer", width : 100, align:"right", summaryType:'sum'} //조정반영예상금액
             
             //{name:'money', index:'money',width:165, align:"right", sorttype:'int', sortable:true, formatter: 'integer', formatoptions:{thousandsSeparator:","}, summaryType:'sum', summaryTpl: 'Totals :'}
 
@@ -156,18 +156,18 @@ function popPrintExcel(){
 	        </colgroup>
 	        <tbody>
 	            <tr>
-	                <th>납부계정ID</th><!-- 신청자 -->
+	                <th><spring:message code="LAB.M02.LAB00006"/></th><!-- 납부계정ID -->
 	                <td><p id="popPymAcntId"></p></td>
 	                
-	                <th>납부자명</th><!-- 신청일시 -->
+	                <th><spring:message code="LAB.M02.LAB00018"/></th><!-- 납부자명 -->
 	                <td><p id="popPymAcnt" /></td>
 	                
-	                <th>주민/사업자번호</th><!-- 신청일시 -->
+	                <th><spring:message code="LAB.M09.LAB00188"/></th><!-- 주민/사업자번호 -->
 	                <td><p id="popRsdtCrrno" /></td>
 	            </tr>
 	            <tr>
 	            <tr>
-	                <th>고객유형</th><!-- 신청자 -->
+	                <th><spring:message code="LAB.M01.LAB00053"/></th><!-- 고객유형 -->
 	                <td><p id="popCustTpNm"></p></td>
 	                
 	                <th>업체명</th>

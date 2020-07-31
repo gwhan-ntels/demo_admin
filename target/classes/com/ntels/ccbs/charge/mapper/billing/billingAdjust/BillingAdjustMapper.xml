@@ -55,196 +55,235 @@
     </select>
             
     <select id="getBeforeAdjTgtList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
-        SELECT A.GUBUN
-              ,A.ADJ_NO
-              ,A.USE_YYMM
-              ,A.PROD_CMPS_ID
-              ,A.SVC_CMPS_ID
-              ,A.CHRG_ITM_CD
-              ,A.CHRG_ITM_NM
-              ,A.CUST_ID
-              ,A.CTRT_ID
-              ,A.CUST_NM
-              ,A.SO_ID
-              ,A.ADJ_PRV_BILL_AMT
-              ,A.ADJ_AMT
-              ,A.ADJ_AFT_BILL_AMT
-              ,A.ADJ_APPL_AMT AS ORG_ADJ_APPL_AMT
-              ,0 AS TOT_ADJ_APPL_AMT
-              ,A.ADJ_APPL_AMT
-              ,A.ADJ_PT
-              ,A.PROD_CD
-              ,A.PROD_NM
-              ,A.SVC_CD
-              ,A.EXRATE
-              ,A.CRNCY_CD
-              ,A.EXRATE_APLY_DT
-              ,A.ATTR_VAL
-              ,A.RATE_STRT_DT
-              ,A.TERM_DT
-              ,A.CTRT_STAT
-              ,A.CTRT_STAT_NM
-              ,A.SVC_TEL_NO
-              ,NVL(B.CHRG_ITM_CD,'Y') AS MNS_FLG
-          FROM (
-		        SELECT 'N' AS GUBUN
-		              ,B.ADJ_NO
-		              ,'0' AS USE_YYMM
-		              ,A.PROD_CMPS_ID
-		              ,A.SVC_CMPS_ID
-		              ,A.CHRG_ITM_CD
-		              ,A.CHRG_ITM_NM
-		              ,A.CUST_ID
-		              ,A.CTRT_ID
-		              ,A.CUST_NM
-		              ,A.SO_ID
-		              ,0 AS ADJ_PRV_BILL_AMT
-		              ,0 AS ADJ_AMT
-		              ,0 AS ADJ_AFT_BILL_AMT
-		              ,NVL(B.ADJ_APPL_AMT, 0) AS ADJ_APPL_AMT
-		              ,B.ADJ_PT
-		              ,A.PROD_CD
-		              ,A.PROD_NM
-		              ,A.SVC_CD
-		              ,NVL(B.EXRATE,         C.EXRATE)     AS EXRATE
-		              ,NVL(B.CRNCY_CD,       C.CRNCY_CD)   AS CRNCY_CD
-		              ,NVL(B.EXRATE_APLY_DT, C.EXRATE_APLY_DT) AS EXRATE_APLY_DT
-		              ,A.ATTR_VAL
-		              ,A.RATE_STRT_DT
-		              ,A.TERM_DT
-		              ,A.CTRT_STAT
-		              ,(SELECT  NAME.CODE_NM AS COMMON_CD_NM
-			              FROM  TSYCO_CODE_MAST MAST
-			                  , TSYCO_CODE_MAST_NAME MNAME
-			                  , TSYCO_CODE_DETAIL DETAIL
-			                  , TSYCO_CODE_DETAIL_NAME NAME
-			            WHERE   MAST.COMMON_GRP=DETAIL.COMMON_GRP
-			                    AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
-			                    AND MNAME.LNG_TYP     =#{billingAdjust.lngTyp}
-			                    AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
-			                    AND DETAIL.COMMON_CD  =NAME.COMMON_CD
-			                    AND NAME.LNG_TYP      =#{billingAdjust.lngTyp}
-			                    AND MAST.COMMON_GRP   ='CM00023'
-			                    AND DETAIL.COMMON_CD = A.CTRT_STAT
-		                    ) AS CTRT_STAT_NM
-		              ,A.SVC_TEL_NO
-		          FROM (
-		                        SELECT DISTINCT B.PYM_ACNT_ID
-		                              ,A.CUST_ID
-		                              ,A.CUST_NM
-		                              ,B.CTRT_ID
-		                              ,B.PROD_CMPS_ID
-		                              ,B.SVC_CMPS_ID
-		                              ,B.SO_ID
-		                              ,B.PROD_CD
-		                              ,(SELECT PROD_NM FROM IFNBRM_PROD_INFO WHERE PROD_CD = B.PROD_CD) PROD_NM
-		                              ,B.SVC_CD
-		                              ,C.SVC_RATE_ITM_TYP_CD   AS CHRG_ITM_CD
-		                              ,C.SVC_RATE_ITM_TYP_NM   AS CHRG_ITM_NM
-		                              ,NVL(D.ATTR_VAL, 'X')    AS ATTR_VAL
-		                              ,C.DISP_PRI_NO
-		                              ,B.RATE_STRT_DT
-		                              ,B.TERM_DT
-		                              ,B.CTRT_STAT
-		                              ,B.SVC_TEL_NO
-		                          FROM IFNBRM_CUST_INFO A
-		                              ,IFNBRM_CTRT_INFO B
-		                              ,IFNBRM_SVC_RATE_ITM_INFO C
-		                              ,IFNBRM_SVC_RATE_ITM_ATTR_INFO D
-		                              ,IFNBRM_RATE_ITM_INFO E
-		                         WHERE 1=1
-		                           AND A.SO_ID = B.SO_ID
-		                           AND A.PYM_ACNT_ID = B.PYM_ACNT_ID
-		                           AND A.CUST_ID = B.CUST_ID
-		                           AND B.PYM_ACNT_ID = #{billingAdjust.pymAcntId}
-		                           AND B.INACT_DTTM = '99991231235959'
-		                           AND B.CTRT_STAT NOT IN ('10', '99', '50', '90')
-		                           AND B.TERM_DT &gt; TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(SYSDATE, 'YYYYMM') || '01', 'YYYYMMDD'), -1), 'YYYYMM')
-		                           AND C.CHRG_CTGRY IN ('R','U','N','D')        /* 요금영역(R:정액,U:종량,N:일회성,D:할인) */
-		                           AND B.PROD_CD = E.PROD_CD
-		                           AND C.SVC_RATE_ITM_TYP_CD = E.SVC_RATE_ITM_TYP_CD
-		                           AND C.SVC_RATE_ITM_TYP_CD = D.SVC_RATE_ITM_TYP_CD
-		                           AND D.ATTR_CD = 'DF059' /* 속성(요금조정대상항목) */
-		                           AND D.ATTR_VAL = '1'  /* 요금조정대상 */
-		                           AND D.INACT_DT = '99991231'
-		                UNION ALL
-		                        SELECT A.PYM_ACNT_ID
-		                              ,A.CUST_ID
-		                              ,A.CUST_NM
-		                              ,B.CTRT_ID
-		                              ,B.PROD_CMPS_ID
-		                              ,B.SVC_CMPS_ID
-		                              ,B.SO_ID
-		                              ,B.PROD_CD
-		                              ,C.PROD_NM
-		                              ,B.SVC_CD
-		                              ,'SR001' AS CHRG_ITM_CD
-		                              ,'Late Fee' AS CHRG_ITM_NM
-		                              ,'1' AS ATTR_VAL
-		                              , 99999
-		                              ,B.RATE_STRT_DT
-		                              ,B.TERM_DT
-		                              ,B.CTRT_STAT
-		                              ,B.SVC_TEL_NO
-		                          FROM IFNBRM_CUST_INFO A
-		                              ,IFNBRM_CTRT_INFO B
-		                              ,IFNBRM_PROD_INFO C
-		                         WHERE A.SO_ID = B.SO_ID
-		                           AND B.PYM_ACNT_ID = #{billingAdjust.pymAcntId}
-		                           AND A.PYM_ACNT_ID = B.PYM_ACNT_ID
-		                           AND A.CUST_ID = B.CUST_ID
-		                           AND B.INACT_DTTM = '99991231235959'
-		                           AND B.CTRT_STAT NOT IN ('10', '99', '50', '90')
-		                           AND B.PROD_CD = C.PROD_CD
-		                           AND C.BASIC_PROD_FL = 'B'
-		                    ) A
-		                 ,(
-		                     SELECT  X.ADJ_NO
-		                       , Y.PROD_CMPS_ID
-		                       , Y.SVC_CMPS_ID
-		                       , Y.CHRG_ITM_CD
-		                       , Y.ADJ_APPL_AMT
-		                       , X.ADJ_PT
-		                       , Y.CTRT_ID
-		                       , Y.CRNCY_CD
-		                       , Y.EXRATE
-		                       , Y.EXRATE_APLY_DT
-		                    FROM TBLIV_CHRG_ADJ_APLY      X                         /* 요금조정신청 */
-		                       , TBLIV_CHRG_ADJ_APLY_DTL  Y                         /* 요금조정신청상세 */
-		                   WHERE 1=1
-		                     <if test="billingAdjust.adjNo != null and billingAdjust.adjNo != ''">
-		                         AND X.ADJ_NO = #{billingAdjust.adjNo}
-		                     </if>
-		                     <if test="billingAdjust.adjNo == null and billingAdjust.adjNo == ''">
-		                         AND X.ADJ_NO = '0000000000'
-		                     </if>
-		                     AND X.ADJ_NO = Y.ADJ_NO
-		                     AND X.ADJ_PT = #{billingAdjust.adjPt}    /* 조정시점(BLIV015, 1:청구전,2:청구후) */
-		              ) B
-		             ,(
-		               SELECT EXRATE_APLY_DT
-		                    , EXRATE
-		                    , CRNCY_CD
-		                 FROM TBLIV_EXRATE_INFO Y                                  /* 환율정보 */
-		                WHERE CRNCY_CD         = 'KRW'
-		                  AND EXRATE_APLY_DT   IN (SELECT MAX(EXRATE_APLY_DT)
-		                                             FROM TBLIV_EXRATE_INFO Z
-		                                            WHERE Z.CRNCY_CD         = 'KRW'
-		                                              AND EXRATE_APLY_DT  &lt;= TO_CHAR(SYSDATE, 'YYYYMMDD')
-		                                           )
-		              ) C
-		         WHERE A.PROD_CMPS_ID = B.PROD_CMPS_ID (+)
-		           AND A.SVC_CMPS_ID = B.SVC_CMPS_ID (+)
-		           AND A.CHRG_ITM_CD = B.CHRG_ITM_CD (+)
-		        ORDER BY A.CTRT_ID, A.PROD_NM, A.DISP_PRI_NO) A,
-	           (SELECT DISTINCT SVC_RATE_ITM_TYP_CD AS CHRG_ITM_CD
-				  FROM IFNBRM_RATE_INFO A
-				      ,IFNBRM_RATE_ITM_INFO B
-				 WHERE A.RATE_ITM_CD = B.RATE_ITM_CD
-				   AND A.FCTR_VAL1 != '*'
-				   AND A.RATE_VAL > 0
-				   AND CHRG_CTGRY = 'D') B
-		  WHERE A.CHRG_ITM_CD = B.CHRG_ITM_CD(+)
+     <![CDATA[   /*com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO.getBeforeAdjTgtList*/
+    SELECT 'N'
+     , B.ADJ_NO
+     , '0'                                        AS USE_YYMM
+     , A.PROD_CMPS_ID
+     , A.SVC_CMPS_ID
+     , A.CHRG_ITM_CD
+     , A.CHRG_ITM_NM
+     , A.CUST_ID
+     , A.CTRT_ID
+     , A.CUST_NM
+     , A.SO_ID
+     , 0                                          AS ADJ_PRV_BILL_AMT
+     , 0                                          AS ADJ_AMT
+     , 0                                          AS ADJ_AFT_BILL_AMT
+     , IFNULL(B.ADJ_APPL_AMT,0)    AS ADJ_APPL_AMT     /* 신청금액 */
+     , IFNULL(B.ADJ_APPL_AMT,0)    AS ORG_ADJ_APPL_AMT /* 신청금액과 원래값 비교 */
+     , B.ADJ_PT
+     , A.PROD_CD
+     , A.SVC_CD
+     , A.EXRATE
+     , A.CRNCY_CD
+     , A.EXRATE_APLY_DT
+     , A.ATTR_VAL
+     , (
+        SELECT PROD_NM
+          FROM TPMPD_PROD X                      /* 상품정보 */
+         WHERE X.PROD_CD            = A.PROD_CD
+           AND X.MSTR_FL            = '1'
+           AND X.SO_ID              = A.SO_ID
+       )                            AS PROD_NM
+     , (
+        SELECT SVC_NM
+          FROM TPMSV_SVC X                       /* 서비스정보 */
+         WHERE X.SVC_CD             = A.SVC_CD
+           AND X.MSTR_FL            = '1'
+           AND X.SO_ID              = A.SO_ID
+       )                            AS SVC_NM
+     , (
+        SELECT SO_NM
+          FROM TSYCO_SO_MAST X                   /* SO 마스타*/
+         WHERE X.SO_ID              = A.SO_ID
+       )                            AS SO_NM
+     , RATE_STRT_DT                                     /* 과금계시일 */
+     , RATE_END_DT                                      /* 과금종료일 */
+     , CTRT_STAT_NM                                     /* 계약상태 */
+     , A.SVC_TEL_NO
+  FROM (
+        /* 가입된 상품의 과금항목을 조회 */
+		SELECT DISTINCT
+               A1.PYM_ACNT_ID
+             , A3.CUST_NM
+             , A2.CTRT_ID
+             , C1.PROD_CMPS_ID
+             , B1.SVC_CMPS_ID
+             , A3.CUST_ID
+             , A2.SO_ID
+             , C1.PROD_CD
+             , B1.SVC_CD
+             , D1.SVC_RATE_ITM_TYP_CD    AS CHRG_ITM_CD
+             , IFNULL(F1.ATTR_VAL, 'X')  AS ATTR_VAL
+             , D1.SVC_RATE_ITM_TYP_NM    AS CHRG_ITM_NM
+             , D1.DISP_PRI_NO                           /* 출력순서 */
+             , A2.RATE_STRT_DT                          /* 과금개시일 */
+             , A2.RATE_END_DT                           /* 과금종료일 */
+             , A2.SVC_TEL_NO
+             , (SELECT NAME.CODE_NM AS COMMON_CD_NM
+                  FROM TSYCO_CODE_MAST MAST
+                      ,TSYCO_CODE_MAST_NAME MNAME
+                      ,TSYCO_CODE_DETAIL DETAIL
+                      ,TSYCO_CODE_DETAIL_NAME NAME
+                 WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                   AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                   AND MNAME.LNG_TYP     ='ko' /* INPUT */
+                   AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                   AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                   AND NAME.LNG_TYP      ='ko' /* INPUT */
+                   AND MAST.COMMON_GRP   ='CM00023'
+                   AND DETAIL.COMMON_CD = A2.CTRT_STAT
+               ) AS CTRT_STAT_NM                        /* 계약구분 */
+             , I1.EXRATE
+             , I1.CRNCY_CD
+             , I1.EXRATE_APLY_DT
+          FROM TCMCU_PYM_ACNT_INFO         A1           /* 납부계정정보 */
+             , TCMCT_CTRT_INFO             A2           /* 계약정보 */
+             , TCMCU_CUST_INFO             A3           /* 고객정보 */
+             , TCMCT_SVC_CMPS_INFO         B1           /* 서비스구성정보 */
+             , TCMCT_PROD_CMPS_INFO        C1           /* 상품구성정보 */
+             , TPMPD_SVC_RATE_ITM_TYP      D1           /* 서비스과금항목유형 */
+             , TPMPD_SVC_RATE_ITM_TYP_ATTR F1           /* 서비스과금항목유형속성 */
+             , TPMPD_RATE_ITM              G1
+             , TPMPD_RATE                  H1
+             , TBLIV_EXRATE_INFO           I1
+         WHERE A1.PYM_ACNT_ID           = A2.PYM_ACNT_ID
+           AND A2.CUST_ID               = A3.CUST_ID
+           AND A1.SO_ID                 = A2.SO_ID
+           AND A1.SO_ID                 = A3.SO_ID
+           AND A2.SO_ID                 = B1.SO_ID
+           AND A2.CUST_ID               = A3.CUST_ID
+           AND A2.CTRT_ID               = B1.CTRT_ID
+           AND B1.SO_ID                 = C1.SO_ID
+           AND B1.CTRT_ID               = C1.CTRT_ID
+           AND B1.PROD_CMPS_ID          = C1.PROD_CMPS_ID
+           AND B1.SVC_CD                = D1.SVC_CD
+           AND D1.SVC_RATE_ITM_TYP_CD   = F1.SVC_RATE_ITM_TYP_CD
+           AND D1.SVC_RATE_ITM_TYP_CD   NOT IN ('SR008', 'SR511', 'SR001', 'SR003', 'SR004') /*부가세, 특소세, 일회성요금 제외 */
+           AND G1.PROD_CD               = B1.PROD_CD
+           AND G1.SVC_RATE_ITM_TYP_CD   = D1.SVC_RATE_ITM_TYP_CD
+           AND A1.PYM_ACNT_ID           = #{billingAdjust.pymAcntId}  /* INPUT */
+           AND A2.INACT_DTTM            = '99991231235959'
+           AND A2.CTRT_STAT             NOT IN ('10', '99', '50', '90')
+           AND B1.SVC_STS_CD            NOT IN ('10', '99', '50', '90')
+           AND C1.INACT_DTTM            = '99991231235959'
+           AND B1.INACT_DTTM            = '99991231235959'
+--           AND (B1.EQT_CL_CD IS NULL       OR  B1.EQT_CL_CD NOT IN ('090501','090701'))
+           AND D1.CHRG_CTGRY            IN ('R','U','N')        /* 요금영역(R:정액,U:종량) */
+           AND D1.MSTR_FL               = '1'
+           AND F1.MSTR_FL               = '1'
+           AND F1.ATTR_CD               IN ('AT006', 'DF059')   /* 속성(요금조정대상항목) */
+           AND F1.ATTR_VAL              = '1'                   /* 요금조정대상 */
+           AND G1.SO_ID                 = H1.SO_ID
+           AND G1.RATE_ITM_CD           = H1.RATE_ITM_CD
+           AND H1.INACT_DT              = '99991231'
+           AND H1.CRNCY_CD              = I1.CRNCY_CD
+           AND I1.EXRATE_APLY_DT        IN (
+                                            SELECT MAX(EXRATE_APLY_DT)
+                                              FROM TBLIV_EXRATE_INFO Z
+                                             WHERE Z.CRNCY_CD      = I1.CRNCY_CD
+                                               AND EXRATE_APLY_DT  <= DATE_FORMAT(NOW(), '%Y%m%d')
+                                           )
+     UNION ALL
+        /* 가입된 상품의 과금항목외에 조정금액을 넣어 처리하기 위해 추가로 SR코드를 생성하여 처리 */
+		SELECT A1.PYM_ACNT_ID
+             , A3.CUST_NM
+             , A2.CTRT_ID
+             , C1.PROD_CMPS_ID
+             , B1.SVC_CMPS_ID
+             , A3.CUST_ID
+             , A2.SO_ID
+             , C1.PROD_CD
+             , B1.SVC_CD
+             , 'SR999'           AS CHRG_ITM_CD
+             , '1'               AS ATTR_VAL
+             , 'Adjustment Fee'  AS CHRG_ITM_NM
+             , 99999                                             /* 출력순서 */
+             , A2.RATE_STRT_DT                                   /* 과금계시일 */
+             , A2.RATE_END_DT                                    /* 과금종료일 */
+             , A2.SVC_TEL_NO
+             , (SELECT NAME.CODE_NM AS COMMON_CD_NM
+                  FROM TSYCO_CODE_MAST MAST
+                      ,TSYCO_CODE_MAST_NAME MNAME
+                      ,TSYCO_CODE_DETAIL DETAIL
+                      ,TSYCO_CODE_DETAIL_NAME NAME
+                 WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                   AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                   AND MNAME.LNG_TYP     ='ko'  /* INPUT */
+                   AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                   AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                   AND NAME.LNG_TYP      ='ko'  /* INPUT */
+                   AND MAST.COMMON_GRP   ='CM00023'
+                   AND DETAIL.COMMON_CD = A2.CTRT_STAT
+                 ) AS CTRT_STAT_NM                               /* 계약구분 */
+             , G1.EXRATE
+             , G1.CRNCY_CD
+             , G1.EXRATE_APLY_DT
+          FROM TCMCU_PYM_ACNT_INFO         A1                    /* 납부계정정보 */
+             , TCMCT_CTRT_INFO             A2                    /* 계약정보 */
+             , TCMCU_CUST_INFO             A3                    /* 고객정보 */
+             , TCMCT_SVC_CMPS_INFO         B1                    /* 서비스구성정보 */
+             , TCMCT_PROD_CMPS_INFO        C1                    /* 상품구성정보 */
+             , TPMPD_RATE_ITM              D1
+             , TPMPD_SVC_RATE_ITM_TYP      E1                    /* 서비스과금항목유형 */
+             , TPMPD_RATE                  F1
+             , TBLIV_EXRATE_INFO           G1
+         WHERE A1.PYM_ACNT_ID           = A2.PYM_ACNT_ID         /* 납부계정ID */
+           AND A2.CUST_ID               = A3.CUST_ID             /* 고객ID */
+           AND A1.SO_ID                 = A2.SO_ID
+           AND A1.SO_ID                 = A3.SO_ID
+           AND A2.SO_ID                 = B1.SO_ID
+           AND A2.CTRT_ID               = B1.CTRT_ID
+           AND B1.SO_ID                 = C1.SO_ID
+           AND B1.CTRT_ID               = C1.CTRT_ID
+           AND B1.PROD_CMPS_ID          = C1.PROD_CMPS_ID
+           AND A2.PROD_CMPS_ID          = C1.PROD_CMPS_ID        /* 기본상품만(무조건 한건) */
+           AND A1.PYM_ACNT_ID           = #{billingAdjust.pymAcntId}  /* INPUT */
+           AND A2.INACT_DTTM            = '99991231235959'
+           AND A2.CTRT_STAT             NOT IN ('10', '99', '50', '90')
+           AND B1.SVC_STS_CD            NOT IN ('10', '99', '50', '90')
+           AND B1.INACT_DTTM            = '99991231235959'
+--           AND (B1.EQT_CL_CD IS NULL       OR  B1.EQT_CL_CD NOT IN ('090501','090701'))
+           AND C1.INACT_DTTM            = '99991231235959'
+           AND A2.PROD_CD               = D1.PROD_CD
+           AND D1.RATE_ITM_CD           = F1.RATE_ITM_CD
+           AND D1.SVC_RATE_ITM_TYP_CD   = E1.SVC_RATE_ITM_TYP_CD
+           AND D1.SO_ID                 = F1.SO_ID
+           AND F1.INACT_DT              = '99991231'
+           AND F1.CRNCY_CD              = G1.CRNCY_CD
+           AND G1.EXRATE_APLY_DT        IN (
+                                            SELECT MAX(EXRATE_APLY_DT)
+                                              FROM TBLIV_EXRATE_INFO Z
+                                             WHERE Z.CRNCY_CD      = G1.CRNCY_CD
+                                               AND EXRATE_APLY_DT  <= DATE_FORMAT(NOW(), '%Y%m%d')
+                                           )
+      ) A LEFT OUTER JOIN
+      (
+         SELECT  X.ADJ_NO
+               , Y.PROD_CMPS_ID
+               , Y.SVC_CMPS_ID
+               , Y.CHRG_ITM_CD
+               , Y.ADJ_APPL_AMT
+               , X.ADJ_PT
+               , Y.CTRT_ID
+               , Y.CRNCY_CD
+               , Y.EXRATE
+               , Y.EXRATE_APLY_DT
+            FROM TBLIV_CHRG_ADJ_APLY      X                         /* 요금조정신청 */
+               , TBLIV_CHRG_ADJ_APLY_DTL  Y                         /* 요금조정신청상세 */
+           WHERE X.ADJ_NO                 = Y.ADJ_NO ]]>
+        <if test="billingAdjust.adjNo == null or billingAdjust.adjNo == ''">
+             AND X.ADJ_NO                 = '0000000000'
+        </if>
+        <if test="billingAdjust.adjNo != null and billingAdjust.adjNo != ''">
+                     AND X.ADJ_NO                 = #{billingAdjust.adjNo}     /* INPUT */
+        </if>
+             AND X.ADJ_PT                 = #{billingAdjust.adjPt}                   /* 조정시점(BLIV015, 1:청구전,2:청구후) */
+       ) B ON A.PROD_CMPS_ID = B.PROD_CMPS_ID AND A.SVC_CMPS_ID = B.SVC_CMPS_ID AND A.CHRG_ITM_CD = B.CHRG_ITM_CD
+	 WHERE 1=1  
+	 ORDER BY SO_NM, A.CUST_NM, A.CTRT_ID, PROD_NM, SVC_NM, A.ATTR_VAL, A.DISP_PRI_NO
+	
     </select>
     
     <select id="getAfterAdjTgtList" parameterType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingAdjustVO">
@@ -353,5 +392,69 @@
         AND    D1.ATTR_CD          = 'AT006'               /* 속성코드(요금조정대상항목) Vads에서는  AT006 코드로 변경해야함*/
         AND    D1.ATTR_VAL         = '1'                        /* 속성값 (요금조정 대상) */
         ORDER  BY SO_NM, CUST_NM, A1.CTRT_ID, C1.USE_YYMM, PROD_NM, SVC_NM, D2.DISP_PRI_NO
+    </select>
+    <select id="getBasicCustInfo" resultType="com.ntels.ccbs.charge.domain.billing.billingAdjust.BillingBasicCustInfoVO">
+        SELECT '0' AS CHK_JOB                     /* 납부계정별 요금계산에서 사용 */
+             , A.PYM_ACNT_ID
+        ,A.ACNT_NM AS PYM_ACNT
+             , CASE WHEN B.CUST_TP IN ('B','D','E') THEN BIZ_REG_NO
+                    ELSE B.CORP_REG_NO
+               END AS RSDT_CRRNO
+             , B.CORP_REG_NO AS MASKING_RSDT_CRRNO                                       /* 암호화 해제 필요 */
+             , B.CUST_NM                                                                 /* 고객명 */
+             , B.REP_NM                                                                  /* 대표자명 */
+             , B.CUST_NM AS CRR_NM                                                       /* 업체명 */
+             , B.BUSI_CNDT                                                               /* 업태 */
+             , (SELECT NAME.CODE_NM AS COMMON_CD_NM
+                            FROM TSYCO_CODE_MAST MAST
+                                ,TSYCO_CODE_MAST_NAME MNAME
+                                ,TSYCO_CODE_DETAIL DETAIL
+                                ,TSYCO_CODE_DETAIL_NAME NAME
+                           WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                             AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                             AND MNAME.LNG_TYP     ='ko' /* INPUT */
+                             AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                             AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                             AND NAME.LNG_TYP      ='ko' /* INPUT */
+                             AND MAST.COMMON_GRP   ='CM00014'
+                             AND DETAIL.COMMON_CD = B.BUSI_TP
+               ) AS BUSI_TP                                                              /* 업종 */
+             , CONCAT(A.ZIP_CD, ' ', TRIM(A.BASE_ADDR), ' ', TRIM(A.ADDR_DTL)) AS ADDR
+             , B.CUST_TP                                                                 /* 고객유형 */
+             , (SELECT NAME.CODE_NM AS COMMON_CD_NM
+                            FROM TSYCO_CODE_MAST MAST
+                                ,TSYCO_CODE_MAST_NAME MNAME
+                                ,TSYCO_CODE_DETAIL DETAIL
+                                ,TSYCO_CODE_DETAIL_NAME NAME
+                           WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                             AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                             AND MNAME.LNG_TYP     ='ko' /* INPUT */
+                             AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                             AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                             AND NAME.LNG_TYP      ='ko' /* INPUT */
+                             AND MAST.COMMON_GRP   ='CM00009'
+                             AND DETAIL.COMMON_CD = B.CUST_TP
+               ) AS CUST_TP_NM                                                           /* 고객유형명 */                                     
+             , (SELECT NAME.CODE_NM AS COMMON_CD_NM
+                            FROM TSYCO_CODE_MAST MAST
+                                ,TSYCO_CODE_MAST_NAME MNAME
+                                ,TSYCO_CODE_DETAIL DETAIL
+                                ,TSYCO_CODE_DETAIL_NAME NAME
+                           WHERE MAST.COMMON_GRP=DETAIL.COMMON_GRP
+                             AND MAST.COMMON_GRP   =MNAME.COMMON_GRP
+                             AND MNAME.LNG_TYP     ='ko' /* INPUT */
+                             AND DETAIL.COMMON_GRP =NAME.COMMON_GRP
+                             AND DETAIL.COMMON_CD  =NAME.COMMON_CD
+                             AND NAME.LNG_TYP      ='ko' /* INPUT */
+                             AND MAST.COMMON_GRP   ='CM00001'
+                             AND DETAIL.COMMON_CD = A.PYM_MTHD
+               ) AS PYM_MTHD_NM                                                          /* 납부방법 */
+             , A.SO_ID
+          FROM TCMCU_PYM_ACNT_INFO      A                                                /* 납부계정정보 */
+             , TCMCU_CUST_INFO          B                                                /* 고객정보 */
+         WHERE A.CUST_ID                = B.CUST_ID
+               AND A.SO_ID = #{soId}  /* INPUT */
+           AND A.SO_ID = B.SO_ID
+           AND A.PYM_ACNT_ID = #{pymAcntId}  /* INPUT */    
     </select>
 </mapper>

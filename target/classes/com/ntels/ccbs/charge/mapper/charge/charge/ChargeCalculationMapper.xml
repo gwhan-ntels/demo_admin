@@ -166,7 +166,7 @@
 		             , SUM(C.USE_AMT)    AS TOT_USE_AMT
 		             , SUM(C.USE_CNT)    AS TOT_USE_CNT
 		             ,(SELECT CUST_NM
-		               FROM   TCMCU_CUST_INFO      X                   /* 고객정보 */
+		               FROM   TCMCU_CUST_INFO      X                      /* 고객정보 */
 		               WHERE  X.CUST_ID            = B.CUST_ID
 		               AND    X.SO_ID = B.SO_ID
 		              )                            AS CUST_NM
@@ -176,11 +176,11 @@
 		               AND    X.MSTR_FL            = '1'
 		              )                            AS PROD_NM
 		             ,(SELECT SO_NM
-		               FROM   TSYCO_SO_MAST        X                   /* SO 마스타*/
+		               FROM   TSYCO_SO_MAST        X                      /* SO 마스타*/
 		               WHERE  X.SO_ID              = B.SO_ID
 		              )                            AS SO_NM
-		        FROM   TBLCH_SVC_CMPS_MT    B                           /* 서비스구성Master */
-		             , TBLCH_CHRG           C                           /* 요금내역 */
+		        FROM   TBLCH_SVC_CMPS_MT    B                             /* 서비스구성Master */
+		             , TBLCH_CHRG           C                             /* 요금내역 */
 		        WHERE  1=1
 		        AND    B.CLC_WRK_NO      = C.CLC_WRK_NO
 		        AND    B.BILL_YYMM       = C.BILL_YYMM
