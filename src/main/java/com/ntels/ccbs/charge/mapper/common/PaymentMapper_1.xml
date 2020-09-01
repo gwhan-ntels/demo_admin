@@ -124,7 +124,7 @@
 	</update>	
 
 	<update id="updateFullPayBill">
-		UPDATE TBLIV_BILL SET
+		UPDATE TBLIV_BILL SET 
 			RCPT_AMT = RCPT_AMT + (BILL_AMT - RCPT_AMT)
 			, FULL_PAY_YN = 'Y'
 			, CHG_DATE = #{bill.chgDate}
