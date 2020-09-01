@@ -48,10 +48,7 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 
 	@Autowired
 	private SequenceService sequenceService;
-
-//	@Autowired
-//	private EachDepositService eachDepositService;
-
+	
 	@Autowired
 	private DepositService depositService;
 	
