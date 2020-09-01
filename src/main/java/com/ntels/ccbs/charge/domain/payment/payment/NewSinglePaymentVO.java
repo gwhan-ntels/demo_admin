@@ -71,8 +71,6 @@ public class NewSinglePaymentVO extends PagingValue {
 	private String wonDpstAmt;
 	private String rcptBillEmpId;
 	private String crncyCd;
-	private String exrate;
-	private String exrateAplyDt;
 	
 	
 	private String depositDt;		//입금일자
@@ -89,6 +87,24 @@ public class NewSinglePaymentVO extends PagingValue {
 	private String remark;			//적요
 	private String depositSeqNo;    //입금시퀀스
 	
+	private String rdoDpstGubn; // 건별, 전체미납 입금 구분 2020.08.18 gwhan
+
+	private double exrate;
+	private String exrateAplyDt;
+	
+	
+	public double getExrate() {
+		return exrate;
+	}
+	public void setExrate(double exrate) {
+		this.exrate = exrate;
+	}
+	public String getRdoDpstGubn() {
+		return rdoDpstGubn;
+	}
+	public void setRdoDpstGubn(String rdoDpstGubn) {
+		this.rdoDpstGubn = rdoDpstGubn;
+	}
 	public String getProcDt() {
 		return procDt;
 	}
@@ -424,12 +440,6 @@ public class NewSinglePaymentVO extends PagingValue {
 	}
 	public void setCrncyCd(String crncyCd) {
 		this.crncyCd = crncyCd;
-	}
-	public String getExrate() {
-		return exrate;
-	}
-	public void setExrate(String exrate) {
-		this.exrate = exrate;
 	}
 	public String getExrateAplyDt() {
 		return exrateAplyDt;

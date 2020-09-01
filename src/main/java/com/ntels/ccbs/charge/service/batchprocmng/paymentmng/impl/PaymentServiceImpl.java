@@ -49,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public int processReceipt(String procScopeFlag, String pymAcntId, String dpstSeqNo, DepositVO depositInfo, String inptMenuId, String workId) throws Exception {
+	public int processReceipt(String procScopeFlag, String pymAcntId, String dpstSeqNo, DepositVO depositInfo, String inptMenuId, String workId, String rdoDpstGubn) throws Exception {
 		int resultFlag = 1;
 
 		// 작업변수 정의
@@ -189,7 +189,16 @@ public class PaymentServiceImpl implements PaymentService {
 				billMastService.billMastUpdate(billInfo.getSoId(), billInfo.getBillYymm(), billInfo.getBillSeqNo(), billInfo.getPymAcntId(), workId);
 
 				// 5. insert tblpy_rcpt  수납 내역 생성
-				boolean rcptInsRes = insertReceipt(pymSeqNo, dpstSeqNo, billSeqNo, billYymm, billCycl, billDt, pymAcntId, payProcDt, "01" , bddbtTgtYn, inptMenuId, workId, billInfo.getSoId());
+				boolean rcptInsRes = false;
+				if (rdoDpstGubn.equals("S")) {
+					rcptInsRes = insertReceipt(pymSeqNo, dpstSeqNo, billSeqNo, billYymm, billCycl, billDt, pymAcntId, payProcDt, "01", bddbtTgtYn, inptMenuId, workId, billInfo.getSoId());
+				} else {
+					// 전체미납금액 입금 처리 시 billSeqNo, billYymm 를 채우지 않기 위함.
+					billSeqNo = "";
+					billYymm = "";
+					billCycl = "";
+					rcptInsRes = insertReceipt(pymSeqNo, dpstSeqNo, billSeqNo, billYymm, billCycl, billDt, pymAcntId, payProcDt, "01", bddbtTgtYn, inptMenuId, workId, billInfo.getSoId());
+				}
 
 				if (rcptInsRes == false) {
 					resultFlag = -1;
@@ -227,7 +236,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 		}
 
-		// 8. update tblpyd_pst
+		// 8. update tblpy_dpst
 		boolean dpstUpdres = updateDepositReceiptRslt(dpstSeqNo, payProcDt, prepayTgtYn, prepayOccSeqNo, ambgTgtYn, ambgOccSeqNo, assrTgtYn, assrOccSeqNo, workId);
 
 		if (dpstUpdres == false) {

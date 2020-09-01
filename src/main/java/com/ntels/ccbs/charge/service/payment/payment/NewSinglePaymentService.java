@@ -3,6 +3,7 @@ package com.ntels.ccbs.charge.service.payment.payment;
 import java.util.List;
 import java.util.Map;
 
+import com.ntels.ccbs.charge.domain.common.EachDeposit;
 import com.ntels.ccbs.charge.domain.payment.payment.NewSinglePaymentVO;
 
 public interface NewSinglePaymentService {
@@ -30,6 +31,9 @@ public interface NewSinglePaymentService {
 
 	List<Map<String, Object>> listMyReceiptExcel(String soId, String usrId, String lngTyp);
 
-	public int insertDeposit(NewSinglePaymentVO newSinglePaymentVO);
+	
+	
+	
+	public int insertAction(EachDeposit eachDeposit);
 
 }

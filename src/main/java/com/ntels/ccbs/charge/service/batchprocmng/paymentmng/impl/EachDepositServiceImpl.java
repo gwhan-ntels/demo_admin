@@ -40,7 +40,7 @@ public class EachDepositServiceImpl implements EachDepositService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public int processEachDeposit(String eachDpstSeq, String inptMenuId, String workId) throws Exception {
+	public int processEachDeposit(String eachDpstSeq, String inptMenuId, String workId, String rdoDpstGubn) throws Exception {
 		int resultFlag = 1;
 
 		// 개별입금/수납을 처리한다.
@@ -63,7 +63,7 @@ public class EachDepositServiceImpl implements EachDepositService {
 			depositInfo = setEachDepositInfo(dpstSeqNo, eachDepositVO, inptMenuId, workId);
 
 			// 입금/수납 처리
-			int rcptCnt = paymentService.processReceipt("A", pymAcntId, dpstSeqNo, depositInfo, inptMenuId, workId);
+			int rcptCnt = paymentService.processReceipt("A", pymAcntId, dpstSeqNo, depositInfo, inptMenuId, workId, rdoDpstGubn);
 
 			if (rcptCnt == -1) {
 				resultFlag = -1;

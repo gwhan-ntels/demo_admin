@@ -1,57 +1,76 @@
 package com.ntels.ccbs.charge.mapper.payment.payment;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
+import com.ntels.ccbs.charge.domain.common.CBillComm;
+import com.ntels.ccbs.charge.domain.common.Receipt;
+import com.ntels.ccbs.charge.domain.common.ReceiptDetail;
 import com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO;
 
 @Component
 public interface CancelSinglePaymentMapper {
 
-	/**
-	 * List.
-	 *
-	 * @param page the page
-	 * @param perPage the per page
-	 * @param attribute
-	 * @return the list
-	 * 
-	 * 설명 : 속성 목록
-	 */
+	int getCaseByCancelListCount(@Param(value = "cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO);
+
+	List<CancelSinglePaymentVO> getCaseByCancelList(@Param(value = "cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO);
 	
-	List<CancelSinglePaymentVO> getCaseByCancelList(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+
+	Double getTransCheckAmt(@Param("dpstSeqNo") String dpstSeqNo);
 	
-	int getCaseByCancelListCount(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	int getReceiptCheckCnt(@Param("dpstSeqNo") String dpstSeqNo);
+
+
+	CancelSinglePaymentVO getDepositForCancel(@Param("dpstSeqNo") String dpstSeqNo);
 	
-	List<CancelSinglePaymentVO> getPermitOrg(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	int updateCnclYn(@Param(value = "cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO);
 	
-	int getPermitOrgCount(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	CancelSinglePaymentVO getDepositCancelInfo(@Param("dpstSeqNo") String dpstSeqNo);	
+
+	int insertDepositCancel(@Param("cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO);
+
+	List<ReceiptDetail> getReceiptDetailList(@Param("dpstSeqNo") String dpstSeqNo, @Param("pymSeqNo") String pymSeqNo);
+
+	int updateBillCancel(CBillComm bill);
+
+	List<Receipt> getReceiptBillInfo(@Param("dpstSeqNo") String dpstSeqNo);
 	
-	List<CancelSinglePaymentVO> getLoanAvlAmt(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	int updateBillMastCancel(CBillComm bill);
 	
-	int getLoanAvlAmtCount(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	int updateRcptCancel(@Param("dpstSeqNo") String dpstSeqNo, @Param("chgrId") String chgrId);	
+
+	int getPrepayTransCount(@Param("prepayOccTgtSeqNo") String prepayOccTgtSeqNo);
 	
-	List<CancelSinglePaymentVO> getRcptCnclCnt(	
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
-	);
+	int updatePrepayOccCancel(@Param("cnclDttm") String cnclDttm, @Param("prepayOccTgtSeqNo") String prepayOccTgtSeqNo, @Param("chgrId") String chgrId);
 	
-	List<Map<String,Object>> getCaseByCancelListExcel(
-			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO,
-			@Param(value="lngTyp") String lngTyp
-	);
+	
+	
+	
+	
+//	List<CancelSinglePaymentVO> getPermitOrg(
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
+//	);
+//	
+//	int getPermitOrgCount(
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
+//	);
+//	
+//	List<CancelSinglePaymentVO> getLoanAvlAmt(
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
+//	);
+//	
+//	int getLoanAvlAmtCount(
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
+//	);
+//	
+//	List<CancelSinglePaymentVO> getRcptCnclCnt(	
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO
+//	);
+//	
+//	List<Map<String,Object>> getCaseByCancelListExcel(
+//			@Param(value ="cancelSinglePaymentVO") CancelSinglePaymentVO cancelSinglePaymentVO,
+//			@Param(value="lngTyp") String lngTyp
+//	);
 }

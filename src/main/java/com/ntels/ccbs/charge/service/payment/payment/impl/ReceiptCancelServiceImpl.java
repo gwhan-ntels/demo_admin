@@ -1,18 +1,30 @@
 package com.ntels.ccbs.charge.service.payment.payment.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.ntels.ccbs.charge.domain.common.CBillComm;
+import com.ntels.ccbs.charge.domain.common.PrepayOcc;
+import com.ntels.ccbs.charge.domain.common.Receipt;
+import com.ntels.ccbs.charge.domain.common.ReceiptDetail;
 import com.ntels.ccbs.charge.domain.payment.payment.ReceiptCancelVO;
 import com.ntels.ccbs.charge.mapper.payment.payment.ReceiptCancelMapper;
-import com.ntels.ccbs.charge.service.batchprocmng.receiptcnclmng.PaymentCancelService;
+import com.ntels.ccbs.charge.service.common.PaymentService_1;
+import com.ntels.ccbs.charge.service.common.PrepayService;
+import com.ntels.ccbs.charge.service.common.ReceiptService;
 import com.ntels.ccbs.charge.service.payment.payment.ReceiptCancelService;
+import com.ntels.ccbs.common.consts.Consts;
+import com.ntels.ccbs.common.util.CUtil;
+import com.ntels.ccbs.common.util.CommonUtil;
+import com.ntels.ccbs.common.util.DateUtil;
+import com.ntels.ccbs.system.domain.common.service.SessionUser;
+import com.ntels.ccbs.system.service.common.service.SequenceService;
 
 @Service
 public class ReceiptCancelServiceImpl implements ReceiptCancelService {
@@ -23,9 +35,22 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 	/** AttributeMapper Autowired. */
 	@Autowired
 	private ReceiptCancelMapper receiptCancelMapper;
-	
+
 	@Autowired
-	private PaymentCancelService paymentCancelService;
+	private PaymentService_1 paymentService_1;
+
+	@Autowired
+	private ReceiptService receiptService;
+
+	@Autowired
+	private SequenceService sequenceService;
+
+	@Autowired
+	private PrepayService prepayService;
+
+//	
+//	@Autowired
+//	private PaymentCancelService paymentCancelService;
 
 	@Override
 	public int rcptListCnt(ReceiptCancelVO receiptCancel) {
@@ -59,12 +84,6 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 		return receiptCancelMapper.receiptCancelResultList(receiptCancel, start, end);
 	}
 
-	/**
-	 * 대체신청, 환불신청 내역이 있는지 확인한다-수납취소 가능여부 CHECK
-	 * 
-	 * @param pymSeqNo
-	 * @return
-	 */
 	@Override
 	public int getReceiptCancelAbleCheck(String pymSeqNo) {
 		int returnFlag = 1;
@@ -76,29 +95,160 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 		return returnFlag;
 	}
 
-	/**
-	 * 수납취소를 처리한다.
-	 * 
-	 * @param pymSeqNo,
-	 *            cnclResnTxt, inptMenuId, workId
-	 * @return
-	 */
-	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public int processReceiptCancelMain(String pymSeqNo, String cnclResnTxt, String inptMenuId, String workId) throws Exception {
+	public int insertAction(ReceiptCancelVO receiptCancelVO ) {
 		int returnFlag = 1;
+		String pymSeqNo = receiptCancelVO.getPymSeqNo();
+		
+		SessionUser session = CommonUtil.getSessionManager();
+		String userId = session.getUserId();
 
-		logger.debug("========================================");
-		logger.debug(" processReceiptCancelMain Start...  ");
-		logger.debug("========================================");
+		String cnclYn = receiptService.getCancelYn(pymSeqNo);
 
-		returnFlag = paymentCancelService.processReceiptCancel(pymSeqNo, cnclResnTxt, inptMenuId, workId);
+		if ("Y".equals(cnclYn) == true) {
+			logger.debug("Receipt had already been canceled. " + pymSeqNo);
+			throw new RuntimeException("Receipt had already been canceled. " + pymSeqNo);
+		}
 
-		logger.debug("========================================");
-		logger.debug(" processReceiptCancelMain End...  ");
-		logger.debug("========================================");
+		// 수납 상세내역 조회
+		List<ReceiptDetail> receiptDetailList = receiptService.getReceiptDetailList(null, pymSeqNo);
 
+		if (receiptDetailList.isEmpty() == true) {
+			throw new RuntimeException("Receipt detail not exists!!");
+		}
+		
+		// 수납금액의 합
+		double payObjAmt = 0.0;
+
+		// 청구내역의 수납금액 취소
+		for (ReceiptDetail receiptDetail : receiptDetailList) {
+			payObjAmt += receiptDetail.getRcptAmt();
+
+			if (receiptDetail.getRcptAmt() != 0) {
+
+				Double billRcptAmt = paymentService_1.getBillRcptAmt(receiptDetail.getBillSeqNo(), receiptDetail.getUseYymm(), receiptDetail.getProdCmpsId(),
+						receiptDetail.getSvcCmpsId(), receiptDetail.getChrgItmCd());
+
+				billRcptAmt = billRcptAmt == null ? 0 : billRcptAmt;
+
+				if (billRcptAmt < receiptDetail.getRcptAmt()) {
+					throw new RuntimeException(
+							String.format("Bill amount is less than the cancellation amount. Bill amount[%f],Receipt amount[%f]", billRcptAmt, receiptDetail.getRcptAmt()));
+				}
+
+				CBillComm bill = new CBillComm();
+
+				bill.setRcptAmt(receiptDetail.getRcptAmt());
+				bill.setBillSeqNo(receiptDetail.getBillSeqNo());
+				bill.setUseYymm(receiptDetail.getUseYymm());
+				bill.setProdCmpsId(receiptDetail.getProdCmpsId());
+				bill.setSvcCmpsId(receiptDetail.getSvcCmpsId());
+				bill.setChrgItmCd(receiptDetail.getChrgItmCd());
+				bill.setChgrId(userId);
+				bill.setTimeInfo();
+				
+				// 1 TBLIV_BILL rcpt_amt, full_pay_yn update. 
+				paymentService_1.updateBillCancel(bill);
+			}
+		}
+
+		// 수납일련변호로 수납취소 처리 2. TBLPY_RCPT UPDATE, cncl_yn
+		receiptService.updateReceiptCancel(null, pymSeqNo, userId);
+		
+		
+
+		Receipt receipt = receiptService.getReceipt(pymSeqNo);		
+		receipt.setPayObjAmt(receipt.getPayObjAmt() - receipt.getPrepayAplyAmt());
+		
+
+		CBillComm updateBillMast = new CBillComm();	
+		
+		updateBillMast.setBillSeqNo(receipt.getBillSeqNo());
+		updateBillMast.setRcptAmt(receipt.getRcptAmt());
+		updateBillMast.setChgrId(userId);
+		updateBillMast.setTimeInfo();		
+
+		// 2. TBLIV_BILL_MAST rcpt_amt, unpay_amt, full_pay_yn update
+		paymentService_1.updateBillMastCancel(updateBillMast);
+		
+		String payTp = receipt.getPayTp();
+
+		// 수납코드 정의
+		// 1: 정상수납, 2: 선수금수납, 3: 상이납자수납, 4: 미확인입금수납(불명금), 7: (-)매출수납, 9: 대체손각
+
+		if ("1".equals(payTp) == true || "3".equals(payTp) == true) {
+
+			if (payObjAmt != 0.0) {
+				// 선수금 발생내역에 등록
+				String prepayOccSeqNo = sequenceService.createNewSequence(Consts.SEQ_CODE.PY_PRPY_NO, 10);
+				
+				PrepayOcc newPrepayOcc = new PrepayOcc();
+
+				newPrepayOcc.setSoId(receipt.getSoId());
+				newPrepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
+				newPrepayOcc.setPymAcntId(receipt.getPymAcntId());
+				newPrepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
+				newPrepayOcc.setPrepayOccTp("1");
+				newPrepayOcc.setPrepayOccResn("5");
+				newPrepayOcc.setPrepayOccTgtSeqNo(receipt.getPymSeqNo());
+				newPrepayOcc.setDpstDt(receipt.getDpstDt());
+//				newPrepayOcc.setDpstProcDttm(receipt.getDpstProcDt());
+				newPrepayOcc.setDpstProcDt(receipt.getDpstProcDt());
+				newPrepayOcc.setDpstCl(receipt.getDpstCl());
+				newPrepayOcc.setPrepayProcStat("1");
+				newPrepayOcc.setPrepayOccAmt(payObjAmt);
+				newPrepayOcc.setPrepayTransAmt(0.0);
+				newPrepayOcc.setPrepayBal(payObjAmt);
+				newPrepayOcc.setTransCmplYn("N");
+				newPrepayOcc.setWonPrepayOccAmt(payObjAmt);
+				newPrepayOcc.setCrncyCd(receipt.getCrncyCd());
+				newPrepayOcc.setExrate(receipt.getExrate());
+				newPrepayOcc.setExrateAplyDt(receipt.getExrateAplyDt());
+				newPrepayOcc.setRegrId(userId);
+				newPrepayOcc.setRegDate(new Timestamp(new Date().getTime()));
+				newPrepayOcc.setCnclYn("N");
+				newPrepayOcc.setCnclDttm("");
+				newPrepayOcc.setChgDate(new Timestamp(new Date().getTime()));
+				newPrepayOcc.setTransDt(receipt.getTransDt());
+				
+				prepayService.insertPrepayOcc(newPrepayOcc);
+			}
+		} else if ("2".equals(payTp) == true) {
+			prepayService.updatePrepayTransHistory(pymSeqNo, receipt.getPrepayTransSeqNo(), payObjAmt);
+		} else if ("8".equals(payTp) == true) {
+			// kb 없음
+			// assrService.updateAssrOcc(pymSeqNo, receipt.getAssrTransSeqNo(), payObjAmt);
+		} else if ("4".equals(payTp) == true) {
+			// kb 없음
+			// ambgService.updateAmbg(receipt.getDpstSeqNo(), receipt.getAmbgTransSeqNo(), payObjAmt);
+		} else {
+			logger.debug(String.format("receipt type was wrong with the code value[%s]", payTp));
+		}
+
+		receiptService.insertReceiptCancelAppl(pymSeqNo, userId);
+		receiptService.insertReceiptCancel(receiptCancelVO.getCnclResn(), pymSeqNo, "0000000000", payTp);
+		
 		return returnFlag;
 	}
+	
+	
+
+//	@Transactional(propagation = Propagation.REQUIRED)
+//	@Override
+//	public int processReceiptCancelMain(String pymSeqNo, String cnclResnTxt, String inptMenuId, String workId) throws Exception {
+//		int returnFlag = 1;
+//
+//		logger.debug("========================================");
+//		logger.debug(" processReceiptCancelMain Start...  ");
+//		logger.debug("========================================");
+//
+//		returnFlag = paymentCancelService.processReceiptCancel(pymSeqNo, cnclResnTxt, inptMenuId, workId);
+//
+//		logger.debug("========================================");
+//		logger.debug(" processReceiptCancelMain End...  ");
+//		logger.debug("========================================");
+//
+//		return returnFlag;
+//	}
 
 }

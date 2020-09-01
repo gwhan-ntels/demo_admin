@@ -434,8 +434,27 @@ $(document).ready(function() {
 	
 	//입금등록
 	function setPayment() {
-		var param = checkValidation();		
+		var param = checkValidation();
 
+    	if(param) {
+	    	$.ajax({
+	            type : "post",
+	            url : '/charge/payment/payment/newSinglePayment/insertAction.json',
+	            data : param,
+	            async: true,
+	            success : function(data) {
+					alert('<spring:message code="MSG.M07.MSG00084"/>');
+					getAnonyReceiptTable();
+	            },
+	    		error: function() {
+	    		    //에러메세지
+	    		    alert('<spring:message code="MSG.M10.MSG00005"/>'); // MSG.M10.MSG00005=처리에 실패했습니다. 관리자에게 문의해 주세요.
+	    		}
+	        });
+    	}
+		
+		
+/* 
 		if (param) {
 			$.post('/charge/payment/payment/newSinglePayment/insertDeposit', param, function (response) {
 				if (response.success == true) {
@@ -446,6 +465,7 @@ $(document).ready(function() {
 				}
 			});
 		}
+ */		
 	}	
 
 	//입금등록 밸리데이션 체크
@@ -500,9 +520,9 @@ $(document).ready(function() {
 		param.workYymm     = globalYyyyMm;
 		param.billCycl     = '01';
 		param.user         = "${session_user.userId}";
-		param.orgId        = "${session_user.orgId}";
-		
-		if(param != false) {			
+		param.orgId        = "${session_user.orgId}";		
+
+ 		if ($("input:radio[name='rdoDpstGubn']:checked").val() == 'S' ) {
 			//선택된 그리드 row
 			var rowId = $("#anonyReceiptTable").getGridParam("selrow");
 			var data = $("#anonyReceiptTable").getRowData(rowId);
@@ -522,8 +542,11 @@ $(document).ready(function() {
 			//청구년월 세팅
 			param.billYymm  = dateFormatToStringYYYYMM(data.billYymm);
 			param.soId      = data.soId;
+		} else {
+	 		param.soId = $('#searchSoId').val();
+	 		param.pymAcntId = $('#searchPymAcntId').val();
 		}
-			
+
 		return param;	
 	}
 	
@@ -1200,9 +1223,11 @@ function getLoanAvlAmt() {
     	<div class="fl">
         	<h4 class="sub_title"><spring:message code="LAB.M10.LAB00032"/><!-- 청구내역 --></h4>
     	</div>
+			<label><input type="radio" id="rdoDpstGubn" name="rdoDpstGubn" value="A" />전체미납 입금</label>
+			<label><input type="radio" id="rdoDpstGubn" name="rdoDpstGubn" value="S" checked/>건별미납 입금</label>
     	<ntels:auth auth="${menuAuthP}">
 			<a id="printBtn" class="white-btn" title='<spring:message code="LAB.M10.LAB00079"/>' href="#"><span class="printer_icon"><spring:message code="LAB.M10.LAB00079"/></span></a>
-		</ntels:auth>
+		</ntels:auth>					
 	</div>
 
 	<div id="anonyReceiptGrid">

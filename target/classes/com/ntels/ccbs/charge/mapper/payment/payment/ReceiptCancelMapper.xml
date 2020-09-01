@@ -271,45 +271,49 @@
     
 
 	<select id="getTransApplCheckCnt" parameterType="String" resultType="int">
-		SELECT	/* PaymentCancelMapper.xml.getTransApplCheckCnt, 양연희, 2018.01.04 */
-				A.APPL_CNT1 + B.APPL_CNT2 + C.APPL_CNT3 + D.APPL_CNT4
-		FROM	(SELECT  COUNT(TRANS_APPL_NO) AS APPL_CNT1
-                FROM    TBLPY_TRANS_APPL
-                WHERE   TRANS_APPL_CL = '03'
-                AND     TRANS_APPL_TGT_NO IN (SELECT  ASSR_OCC_SEQ_NO
-                                            FROM    TBLPY_RCPT_DTL A
-                                                    ,TBLPY_ASSR_TRANS_HIST B
-                                            WHERE   A.PYM_SEQ_NO = #{pymSeqNo}
-                                            AND     B.ASSR_TRANS_SEQ_NO = A.ASSR_TRANS_SEQ_NO
-                )
-                AND     DCSN_PROC_STAT IN ('01','03')) A
-				,(SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT2
-				FROM	TBLPY_RCPT A
-						,TBLPY_DPST B
-						,TBLPY_RFND_APPL C
-				WHERE	A.PYM_SEQ_NO = #{pymSeqNo}
-				AND		B.DPST_SEQ_NO = A.DPST_SEQ_NO
-				AND		C.RFND_OCC_TGT_SEQ_NO = B.PREPAY_OCC_SEQ_NO 
-				AND		C.RFND_OCC_AMT_CL = '01'
-				AND		C.DCSN_PROC_STAT IN ('01','03')) B
-				,(SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT3
-				FROM	TBLPY_RCPT A
-						,TBLPY_DPST B
-						,TBLPY_RFND_APPL C
-				WHERE	A.PYM_SEQ_NO = #{pymSeqNo}
-				AND		B.DPST_SEQ_NO = A.DPST_SEQ_NO
-				AND		C.RFND_OCC_TGT_SEQ_NO = B.AMBG_OCC_SEQ_NO 
-				AND		C.RFND_OCC_AMT_CL = '02'
-				AND		C.DCSN_PROC_STAT IN ('01','03')) C
-				,(SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT4
-				FROM	TBLPY_RCPT A
-						,TBLPY_DPST B
-						,TBLPY_RFND_APPL C
-				WHERE	A.PYM_SEQ_NO = #{pymSeqNo}
-				AND		B.DPST_SEQ_NO = A.DPST_SEQ_NO
-				AND		C.RFND_OCC_TGT_SEQ_NO = B.ASSR_OCC_SEQ_NO 
-				AND		C.RFND_OCC_AMT_CL = '03'
-				AND		C.DCSN_PROC_STAT IN ('01','03')) D
+    SELECT /* PaymentCancelMapper.xml.getTransApplCheckCnt, 양연희, 2018.01.04 */
+           A.APPL_CNT1 + B.APPL_CNT2 + C.APPL_CNT3 + D.APPL_CNT4
+    FROM  (SELECT  COUNT(TRANS_APPL_NO) AS APPL_CNT1
+           FROM    TBLPY_TRANS_APPL
+           WHERE   TRANS_APPL_CL = '03'
+           AND     TRANS_APPL_TGT_NO IN (SELECT  ASSR_OCC_SEQ_NO
+                                         FROM    TBLPY_RCPT_DTL A
+                                               , TBLPY_ASSR_TRANS_HIST B
+                                         WHERE   A.PYM_SEQ_NO = #{pymSeqNo}
+                                         AND     B.ASSR_TRANS_SEQ_NO = A.ASSR_TRANS_SEQ_NO
+                                        )
+           AND     DCSN_PROC_STAT IN ('01','03')
+          ) A
+         ,(SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT2
+           FROM  TBLPY_RCPT A
+               , TBLPY_DPST B
+               , TBLPY_RFND_APPL C
+           WHERE A.PYM_SEQ_NO = #{pymSeqNo}
+           AND   B.DPST_SEQ_NO = A.DPST_SEQ_NO
+           AND   C.RFND_OCC_TGT_SEQ_NO = B.PREPAY_OCC_SEQ_NO
+           AND   C.RFND_OCC_AMT_CL = '01'
+           AND   C.DCSN_PROC_STAT IN ('01','03')
+          ) B
+        , (SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT3
+           FROM  TBLPY_RCPT A
+               , TBLPY_DPST B
+               , TBLPY_RFND_APPL C
+           WHERE A.PYM_SEQ_NO = #{pymSeqNo}
+           AND   B.DPST_SEQ_NO = A.DPST_SEQ_NO
+           AND   C.RFND_OCC_TGT_SEQ_NO = B.AMBG_OCC_SEQ_NO
+           AND   C.RFND_OCC_AMT_CL = '02'
+           AND   C.DCSN_PROC_STAT IN ('01','03')
+          ) C
+         ,(SELECT COUNT(C.RFND_SEQ_NO) AS APPL_CNT4
+           FROM  TBLPY_RCPT A
+               , TBLPY_DPST B
+               , TBLPY_RFND_APPL C
+           WHERE A.PYM_SEQ_NO = #{pymSeqNo}
+           AND   B.DPST_SEQ_NO = A.DPST_SEQ_NO
+           AND   C.RFND_OCC_TGT_SEQ_NO = B.ASSR_OCC_SEQ_NO
+           AND   C.RFND_OCC_AMT_CL = '03'
+           AND   C.DCSN_PROC_STAT IN ('01','03')
+          ) D
 	</select>
     
     

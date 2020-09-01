@@ -1,5 +1,7 @@
 package com.ntels.ccbs.charge.domain.payment.payment;
 
+import java.util.Date;
+
 import com.ntels.ccbs.system.domain.common.service.PagingValue;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -16,111 +18,68 @@ public class CancelSinglePaymentVO extends PagingValue {
 	private String sord;
 	private String chk;
 	
-	private String registantNm;     //등록자명
-	private String registDate;      //등록일
+	private String regrId;
+	private String regrNm;          //등록자명
+	private Date regDate;         //등록일
 	private String pymAcntId;	    //납부계정id
 	private String pymAcntNm;	    //납부계정
-	private String pymAcntMethod;	//납부방법
-	private String pymAcntMethodNm;	//납부방법
-	private String depositTyp;		//입금형태
-	private String depositTypNm;    //입금형태명
-	private String depositOption;	//입금구분
-	private String depositOptionNm; //입금구분명
-	private String financialInstitution;	//입금기관
-	private String financialInstitutionNm;	//입금기관명
-	private String financialInstitutionType;       //기관유형
-    private String financialInstitutionTypeNm;       //기관유형명
+	private String pymMthd;	        //납부방법
+	private String pymMthdNm;	    //납부방법명
+	private String dpstCl;
+	private String dpstClNm;
+	private String dpstTp;
+	private String dpstTpNm;
+	private String payCorpTp;
+	private String payCorpTpNm;
+	private String payCorpCd;
+	private String payCorpCdNm;
     private String acntCardNo; 		//계좌 및 카드번호
-    private String depositAmt;		//입금금액
-    private String paymentDt;		//고객납부일자
-    private String transferDt;		//이체일
-    private String depositProcessingDt; //입금처리일자
-    private String unknownPayment;	      //미확인입금대상
-    private String overPaymentRecovered;  //선수금대상
-    private String rcptProcessingDt;	  //수납처리일자
+    private String dpstAmt;
+    private String dpstDt;
+    private String transDt;
+    private String dpstProcDt;
+    private String ambgTgtYn;
+    private String prepayTgtYn;
+    private String payProcDt;
     private String payProcYn;       //수납처리여부
-    private String regId;           //등록자ID
-    private String depositSeqNo;    //입금일련번호
-    
-    private String rcptCnclCnt;
+    private String dpstSeqNo;
+    private String dpstTpSeqNo;
+
+	private String cnclResn; //취소사유
+	private String cnclrId; 
+	private String cnclDttm;
+	
 	
 	/* 입금관련 */
-	
-	private String depositDt;		//입금일자
-	private String depositDtFrom;   //입금일자 from
-	private String depositDtTo;     //입금일자 to
-	private String procDt;          //sysdate
-	
-	// 화면 권한 (여신 + 조직관련)
-	private String deptCd;
-	private String loanAvlAmt;
-	private String loanGvFlg;
-	
-	private String rsnForCnsl; //취소사유
+	private String dpstDtFrom;   //입금일자 from
+	private String dpstDtTo;     //입금일자 to
+	private String procDt;       //sysdate
+	private String cnclYn;
+	private String chgrId;
 	
 	
+	private String billSeqNo;
+	private String custId;
+	private String ctrtId;
+	private String feeAmt;
+	private String wonDpstAmt;
+	private String crncyCd;
+	private String exrate;
+	private String exrateAplyDt;
 	
+	private String grpId;
 	
-	public String getChk() {
-		return chk;
-	}
-	public void setChk(String chk) {
-		this.chk = chk;
-	}
-	public String getFinancialInstitutionType() {
-		return financialInstitutionType;
-	}
-	public void setFinancialInstitutionType(String financialInstitutionType) {
-		this.financialInstitutionType = financialInstitutionType;
-	}
-	public String getFinancialInstitutionTypeNm() {
-		return financialInstitutionTypeNm;
-	}
-	public void setFinancialInstitutionTypeNm(String financialInstitutionTypeNm) {
-		this.financialInstitutionTypeNm = financialInstitutionTypeNm;
-	}
-	public String getRcptCnclCnt() {
-		return rcptCnclCnt;
-	}
-	public void setRcptCnclCnt(String rcptCnclCnt) {
-		this.rcptCnclCnt = rcptCnclCnt;
-	}
-	public String getDepositProcessingDt() {
-		return depositProcessingDt;
-	}
-	public void setDepositProcessingDt(String depositProcessingDt) {
-		this.depositProcessingDt = depositProcessingDt;
-	}
-	public String getRcptProcessingDt() {
-		return rcptProcessingDt;
-	}
-	public void setRcptProcessingDt(String rcptProcessingDt) {
-		this.rcptProcessingDt = rcptProcessingDt;
-	}
-	public String getPymAcntMethod() {
-		return pymAcntMethod;
-	}
-	public void setPymAcntMethod(String pymAcntMethod) {
-		this.pymAcntMethod = pymAcntMethod;
-	}
-	public String getFinancialInstitutionNm() {
-		return financialInstitutionNm;
-	}
-	public void setFinancialInstitutionNm(String financialInstitutionNm) {
-		this.financialInstitutionNm = financialInstitutionNm;
-	}
-	public String getPayProcYn() {
-		return payProcYn;
-	}
-	public void setPayProcYn(String payProcYn) {
-		this.payProcYn = payProcYn;
-	}
-	public String getRsnForCnsl() {
-		return rsnForCnsl;
-	}
-	public void setRsnForCnsl(String rsnForCnsl) {
-		this.rsnForCnsl = rsnForCnsl;
-	}
+	// bill 정보
+
+	private String pymSeqNo;
+	private String useYymm;
+	private String prodCmpsId;
+	private String svcCmpsId;
+	private String chrgItmCd;
+	private Double billAmt;
+	private Double rcptAmt;
+	private Double preRcptAmt;	
+	private String preSoId;
 	public String getOrgId() {
 		return orgId;
 	}
@@ -169,17 +128,29 @@ public class CancelSinglePaymentVO extends PagingValue {
 	public void setSord(String sord) {
 		this.sord = sord;
 	}
-	public String getRegistantNm() {
-		return registantNm;
+	public String getChk() {
+		return chk;
 	}
-	public void setRegistantNm(String registantNm) {
-		this.registantNm = registantNm;
+	public void setChk(String chk) {
+		this.chk = chk;
 	}
-	public String getRegistDate() {
-		return registDate;
+	public String getRegrId() {
+		return regrId;
 	}
-	public void setRegistDate(String registDate) {
-		this.registDate = registDate;
+	public void setRegrId(String regrId) {
+		this.regrId = regrId;
+	}
+	public String getRegrNm() {
+		return regrNm;
+	}
+	public void setRegrNm(String regrNm) {
+		this.regrNm = regrNm;
+	}
+	public Date getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
 	}
 	public String getPymAcntId() {
 		return pymAcntId;
@@ -193,41 +164,65 @@ public class CancelSinglePaymentVO extends PagingValue {
 	public void setPymAcntNm(String pymAcntNm) {
 		this.pymAcntNm = pymAcntNm;
 	}
-	public String getPymAcntMethodNm() {
-		return pymAcntMethodNm;
+	public String getPymMthd() {
+		return pymMthd;
 	}
-	public void setPymAcntMethodNm(String pymAcntMethodNm) {
-		this.pymAcntMethodNm = pymAcntMethodNm;
+	public void setPymMthd(String pymMthd) {
+		this.pymMthd = pymMthd;
 	}
-	public String getDepositTyp() {
-		return depositTyp;
+	public String getPymMthdNm() {
+		return pymMthdNm;
 	}
-	public void setDepositTyp(String depositTyp) {
-		this.depositTyp = depositTyp;
+	public void setPymMthdNm(String pymMthdNm) {
+		this.pymMthdNm = pymMthdNm;
 	}
-	public String getDepositTypNm() {
-		return depositTypNm;
+	public String getDpstCl() {
+		return dpstCl;
 	}
-	public void setDepositTypNm(String depositTypNm) {
-		this.depositTypNm = depositTypNm;
+	public void setDpstCl(String dpstCl) {
+		this.dpstCl = dpstCl;
 	}
-	public String getDepositOption() {
-		return depositOption;
+	public String getDpstClNm() {
+		return dpstClNm;
 	}
-	public void setDepositOption(String depositOption) {
-		this.depositOption = depositOption;
+	public void setDpstClNm(String dpstClNm) {
+		this.dpstClNm = dpstClNm;
 	}
-	public String getDepositOptionNm() {
-		return depositOptionNm;
+	public String getDpstTp() {
+		return dpstTp;
 	}
-	public void setDepositOptionNm(String depositOptionNm) {
-		this.depositOptionNm = depositOptionNm;
+	public void setDpstTp(String dpstTp) {
+		this.dpstTp = dpstTp;
 	}
-	public String getFinancialInstitution() {
-		return financialInstitution;
+	public String getDpstTpNm() {
+		return dpstTpNm;
 	}
-	public void setFinancialInstitution(String financialInstitution) {
-		this.financialInstitution = financialInstitution;
+	public void setDpstTpNm(String dpstTpNm) {
+		this.dpstTpNm = dpstTpNm;
+	}
+	public String getPayCorpTp() {
+		return payCorpTp;
+	}
+	public void setPayCorpTp(String payCorpTp) {
+		this.payCorpTp = payCorpTp;
+	}
+	public String getPayCorpTpNm() {
+		return payCorpTpNm;
+	}
+	public void setPayCorpTpNm(String payCorpTpNm) {
+		this.payCorpTpNm = payCorpTpNm;
+	}
+	public String getPayCorpCd() {
+		return payCorpCd;
+	}
+	public void setPayCorpCd(String payCorpCd) {
+		this.payCorpCd = payCorpCd;
+	}
+	public String getPayCorpCdNm() {
+		return payCorpCdNm;
+	}
+	public void setPayCorpCdNm(String payCorpCdNm) {
+		this.payCorpCdNm = payCorpCdNm;
 	}
 	public String getAcntCardNo() {
 		return acntCardNo;
@@ -235,65 +230,95 @@ public class CancelSinglePaymentVO extends PagingValue {
 	public void setAcntCardNo(String acntCardNo) {
 		this.acntCardNo = acntCardNo;
 	}
-	public String getDepositAmt() {
-		return depositAmt;
+	public String getDpstAmt() {
+		return dpstAmt;
 	}
-	public void setDepositAmt(String depositAmt) {
-		this.depositAmt = depositAmt;
+	public void setDpstAmt(String dpstAmt) {
+		this.dpstAmt = dpstAmt;
 	}
-	public String getPaymentDt() {
-		return paymentDt;
+	public String getDpstDt() {
+		return dpstDt;
 	}
-	public void setPaymentDt(String paymentDt) {
-		this.paymentDt = paymentDt;
+	public void setDpstDt(String dpstDt) {
+		this.dpstDt = dpstDt;
 	}
-	public String getTransferDt() {
-		return transferDt;
+	public String getTransDt() {
+		return transDt;
 	}
-	public void setTransferDt(String transferDt) {
-		this.transferDt = transferDt;
+	public void setTransDt(String transDt) {
+		this.transDt = transDt;
 	}
-	public String getUnknownPayment() {
-		return unknownPayment;
+	public String getDpstProcDt() {
+		return dpstProcDt;
 	}
-	public void setUnknownPayment(String unknownPayment) {
-		this.unknownPayment = unknownPayment;
+	public void setDpstProcDt(String dpstProcDt) {
+		this.dpstProcDt = dpstProcDt;
 	}
-	public String getOverPaymentRecovered() {
-		return overPaymentRecovered;
+	public String getAmbgTgtYn() {
+		return ambgTgtYn;
 	}
-	public void setOverPaymentRecovered(String overPaymentRecovered) {
-		this.overPaymentRecovered = overPaymentRecovered;
+	public void setAmbgTgtYn(String ambgTgtYn) {
+		this.ambgTgtYn = ambgTgtYn;
 	}
-	public String getRegId() {
-		return regId;
+	public String getPrepayTgtYn() {
+		return prepayTgtYn;
 	}
-	public void setRegId(String regId) {
-		this.regId = regId;
+	public void setPrepayTgtYn(String prepayTgtYn) {
+		this.prepayTgtYn = prepayTgtYn;
 	}
-	public String getDepositSeqNo() {
-		return depositSeqNo;
+	public String getPayProcDt() {
+		return payProcDt;
 	}
-	public void setDepositSeqNo(String depositSeqNo) {
-		this.depositSeqNo = depositSeqNo;
+	public void setPayProcDt(String payProcDt) {
+		this.payProcDt = payProcDt;
 	}
-	public String getDepositDt() {
-		return depositDt;
+	public String getPayProcYn() {
+		return payProcYn;
 	}
-	public void setDepositDt(String depositDt) {
-		this.depositDt = depositDt;
+	public void setPayProcYn(String payProcYn) {
+		this.payProcYn = payProcYn;
 	}
-	public String getDepositDtFrom() {
-		return depositDtFrom;
+	public String getDpstSeqNo() {
+		return dpstSeqNo;
 	}
-	public void setDepositDtFrom(String depositDtFrom) {
-		this.depositDtFrom = depositDtFrom;
+	public void setDpstSeqNo(String dpstSeqNo) {
+		this.dpstSeqNo = dpstSeqNo;
 	}
-	public String getDepositDtTo() {
-		return depositDtTo;
+	public String getDpstTpSeqNo() {
+		return dpstTpSeqNo;
 	}
-	public void setDepositDtTo(String depositDtTo) {
-		this.depositDtTo = depositDtTo;
+	public void setDpstTpSeqNo(String dpstTpSeqNo) {
+		this.dpstTpSeqNo = dpstTpSeqNo;
+	}
+	public String getCnclResn() {
+		return cnclResn;
+	}
+	public void setCnclResn(String cnclResn) {
+		this.cnclResn = cnclResn;
+	}
+	public String getCnclrId() {
+		return cnclrId;
+	}
+	public void setCnclrId(String cnclrId) {
+		this.cnclrId = cnclrId;
+	}
+	public String getCnclDttm() {
+		return cnclDttm;
+	}
+	public void setCnclDttm(String cnclDttm) {
+		this.cnclDttm = cnclDttm;
+	}
+	public String getDpstDtFrom() {
+		return dpstDtFrom;
+	}
+	public void setDpstDtFrom(String dpstDtFrom) {
+		this.dpstDtFrom = dpstDtFrom;
+	}
+	public String getDpstDtTo() {
+		return dpstDtTo;
+	}
+	public void setDpstDtTo(String dpstDtTo) {
+		this.dpstDtTo = dpstDtTo;
 	}
 	public String getProcDt() {
 		return procDt;
@@ -301,24 +326,135 @@ public class CancelSinglePaymentVO extends PagingValue {
 	public void setProcDt(String procDt) {
 		this.procDt = procDt;
 	}
-	public String getDeptCd() {
-		return deptCd;
+	public String getCnclYn() {
+		return cnclYn;
 	}
-	public void setDeptCd(String deptCd) {
-		this.deptCd = deptCd;
+	public void setCnclYn(String cnclYn) {
+		this.cnclYn = cnclYn;
 	}
-	public String getLoanAvlAmt() {
-		return loanAvlAmt;
+	public String getChgrId() {
+		return chgrId;
 	}
-	public void setLoanAvlAmt(String loanAvlAmt) {
-		this.loanAvlAmt = loanAvlAmt;
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
 	}
-	public String getLoanGvFlg() {
-		return loanGvFlg;
+	public String getBillSeqNo() {
+		return billSeqNo;
 	}
-	public void setLoanGvFlg(String loanGvFlg) {
-		this.loanGvFlg = loanGvFlg;
+	public void setBillSeqNo(String billSeqNo) {
+		this.billSeqNo = billSeqNo;
 	}
+	public String getCustId() {
+		return custId;
+	}
+	public void setCustId(String custId) {
+		this.custId = custId;
+	}
+	public String getCtrtId() {
+		return ctrtId;
+	}
+	public void setCtrtId(String ctrtId) {
+		this.ctrtId = ctrtId;
+	}
+	public String getFeeAmt() {
+		return feeAmt;
+	}
+	public void setFeeAmt(String feeAmt) {
+		this.feeAmt = feeAmt;
+	}
+	public String getWonDpstAmt() {
+		return wonDpstAmt;
+	}
+	public void setWonDpstAmt(String wonDpstAmt) {
+		this.wonDpstAmt = wonDpstAmt;
+	}
+	public String getCrncyCd() {
+		return crncyCd;
+	}
+	public void setCrncyCd(String crncyCd) {
+		this.crncyCd = crncyCd;
+	}
+	public String getExrate() {
+		return exrate;
+	}
+	public void setExrate(String exrate) {
+		this.exrate = exrate;
+	}
+	public String getExrateAplyDt() {
+		return exrateAplyDt;
+	}
+	public void setExrateAplyDt(String exrateAplyDt) {
+		this.exrateAplyDt = exrateAplyDt;
+	}
+	public String getGrpId() {
+		return grpId;
+	}
+	public void setGrpId(String grpId) {
+		this.grpId = grpId;
+	}
+	public String getPymSeqNo() {
+		return pymSeqNo;
+	}
+	public void setPymSeqNo(String pymSeqNo) {
+		this.pymSeqNo = pymSeqNo;
+	}
+	public String getUseYymm() {
+		return useYymm;
+	}
+	public void setUseYymm(String useYymm) {
+		this.useYymm = useYymm;
+	}
+	public String getProdCmpsId() {
+		return prodCmpsId;
+	}
+	public void setProdCmpsId(String prodCmpsId) {
+		this.prodCmpsId = prodCmpsId;
+	}
+	public String getSvcCmpsId() {
+		return svcCmpsId;
+	}
+	public void setSvcCmpsId(String svcCmpsId) {
+		this.svcCmpsId = svcCmpsId;
+	}
+	public String getChrgItmCd() {
+		return chrgItmCd;
+	}
+	public void setChrgItmCd(String chrgItmCd) {
+		this.chrgItmCd = chrgItmCd;
+	}
+	public Double getBillAmt() {
+		return billAmt;
+	}
+	public void setBillAmt(Double billAmt) {
+		this.billAmt = billAmt;
+	}
+	public Double getRcptAmt() {
+		return rcptAmt;
+	}
+	public void setRcptAmt(Double rcptAmt) {
+		this.rcptAmt = rcptAmt;
+	}
+	public Double getPreRcptAmt() {
+		return preRcptAmt;
+	}
+	public void setPreRcptAmt(Double preRcptAmt) {
+		this.preRcptAmt = preRcptAmt;
+	}
+	public String getPreSoId() {
+		return preSoId;
+	}
+	public void setPreSoId(String preSoId) {
+		this.preSoId = preSoId;
+	}
+	
+
+	
+	
+	
+	// 화면 권한 (여신 + 조직관련)
+//	private String deptCd;
+//	private String loanAvlAmt;
+//	private String loanGvFlg;
 	
 	
 	

@@ -835,71 +835,66 @@
     
     
 
-    <insert id="insertEachDpst" parameterType="NewSinglePaymentVO">
-    INSERT INTO TBLPY_EACH_DPST
-    (
-        SO_ID
-      , EACH_DPST_SEQ
-      , DPST_SEQ_NO
-      , PYM_ACNT_ID
-      , BILL_SEQ_NO
-      , CUST_ID
-      , CTRT_ID
-      , DPST_CL
-      , CASH_DPST_CL
-      , DPST_AMT
-      , DPST_FEE_TP
-      , FEE_AMT
-      , DPST_BNK_ACNT_CD
-      , DPST_DT
-      , TRANS_DT
-      , DPST_PROC_DT
-      , SMRY
-      , RCPT_EMP_ID
-      , RCPT_BILL_EMP_ID
-      , WON_DPST_AMT
-      , CRNCY_CD
-      , EXRATE
-      , EXRATE_APLY_DT
-      , GRP_ID
-      , INPT_MENU_ID
-      , REGR_ID
-      , REG_DATE
-      , CHGR_ID
-      , CHG_DATE
-    )
-    VALUES
-    (
-        #{newSinglePaymentVO.soId}
-      , #{newSinglePaymentVO.eachDpstSeq}
-      , #{newSinglePaymentVO.dpstSeqNo}
-      , #{newSinglePaymentVO.pymAcntId}
-      , #{newSinglePaymentVO.billSeqNo}
-      , #{newSinglePaymentVO.custId}
-      , #{newSinglePaymentVO.ctrtId}
-      , #{newSinglePaymentVO.dpstCl}
-      , #{newSinglePaymentVO.cashDpstCl}
-      , #{newSinglePaymentVO.dpstAmt}
-      , #{newSinglePaymentVO.dpstFeeTp}
-      , #{newSinglePaymentVO.feeAmt}
-      , #{newSinglePaymentVO.dpstBnkAcntCd}
-      , #{newSinglePaymentVO.dpstDt}
-      , #{newSinglePaymentVO.transDt}
-      , '00000000'
-      , #{newSinglePaymentVO.smry}
-      , #{newSinglePaymentVO.rcptEmpId}
-      , #{newSinglePaymentVO.rcptBillEmpId}
-      , #{newSinglePaymentVO.grpId}
-      , #{newSinglePaymentVO.wonDpstAmt}
-      , #{newSinglePaymentVO.crncyCd}
-      , #{newSinglePaymentVO.exrate}
-      , #{newSinglePaymentVO.exrateAplyDt}
-      , #{newSinglePaymentVO.inptMenuId}
-      , #{newSinglePaymentVO.regrId}
-      , #{newSinglePaymentVO.regDate}
-      , #{newSinglePaymentVO.regrId}
-      , #{newSinglePaymentVO.regDate}
-    )
+    <!-- 건별입금등록를 건별입금내역에 등록한다. -->
+    <insert id="insertEachDeposit">
+        INSERT INTO TBLPY_EACH_DPST
+        (
+            EACH_DPST_SEQ
+          , DPST_CL
+          , CASH_DPST_CL
+          , DPST_DT
+          , DPST_AMT
+          , DPST_FEE_TP
+          , FEE_AMT
+          , BILL_SEQ_NO
+          , SO_ID
+          , GRP_ID
+          , PYM_ACNT_ID
+          , CUST_ID
+          , CTRT_ID
+          , SMRY
+          , DPST_BNK_ACNT_CD
+          , TRANS_DT
+          , DPST_PROC_DT
+          , DPST_SEQ_NO
+          , WON_DPST_AMT
+          , RCPT_EMP_ID
+          , RCPT_BILL_EMP_ID
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , REGR_ID
+          , REG_DATE
+        )
+        VALUES
+        (
+            #{newSinglePaymentVO.eachDpstSeq}
+          , #{newSinglePaymentVO.dpstCl}
+          , #{newSinglePaymentVO.cashDpstCl}
+          , #{newSinglePaymentVO.dpstDt}
+          , #{newSinglePaymentVO.dpstAmt}
+          , #{newSinglePaymentVO.dpstFeeTp}
+          , #{newSinglePaymentVO.feeAmt}
+          , #{newSinglePaymentVO.billSeqNo}
+          , #{newSinglePaymentVO.soId}
+          , #{newSinglePaymentVO.grpId}
+          , #{newSinglePaymentVO.pymAcntId}
+          , #{newSinglePaymentVO.custId}
+          , #{newSinglePaymentVO.ctrtId}
+          , #{newSinglePaymentVO.smry}
+          , #{newSinglePaymentVO.dpstBnkAcntCd}
+          , #{newSinglePaymentVO.transDt}
+          , '00000000'
+          , #{newSinglePaymentVO.dpstSeqNo}
+          , #{newSinglePaymentVO.wonDpstAmt}
+          , #{newSinglePaymentVO.rcptEmpId}
+          , #{newSinglePaymentVO.rcptBillEmpId}
+          , #{newSinglePaymentVO.crncyCd}
+          , #{newSinglePaymentVO.exrate}
+          , #{newSinglePaymentVO.exrateAplyDt}
+          , #{newSinglePaymentVO.regrId}
+          , #{newSinglePaymentVO.regDate}
+        )
     </insert>
     
     

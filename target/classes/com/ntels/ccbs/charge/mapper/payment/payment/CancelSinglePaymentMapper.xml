@@ -9,10 +9,12 @@
 	<select id="getCaseByCancelList" parameterType="com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO" resultType="com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO">
     /* bl.py.receipt.getCaseByCancelList : 건별입금취소 : 건별입금취소 대상 조회 */
     SELECT '0'                                 AS CHK            /* 체크 */
-         , D.USER_NAME                         AS REGISTANT_NM         /* 등록자명 */
-         , A.REG_DATE                          AS REGIST_DATE       /* 등록일(Formatting) */
+         , A.REGR_ID                                             /* 등록자ID */
+         , D.USER_NAME                         AS REGR_NM        /* 등록자명 */
+         , A.REG_DATE                          AS REG_DATE       /* 등록일(Formatting) */
          , A.PYM_ACNT_ID                       AS PYM_ACNT_ID    /* 납부계정ID */
-         , B.ACNT_NM                           AS PYM_ACNT_NM        /* 납부자계정명 */
+         , B.ACNT_NM                           AS PYM_ACNT_NM    /* 납부자계정명 */
+         , B.PYM_MTHD                                            /* 납부방법 */
          ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
            FROM   TSYCO_CODE_MAST MAST
                 , TSYCO_CODE_MAST_NAME MNAME
@@ -26,7 +28,8 @@
            AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
            AND    MAST.COMMON_GRP   = 'BL00017'
            AND    DETAIL.COMMON_CD  = B.PYM_MTHD
-           ) AS PYM_ACNT_METHOD_NM /* 납부방법명(BLIV005) */
+           ) AS PYM_MTHD_NM /* 납부방법명(BLIV005) */
+         , A.DPST_CL               /* 입금구분(BLPY001) */
          ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
            FROM   TSYCO_CODE_MAST MAST
                 , TSYCO_CODE_MAST_NAME MNAME
@@ -40,7 +43,8 @@
            AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
            AND    MAST.COMMON_GRP   = 'BL00067'
            AND    DETAIL.COMMON_CD  = A.DPST_CL
-          ) AS DEPOSIT_OPTION_NM /* 입금구분명(BLPY001) */
+          ) AS DPST_CL_NM /* 입금구분명(BLPY001) */
+         , A.DPST_TP               /* 입금형태(BLPY003) */
          ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
            FROM   TSYCO_CODE_MAST MAST
                 , TSYCO_CODE_MAST_NAME MNAME
@@ -54,8 +58,8 @@
            AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
            AND    MAST.COMMON_GRP   = 'BL00069'
            AND    DETAIL.COMMON_CD  = A.DPST_TP
-          ) AS DEPOSIT_TYP_NM /* 입금형태명(BLPY003) */
-         , PAY_CORP_TP AS FINANCIAL_INSTITUTION
+          ) AS DPST_TP_NM /* 입금형태명(BLPY003) */
+         , PAY_CORP_TP
          ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
            FROM   TSYCO_CODE_MAST MAST
                 , TSYCO_CODE_MAST_NAME MNAME
@@ -69,7 +73,7 @@
            AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
            AND    MAST.COMMON_GRP   = 'BL00080'
            AND    DETAIL.COMMON_CD  = A.PAY_CORP_TP
-          ) AS FINANCIAL_INSTITUTION_NM /* 입금기관명(BLPY014) */
+          ) AS PAY_CORP_TP_NM /* 입금기관명(BLPY014) */
          ,(CASE A.PAY_CORP_TP WHEN '01' THEN (SELECT NAME.CODE_NM AS COMMON_CD_NM
                                               FROM   TSYCO_CODE_MAST MAST
                                                    , TSYCO_CODE_MAST_NAME MNAME
@@ -98,28 +102,24 @@
                                               AND    MAST.COMMON_GRP   ='BL00123'
                                               AND    DETAIL.COMMON_CD = A.PAY_CORP_CD
                                              )
-           END )            AS FINANCIAL_INSTITUTION_TYPE_NM /* 기관유형명(BLPY015[은행],BLPY016[카드]) */
+           END )            AS PAY_CORP_CD_NM /* 기관유형명(BLPY015[은행],BLPY016[카드]) */
          <!-- , DECODE(A.ACNT_CARD_NO, '', '',SUBSTR(FSYCO_DECRYPT( A.ACNT_CARD_NO , 'ACNT_CARD_NO'),1,6)||'*****') AS ACNT_CARD_NO /* 계좌/카드번호(Formatting) */ -->
          , CASE WHEN A.ACNT_CARD_NO = '' THEN ''
                 ELSE SUBSTR(FSYCO_DECRYPT( A.ACNT_CARD_NO , 'ACNT_CARD_NO'),1,6)||'*****'
            END              AS ACNT_CARD_NO            /* 계좌/카드번호(Formatting) */
-         , A.DPST_AMT       AS DEPOSIT_AMT             /* 입금금액(Formatting) */
-         , A.DPST_DT        AS PAYMENT_DT              /* 고객납부일자(Formatting) */
-         , A.TRANS_DT       AS TRANSFER_DT             /* 이체일자(Formatting) */
-         , A.DPST_PROC_DT   AS DEPOSIT_PROCESSING_DT   /* 입금처리일자(Formatting) */
-         , A.AMBG_TGT_YN    AS UNKNOWN_PAYMENT         /* 미확인입금대상 */
-         , A.PREPAY_TGT_YN  AS OVER_PAYMENT_RECOVERED  /* 선수금대상 */
-         , A.PAY_PROC_DT    AS RCPT_PROCESSING_DT      /* 수납처리일자(Formatting) */
-         , A.PAY_PROC_YN    AS PAY_PROC_YN             /* 수납처리여부 */
-         , A.REGR_ID        AS REG_ID                  /* 등록자ID */
-         , A.DPST_SEQ_NO    AS DEPOSIT_SEQ_NO          /* 입금일련번호 */
-         , A.DPST_TP        AS DEPOSIT_TYP             /* 입금형태(BLPY003) */
-         , A.DPST_CL        AS DEPOSIT_OPTION          /* 입금구분(BLPY001) */
+         , A.DPST_AMT              /* 입금금액(Formatting) */
+         , A.DPST_DT               /* 고객납부일자(Formatting) */
+         , A.TRANS_DT              /* 이체일자(Formatting) */
+         , A.DPST_PROC_DT          /* 입금처리일자(Formatting) */
+         , A.AMBG_TGT_YN           /* 미확인입금대상 */
+         , A.PREPAY_TGT_YN         /* 선수금대상 */
+         , A.PAY_PROC_DT           /* 수납처리일자(Formatting) */
+         , A.PAY_PROC_YN           /* 수납처리여부 */
+         , A.DPST_SEQ_NO           /* 입금일련번호 */
+         , A.DPST_TP_SEQ_NO        /* 입금구분에 따른 참조 일련번호 */
+         , A.SO_ID                 /* SO_ID   */
          <!-- , A.PAY_CORP_CD    AS FINANCIAL_INSTITUTION   /* 입금기관(BLPY014) */ -->
          <!-- , A.PAY_CORP_TP    AS INSTITUTION_TYPE        /* 기관유형(BLPY015[은행],BLPY016[카드]) */ -->
-         , B.PYM_MTHD       AS PYM_ACNT_METHOD         /* 납부방법 */
-         , A.DPST_TP_SEQ_NO AS DPST_TP_SEQ_NO          /* 입금구분에 따른 참조 일련번호 */
-         , A.SO_ID          AS SO_ID                   /* SO_ID   */
     FROM   TBLPY_DPST          A
            LEFT OUTER JOIN TCMCU_PYM_ACNT_INFO B
            ON   A.PYM_ACNT_ID = B.PYM_ACNT_ID
@@ -154,31 +154,33 @@
     AND    A.PAY_PROC_YN   = #{cancelSinglePaymentVO.payProcYn} /* PAY_PROC_YN */ /* 수납처리여부(전체:조건제외,처리:Y,미처리:N) */
         </if>
     </if>
-    <if test="cancelSinglePaymentVO.depositDtFrom != null and cancelSinglePaymentVO.depositDtFrom != ''">
-        <if test="cancelSinglePaymentVO.depositDtTo != null and cancelSinglePaymentVO.depositDtTo != ''">
-    AND    A.DPST_DT BETWEEN #{cancelSinglePaymentVO.depositDtFrom} /* DPST_DT_FROM */ AND #{cancelSinglePaymentVO.depositDtTo} /* DPST_DT_TO */ /* 입금일자 */
+    <if test="cancelSinglePaymentVO.dpstDtFrom != null and cancelSinglePaymentVO.dpstDtFrom != ''">
+        <if test="cancelSinglePaymentVO.dpstDtTo != null and cancelSinglePaymentVO.dpstDtTo != ''">
+    AND    A.DPST_DT BETWEEN #{cancelSinglePaymentVO.dpstDtFrom} /* DPST_DT_FROM */ AND #{cancelSinglePaymentVO.dpstDtTo} /* DPST_DT_TO */ /* 입금일자 */
         </if>
     </if>
-    <if test="cancelSinglePaymentVO.depositOption != null and cancelSinglePaymentVO.depositOption != ''">
-    AND    A.DPST_CL       = #{cancelSinglePaymentVO.depositOption} /* DPST_CL */ /* 입금구분 */
+    <if test="cancelSinglePaymentVO.dpstCl != null and cancelSinglePaymentVO.dpstCl != ''">
+    AND    A.DPST_CL       = #{cancelSinglePaymentVO.dpstCl} /* DPST_CL */ /* 입금구분 */
     </if>
-    <if test="cancelSinglePaymentVO.regId != null and cancelSinglePaymentVO.regId != ''">
-    AND    A.REGR_ID       = #{cancelSinglePaymentVO.regId} /* INPUT_REGR_ID */ /* 등록자ID */
+    <if test="cancelSinglePaymentVO.regrId != null and cancelSinglePaymentVO.regrId != ''">
+    AND    A.REGR_ID       = #{cancelSinglePaymentVO.regrId} /* INPUT_REGR_ID */ /* 등록자ID */
     </if>
     <if test="cancelSinglePaymentVO.acntCardNo != null and cancelSinglePaymentVO.acntCardNo != ''">
     AND    FSYCO_DECRYPT(A.ACNT_CARD_NO , 'ACNT_CARD_NO') = #{cancelSinglePaymentVO.acntCardNo} /* ACNT_CARD_NO */ /* 카드/신용카드 번호 */
-    </if> 
+    </if>
     </select>
     
     <select id="getCaseByCancelListCount" parameterType="com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO" resultType="int">
     /* bl.py.receipt.getCaseByCancelListCount : 건별입금취소 : 건별입금취소 대상 조회 */
-    SELECT COUNT(1) 
+    SELECT COUNT(1)
     FROM  (
            SELECT '0'                                 AS CHK            /* 체크 */
-                , D.USER_NAME                         AS REGISTANT_NM         /* 등록자명 */
-                , A.REG_DATE                          AS REGIST_DATE       /* 등록일(Formatting) */
+                , A.REGR_ID                                             /* 등록자ID */
+                , D.USER_NAME                         AS REGR_NM        /* 등록자명 */
+                , A.REG_DATE                          AS REG_DATE       /* 등록일(Formatting) */
                 , A.PYM_ACNT_ID                       AS PYM_ACNT_ID    /* 납부계정ID */
-                , B.ACNT_NM                           AS PYM_ACNT_NM        /* 납부자계정명 */
+                , B.ACNT_NM                           AS PYM_ACNT_NM    /* 납부자계정명 */
+                , B.PYM_MTHD                                            /* 납부방법 */
                 ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
                   FROM   TSYCO_CODE_MAST MAST
                        , TSYCO_CODE_MAST_NAME MNAME
@@ -192,7 +194,8 @@
                   AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
                   AND    MAST.COMMON_GRP   = 'BL00017'
                   AND    DETAIL.COMMON_CD  = B.PYM_MTHD
-                  ) AS PYM_ACNT_METHOD_NM /* 납부방법명(BLIV005) */
+                  ) AS PYM_MTHD_NM /* 납부방법명(BLIV005) */
+                , A.DPST_CL               /* 입금구분(BLPY001) */
                 ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
                   FROM   TSYCO_CODE_MAST MAST
                        , TSYCO_CODE_MAST_NAME MNAME
@@ -206,7 +209,8 @@
                   AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
                   AND    MAST.COMMON_GRP   = 'BL00067'
                   AND    DETAIL.COMMON_CD  = A.DPST_CL
-                 ) AS DEPOSIT_OPTION_NM /* 입금구분명(BLPY001) */
+                 ) AS DPST_CL_NM /* 입금구분명(BLPY001) */
+                , A.DPST_TP               /* 입금형태(BLPY003) */
                 ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
                   FROM   TSYCO_CODE_MAST MAST
                        , TSYCO_CODE_MAST_NAME MNAME
@@ -220,8 +224,8 @@
                   AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
                   AND    MAST.COMMON_GRP   = 'BL00069'
                   AND    DETAIL.COMMON_CD  = A.DPST_TP
-                 ) AS DEPOSIT_TYP_NM /* 입금형태명(BLPY003) */
-                , PAY_CORP_TP AS FINANCIAL_INSTITUTION
+                 ) AS DPST_TP_NM /* 입금형태명(BLPY003) */
+                , PAY_CORP_TP
                 ,(SELECT NAME.CODE_NM AS COMMON_CD_NM
                   FROM   TSYCO_CODE_MAST MAST
                        , TSYCO_CODE_MAST_NAME MNAME
@@ -235,7 +239,7 @@
                   AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
                   AND    MAST.COMMON_GRP   = 'BL00080'
                   AND    DETAIL.COMMON_CD  = A.PAY_CORP_TP
-                 ) AS FINANCIAL_INSTITUTION_NM /* 입금기관명(BLPY014) */
+                 ) AS PAY_CORP_TP_NM /* 입금기관명(BLPY014) */
                 ,(CASE A.PAY_CORP_TP WHEN '01' THEN (SELECT NAME.CODE_NM AS COMMON_CD_NM
                                                      FROM   TSYCO_CODE_MAST MAST
                                                           , TSYCO_CODE_MAST_NAME MNAME
@@ -261,31 +265,27 @@
                                                      AND    DETAIL.COMMON_GRP =NAME.COMMON_GRP
                                                      AND    DETAIL.COMMON_CD  =NAME.COMMON_CD
                                                      AND    NAME.LNG_TYP      = #{cancelSinglePaymentVO.lngTyp}
-                                                     AND    MAST.COMMON_GRP   ='BLPY016'
+                                                     AND    MAST.COMMON_GRP   ='BL00123'
                                                      AND    DETAIL.COMMON_CD = A.PAY_CORP_CD
                                                     )
-                  END )            AS FINANCIAL_INSTITUTION_TYPE_NM /* 기관유형명(BLPY015[은행],BLPY016[카드]) */
+                  END )            AS PAY_CORP_CD_NM /* 기관유형명(BLPY015[은행],BLPY016[카드]) */
                 <!-- , DECODE(A.ACNT_CARD_NO, '', '',SUBSTR(FSYCO_DECRYPT( A.ACNT_CARD_NO , 'ACNT_CARD_NO'),1,6)||'*****') AS ACNT_CARD_NO /* 계좌/카드번호(Formatting) */ -->
                 , CASE WHEN A.ACNT_CARD_NO = '' THEN ''
                        ELSE SUBSTR(FSYCO_DECRYPT( A.ACNT_CARD_NO , 'ACNT_CARD_NO'),1,6)||'*****'
                   END              AS ACNT_CARD_NO            /* 계좌/카드번호(Formatting) */
-                , A.DPST_AMT       AS DEPOSIT_AMT             /* 입금금액(Formatting) */
-                , A.DPST_DT        AS PAYMENT_DT              /* 고객납부일자(Formatting) */
-                , A.TRANS_DT       AS TRANSFER_DT             /* 이체일자(Formatting) */
-                , A.DPST_PROC_DT   AS DEPOSIT_PROCESSING_DT   /* 입금처리일자(Formatting) */
-                , A.AMBG_TGT_YN    AS UNKNOWN_PAYMENT         /* 미확인입금대상 */
-                , A.PREPAY_TGT_YN  AS OVER_PAYMENT_RECOVERED  /* 선수금대상 */
-                , A.PAY_PROC_DT    AS RCPT_PROCESSING_DT      /* 수납처리일자(Formatting) */
-                , A.PAY_PROC_YN    AS PAY_PROC_YN             /* 수납처리여부 */
-                , A.REGR_ID        AS REG_ID                  /* 등록자ID */
-                , A.DPST_SEQ_NO    AS DEPOSIT_SEQ_NO          /* 입금일련번호 */
-                , A.DPST_TP        AS DEPOSIT_TYP             /* 입금형태(BLPY003) */
-                , A.DPST_CL        AS DEPOSIT_OPTION          /* 입금구분(BLPY001) */
+                , A.DPST_AMT              /* 입금금액(Formatting) */
+                , A.DPST_DT               /* 고객납부일자(Formatting) */
+                , A.TRANS_DT              /* 이체일자(Formatting) */
+                , A.DPST_PROC_DT          /* 입금처리일자(Formatting) */
+                , A.AMBG_TGT_YN           /* 미확인입금대상 */
+                , A.PREPAY_TGT_YN         /* 선수금대상 */
+                , A.PAY_PROC_DT           /* 수납처리일자(Formatting) */
+                , A.PAY_PROC_YN           /* 수납처리여부 */
+                , A.DPST_SEQ_NO           /* 입금일련번호 */
+                , A.DPST_TP_SEQ_NO        /* 입금구분에 따른 참조 일련번호 */
+                , A.SO_ID                 /* SO_ID   */
                 <!-- , A.PAY_CORP_CD    AS FINANCIAL_INSTITUTION   /* 입금기관(BLPY014) */ -->
                 <!-- , A.PAY_CORP_TP    AS INSTITUTION_TYPE        /* 기관유형(BLPY015[은행],BLPY016[카드]) */ -->
-                , B.PYM_MTHD       AS PYM_ACNT_METHOD         /* 납부방법 */
-                , A.DPST_TP_SEQ_NO AS DPST_TP_SEQ_NO          /* 입금구분에 따른 참조 일련번호 */
-                , A.SO_ID          AS SO_ID                   /* SO_ID   */
            FROM   TBLPY_DPST          A
                   LEFT OUTER JOIN TCMCU_PYM_ACNT_INFO B
                   ON   A.PYM_ACNT_ID = B.PYM_ACNT_ID
@@ -300,7 +300,7 @@
                              FROM   TBLPY_PREPAY_OCC C
                              WHERE  A.DPST_SEQ_NO      = C.PREPAY_OCC_TGT_SEQ_NO
                              AND    A.PYM_ACNT_ID      = C.PYM_ACNT_ID
-                      AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                             AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
                        ELSE 0
                    END)
              +   (CASE WHEN A.PREPAY_TGT_YN = 'Y'
@@ -309,7 +309,7 @@
                                   , TBLPY_PREPAY_OCC C
                              WHERE  A.DPST_SEQ_NO      = B.DPST_SEQ_NO
                              AND    B.PYM_SEQ_NO       = C.PREPAY_OCC_TGT_SEQ_NO
-                      AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                             AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
                        ELSE 0
                   END) = 0
            <if test="cancelSinglePaymentVO.soId != null and cancelSinglePaymentVO.soId != ''">
@@ -320,22 +320,335 @@
            AND    A.PAY_PROC_YN   = #{cancelSinglePaymentVO.payProcYn} /* PAY_PROC_YN */ /* 수납처리여부(전체:조건제외,처리:Y,미처리:N) */
                </if>
            </if>
-           <if test="cancelSinglePaymentVO.depositDtFrom != null and cancelSinglePaymentVO.depositDtFrom != ''">
-               <if test="cancelSinglePaymentVO.depositDtTo != null and cancelSinglePaymentVO.depositDtTo != ''">
-           AND    A.DPST_DT BETWEEN #{cancelSinglePaymentVO.depositDtFrom} /* DPST_DT_FROM */ AND #{cancelSinglePaymentVO.depositDtTo} /* DPST_DT_TO */ /* 입금일자 */
+           <if test="cancelSinglePaymentVO.dpstDtFrom != null and cancelSinglePaymentVO.dpstDtFrom != ''">
+               <if test="cancelSinglePaymentVO.dpstDtTo != null and cancelSinglePaymentVO.dpstDtTo != ''">
+           AND    A.DPST_DT BETWEEN #{cancelSinglePaymentVO.dpstDtFrom} /* DPST_DT_FROM */ AND #{cancelSinglePaymentVO.dpstDtTo} /* DPST_DT_TO */ /* 입금일자 */
                </if>
            </if>
-           <if test="cancelSinglePaymentVO.depositOption != null and cancelSinglePaymentVO.depositOption != ''">
-           AND    A.DPST_CL       = #{cancelSinglePaymentVO.depositOption} /* DPST_CL */ /* 입금구분 */
+           <if test="cancelSinglePaymentVO.dpstCl != null and cancelSinglePaymentVO.dpstCl != ''">
+           AND    A.DPST_CL       = #{cancelSinglePaymentVO.dpstCl} /* DPST_CL */ /* 입금구분 */
            </if>
-           <if test="cancelSinglePaymentVO.regId != null and cancelSinglePaymentVO.regId != ''">
-           AND    A.REGR_ID       = #{cancelSinglePaymentVO.regId} /* INPUT_REGR_ID */ /* 등록자ID */
+           <if test="cancelSinglePaymentVO.regrId != null and cancelSinglePaymentVO.regrId != ''">
+           AND    A.REGR_ID       = #{cancelSinglePaymentVO.regrId} /* INPUT_REGR_ID */ /* 등록자ID */
            </if>
            <if test="cancelSinglePaymentVO.acntCardNo != null and cancelSinglePaymentVO.acntCardNo != ''">
            AND    FSYCO_DECRYPT(A.ACNT_CARD_NO , 'ACNT_CARD_NO') = #{cancelSinglePaymentVO.acntCardNo} /* ACNT_CARD_NO */ /* 카드/신용카드 번호 */
-           </if>  
+           </if>
           ) Z
     </select>
+    
+    
+    
+	<select id="getTransCheckAmt" parameterType="String" resultType="Double">
+    SELECT /* DepositCancelMapper.xml.getTransCheckAmt, 양연희, 2017.11.20 */
+           A.PREPAY_TRANS_CNT + B.AMBG_TRANS_CNT + C.PREPAY_RFND_CNT + D.AMBG_RFND_CNT
+    FROM  (SELECT COUNT(PREPAY_TRANS_SEQ_NO) AS PREPAY_TRANS_CNT
+           FROM   TBLPY_PREPAY_TRANS_HIST
+           WHERE  PREPAY_OCC_SEQ_NO IN (SELECT PREPAY_OCC_SEQ_NO
+                                        FROM   TBLPY_PREPAY_OCC
+                                        WHERE  PREPAY_OCC_TP = '01'
+                                        AND    PREPAY_OCC_TGT_SEQ_NO = #{dpstSeqNo}
+                                        AND    CNCL_YN != 'Y'
+                                        UNION  ALL
+                                        SELECT PREPAY_OCC_SEQ_NO
+                                        FROM   TBLPY_PREPAY_OCC
+                                        WHERE  PREPAY_OCC_TP = '02'
+                                        AND    PREPAY_OCC_TGT_SEQ_NO IN (SELECT AMBG_OCC_SEQ_NO
+                                                                         FROM   TBLPY_AMBG_OCC
+                                                                         WHERE  DPST_TP_SEQ_NO = #{dpstSeqNo})
+                                        UNION  ALL
+                                        SELECT PREPAY_OCC_SEQ_NO
+                                        FROM   TBLPY_PREPAY_OCC
+                                        WHERE  PREPAY_OCC_TP = '03'
+                                        AND    PREPAY_OCC_TGT_SEQ_NO IN (SELECT PYM_SEQ_NO
+                                                                         FROM   TBLPY_RCPT
+                                                                         WHERE  DPST_SEQ_NO = #{dpstSeqNo})
+                                        AND    CNCL_YN != 'Y'
+                                       )
+           AND    CNCL_YN != 'Y'
+           AND    TRANS_PROC_AMT > 0
+          ) A
+         ,(SELECT COUNT(B.AMBG_TRANS_SEQ_NO) AS AMBG_TRANS_CNT
+           FROM   TBLPY_AMBG_OCC A
+                , TBLPY_AMBG_TRANS_HIST B
+           WHERE  A.DPST_TP_SEQ_NO = #{dpstSeqNo}
+           AND    A.CNCL_YN != 'Y'
+           AND    B.AMBG_OCC_SEQ_NO = A.AMBG_OCC_SEQ_NO
+           AND    B.CNCL_YN != 'Y'
+           AND    B.TRANS_PROC_AMT > 0
+          ) B
+         ,(SELECT COUNT(RFND_SEQ_NO) AS PREPAY_RFND_CNT
+           FROM   TBLPY_RFND_APPL
+           WHERE  RFND_OCC_AMT_CL = '01'
+           AND    RFND_OCC_TGT_SEQ_NO IN (SELECT PREPAY_OCC_SEQ_NO
+                                          FROM  (SELECT PREPAY_OCC_SEQ_NO
+                                                 FROM   TBLPY_PREPAY_OCC
+                                                 WHERE  PREPAY_OCC_TP = '01'
+                                                 AND    PREPAY_OCC_TGT_SEQ_NO = #{dpstSeqNo}
+                                                 AND    CNCL_YN != 'Y'
+                                                 UNION  ALL
+                                                 SELECT PREPAY_OCC_SEQ_NO
+                                                 FROM   TBLPY_PREPAY_OCC
+                                                 WHERE  PREPAY_OCC_TP = '02'
+                                                 AND    PREPAY_OCC_TGT_SEQ_NO IN (SELECT AMBG_OCC_SEQ_NO
+                                                                                  FROM   TBLPY_AMBG_OCC
+                                                                                  WHERE  DPST_TP_SEQ_NO = #{dpstSeqNo})
+                                                 UNION  ALL
+                                                 SELECT PREPAY_OCC_SEQ_NO
+                                                 FROM   TBLPY_PREPAY_OCC
+                                                 WHERE  PREPAY_OCC_TP = '03'
+                                                 AND    PREPAY_OCC_TGT_SEQ_NO IN (SELECT PYM_SEQ_NO
+                                                                                  FROM    TBLPY_RCPT
+                                                                                  WHERE   DPST_SEQ_NO = #{dpstSeqNo})
+                                                 AND    CNCL_YN != 'Y'
+                                                ) CC
+                                         )
+           AND    DCSN_PROC_STAT IN ('01','03')
+          ) C
+         ,(SELECT COUNT(B.RFND_SEQ_NO) AS AMBG_RFND_CNT
+           FROM   TBLPY_AMBG_OCC A
+                , TBLPY_RFND_APPL B
+           WHERE  A.DPST_TP_SEQ_NO = #{dpstSeqNo}
+           AND    A.CNCL_YN != 'Y'
+           AND    B.RFND_OCC_TGT_SEQ_NO = A.AMBG_OCC_SEQ_NO
+           AND    B.RFND_OCC_AMT_CL = '01'
+           AND    B.DCSN_PROC_STAT IN ('01','03')
+          ) D
+	</select>
+    
+
+	<select id="getReceiptCheckCnt" parameterType="String" resultType="int">
+    SELECT /* CancelSinglePayment.xml.getReceiptCheckCnt, 신광진, 2018.04.23 */
+           COUNT(0)
+    FROM   TBLPY_RCPT
+    WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    AND    CNCL_YN = 'N'
+	</select>  
+    
+	<select id="getDepositForCancel" resultType="CancelSinglePaymentVO">
+    SELECT DPST_TP
+         , PAY_PROC_YN
+         , CNCL_YN
+    FROM   TBLPY_DPST
+    WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+	</select>
+    
+	<update id="updateCnclYn">
+		UPDATE TBLPY_DPST 
+		SET    CNCL_YN = #{cancelSinglePaymentVO.cnclYn}
+		     , CHGR_ID = #{cancelSinglePaymentVO.chgrId}
+		     , CHG_DATE = NOW()
+		WHERE  DPST_SEQ_NO = #{cancelSinglePaymentVO.dpstSeqNo}
+	</update>
+    
+    
+    <!-- TBLPY_DPST_CNCL에 등록할 데이터를 조회한다. -->
+    <select id="getDepositCancelInfo" resultType="CancelSinglePaymentVO">
+        SELECT DPST_SEQ_NO
+             , BILL_SEQ_NO
+             , TRANS_DT
+             , DPST_PROC_DT
+             , SO_ID
+             , GRP_ID
+             , PYM_ACNT_ID
+             , CUST_ID
+             , CTRT_ID
+             , DPST_DT
+             , DPST_TP
+             , DPST_CL
+             , DPST_TP_SEQ_NO
+             , PAY_CORP_TP
+             , PAY_CORP_CD
+             , ACNT_CARD_NO
+             , DPST_AMT
+             , FEE_AMT
+             , PAY_PROC_YN
+             , PAY_PROC_DT
+             , AMBG_TGT_YN
+             , WON_DPST_AMT
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , REGR_ID
+        FROM   TBLPY_DPST
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+        AND    CNCL_YN = 'Y'
+    </select>
+    
+    
+
+    <insert id="insertDepositCancel">
+        INSERT INTO TBLPY_DPST_CNCL
+        (
+               DPST_SEQ_NO
+             , BILL_SEQ_NO
+             , TRANS_DT
+             , DPST_PROC_DT
+             , SO_ID
+             , GRP_ID
+             , PYM_ACNT_ID
+             , CUST_ID
+             , CTRT_ID
+             , DPST_DT
+             , DPST_TP
+             , DPST_CL
+             , DPST_TP_SEQ_NO
+             , PAY_CORP_TP
+             , PAY_CORP_CD
+             , ACNT_CARD_NO
+             , DPST_AMT
+             , FEE_AMT
+             , PAY_PROC_YN
+             , PAY_PROC_DT
+             , AMBG_TGT_YN
+             , WON_DPST_AMT
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , CNCLR_ID
+             , CNCL_DTTM
+             , CNCL_RESN
+             , REGR_ID
+             , REG_DATE
+             , CHGR_ID
+             , CHG_DATE
+        )
+        VALUES
+        (
+               #{cancelSinglePaymentVO.dpstSeqNo,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.billSeqNo,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.transDt,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstProcDt,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.soId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.grpId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.pymAcntId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.custId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.ctrtId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstDt,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstTp,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstCl,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstTpSeqNo,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.payCorpTp,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.payCorpCd,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.acntCardNo,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.dpstAmt}
+             , #{cancelSinglePaymentVO.feeAmt}
+             , #{cancelSinglePaymentVO.payProcYn,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.payProcDt,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.ambgTgtYn,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.wonDpstAmt}
+             , #{cancelSinglePaymentVO.crncyCd,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.exrate}
+             , #{cancelSinglePaymentVO.exrateAplyDt,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.cnclrId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.cnclDttm,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.cnclResn,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.regrId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.regDate}
+             , #{cancelSinglePaymentVO.regrId,jdbcType=VARCHAR}
+             , #{cancelSinglePaymentVO.regDate}
+        )
+    </insert>
+    
+    
+
+    <select id="getReceiptDetailList" resultType="ReceiptDetail">
+        SELECT T2.BILL_SEQ_NO AS BILL_SEQ_NO
+             , T2.PYM_SEQ_NO AS PYM_SEQ_NO
+             , T2.USE_YYMM AS USE_YYMM
+             , T2.PROD_CMPS_ID AS PROD_CMPS_ID
+             , T2.SVC_CMPS_ID AS SVC_CMPS_ID
+             , T2.CHRG_ITM_CD AS CHRG_ITM_CD
+             , T2.BILL_AMT AS BILL_AMT
+             , T2.RCPT_AMT AS RCPT_AMT
+             , T2.CRNCY_CD AS CRNCY_CD
+             , T2.EXRATE AS EXRATE
+             , T2.EXRATE_APLY_DT AS EXRATE_APLY_DT
+        FROM   TBLPY_RCPT T1
+             , TBLPY_RCPT_DTL T2
+        WHERE  T1.PYM_SEQ_NO = T2.PYM_SEQ_NO
+            <if test="dpstSeqNo != null">
+        AND    T1.DPST_SEQ_NO = #{dpstSeqNo}
+            </if>
+            <if test="pymSeqNo != null">
+        AND    T1.PYM_SEQ_NO = #{pymSeqNo}
+            </if>
+    </select>
+    
+    <update id="updateBillCancel">
+        UPDATE TBLIV_BILL
+        SET    RCPT_AMT = RCPT_AMT - #{rcptAmt}
+             , FULL_PAY_YN =  'N'
+             , CHGR_ID = #{chgrId}
+             , CHG_DATE = #{chgDate}
+        WHERE  BILL_SEQ_NO = #{billSeqNo}
+        AND    USE_YYMM = #{useYymm}
+        AND    PROD_CMPS_ID = #{prodCmpsId}
+        AND    SVC_CMPS_ID = #{svcCmpsId}
+        AND    CHRG_ITM_CD = #{chrgItmCd}
+    </update>
+    
+    
+    
+    <select id="getReceiptBillInfo" resultType="Receipt">
+        SELECT B.PYM_SEQ_NO
+             , B.BILL_SEQ_NO
+             , SUM(B.RCPT_AMT) AS RCPT_AMT
+        FROM   TBLPY_RCPT A
+             , TBLPY_RCPT_DTL B
+        WHERE  A.DPST_SEQ_NO = #{dpstSeqNo}
+        AND    A.PYM_SEQ_NO = B.PYM_SEQ_NO
+        GROUP  BY B.PYM_SEQ_NO
+                , B.BILL_SEQ_NO
+    </select>
+    
+    
+
+    <update id="updateBillMastCancel">
+        UPDATE TBLIV_BILL_MAST 
+        SET    RCPT_AMT    = RCPT_AMT  - #{rcptAmt}
+             , UNPAY_AMT   = UNPAY_AMT + #{rcptAmt}
+             , FULL_PAY_YN = 'N'
+             , CHGR_ID     = #{chgrId}
+             , CHG_DATE    = #{chgDate}
+        WHERE  BILL_SEQ_NO = #{billSeqNo}
+    </update>
+    
+    
+    
+    <update id="updateRcptCancel">
+        UPDATE TBLPY_RCPT 
+        SET    CNCL_YN     = 'Y'
+             , CHGR_ID     = #{chgrId}
+             , CHG_DATE    = now()
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </update>
+    
+    
+    <select id="getPrepayTransCount" resultType="int">
+        SELECT COUNT(*)
+        FROM   TBLPY_PREPAY_OCC T1,
+               TBLPY_PREPAY_TRANS_HIST T2
+        WHERE  T1.PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+        AND    T1.PREPAY_OCC_SEQ_NO = T2.PREPAY_OCC_SEQ_NO
+    </select>
+    
+    
+    <update id="updatePrepayOccCancel">
+        UPDATE TBLPY_PREPAY_OCC SET
+               CNCL_YN = 'Y'
+             , CNCL_DTTM = #{cnclDttm}
+             , CHGR_ID = #{chgrId} 
+             , CHG_DATE = now() 
+        WHERE  PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+    </update>
+    
+    
+    
+    
+    
+    
+    
     
     <select id="getBillInfo" parameterType="com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO" resultType="com.ntels.ccbs.charge.domain.payment.payment.CancelSinglePaymentVO">
    	 SELECT   

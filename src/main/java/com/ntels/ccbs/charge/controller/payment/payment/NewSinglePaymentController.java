@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ntels.ccbs.charge.domain.common.EachDeposit;
 import com.ntels.ccbs.charge.domain.payment.payment.NewSinglePaymentVO;
 import com.ntels.ccbs.charge.service.payment.payment.NewSinglePaymentService;
 import com.ntels.ccbs.common.consts.Consts;
@@ -419,20 +420,34 @@ public class NewSinglePaymentController {
 		model.addAttribute("loanAvlAmtList", LoanAvlAmtList); // 목록리스트
 	}
 
-	@RequestMapping(value = "insertDeposit", method = RequestMethod.POST)
-	@ResponseBody
-	public ModelMap insertDeposit(NewSinglePaymentVO newSinglePaymentVO) {
-		ModelMap modelMap = new ModelMap();
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value = "insertAction", method = RequestMethod.POST)
+	public String insertDeposit(EachDeposit eachDeposit, HttpServletRequest request, Model model) {
+		
+		int result = newSinglePaymentService.insertAction(eachDeposit);		
+		
+		model.addAttribute("result", result);
+		
+		return  URL + "/ajax/newSinglePaymentList"; 
+		
 
-		try {
-			newSinglePaymentService.insertDeposit(newSinglePaymentVO);
-			modelMap.addAttribute("success", true);
-		} catch (Exception e) {
-			modelMap.addAttribute("success", false);
-			modelMap.addAttribute("message", e.getMessage());
-		}
-
-		return modelMap;
+		
+//		ModelMap modelMap = new ModelMap();
+//
+//		try {
+//			newSinglePaymentService.insertDeposit(newSinglePaymentVO);
+//			modelMap.addAttribute("success", true);
+//		} catch (Exception e) {
+//			modelMap.addAttribute("success", false);
+//			modelMap.addAttribute("message", e.getMessage());
+//		}
+		
 	}
 
 }

@@ -7,6 +7,7 @@ public interface EachDepositService {
 	 * @param eachDpstSeq, inptMenuId, workId
 	 * @return
 	 */
-	public int processEachDeposit(String eachDpstSeq, String inptMenuId, String workId) throws Exception;
+	//public int processEachDeposit(String eachDpstSeq, String inptMenuId, String workId) throws Exception;
+	public int processEachDeposit(String eachDpstSeq, String inptMenuId, String workId, String rdoDpstGubn) throws Exception;
 
 }

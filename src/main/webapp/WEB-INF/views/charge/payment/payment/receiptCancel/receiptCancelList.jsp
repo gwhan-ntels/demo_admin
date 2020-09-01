@@ -99,7 +99,7 @@ $(document).ready(function() {
 	
 	
 	$("#recCnclTable").jqGrid({
-		url:'recCnclListAction.json?',
+		url:'/charge/payment/payment/receiptCancel/recCnclListAction.json?',
 		datatype: "local",
 		mtype:"POST",
 		postData: {},
@@ -156,60 +156,9 @@ $(document).ready(function() {
 		searchReceipt();
 	});    	
 	    
-	//수납취소 Batch 호출
+	//수납취소
 	$("#cancelRcpt").click(function(){
-		setCnclReceipt();  // online 호출 시 사용
-
-		//cancelReceipt(); 배치 호출 시 사용 
-   	
-   	/* 
-       var rowId = $("#recCnclTable").getGridParam("selrow");
-       //선택한 row가 없을 경우
-       if (rowId == 0){
-              return;
-          }
-       
-       var data = $("#recCnclTable").getRowData(rowId);
-       
-       //수납취소건일 경우
-       if(data.cncl == "Y"){
-           alert("<spring:message code="MSG.M10.MSG00038"/>");
-           return;
-       }
-       //취소사유가 없을경우
-       if($('#rsn').val().length == 0){
-           alert("<spring:message code="MSG.M10.MSG00037"/>");
-           $("#rsn").focus();
-           return;
-       }
-       
-       var check = confirm("<spring:message code="MSG.M10.MSG00034"/> \n<spring:message code="MSG.M09.MSG00008"/>"); //취소된 수납금은 선수금으로 생성됩니다. 저장하시겠습니까?
-       
-       if(!check){
-           return;
-       }
-       
-       //현재 년월
-       var yyyymm = getStrYearMonth();
-       
-       var params  = new Array();
-       
-       params[ 0 ]  = 'BLPYC03M02';
-       params[ 1 ]  = '0';
-       params[ 2 ]  = '99999';
-       params[ 3 ]  = '1234567890';                           // 배치시퀀스번호 만들어야됨
-       params[ 4 ]  = yyyymm;        //년월
-       params[ 5 ]  = '01';
-       params[ 6 ]  = "<c:out value='${session_user.userId}'/>";    // 사용자ID
-       params[ 7 ]  = data.soId;                                    // SO_ID
-       params[ 8 ]  = $('#rsn').val();                              // 취소사유
-       params[ 9 ]  = '';
-       params[ 10 ] = data.pymSeqNo;                                // 납부일련번호
-       
-       var tempParam = JSON.stringify(params);
-       alert(tempParam); return;
-       
-        */
+		setCnclReceipt();  
 	});
 });
 
@@ -248,25 +197,28 @@ function searchReceipt(){
 }
 
 function setCnclReceipt() {
-	var param = checkValidation();		
+	var param = checkValidation();	
 
-	if (param) {
-		$.post('chkIsCancelAble', param, function (response) {
-			//console.log(response.data);
-			if (response.data  == 1) { // 대체신청 없음 수납취소 가능 상태				
-		        var check = confirm('수납취소하시겠습니까?'); //취소된 수납금은 선수금으로 생성됩니다. 저장하시겠습니까?
-		       
-		        if(!check){
-		            return;
-		        }
-		        // 수납취소
-		        insert(param);
+	$.ajax({
+        type : "post",
+        url : '/charge/payment/payment/receiptCancel/chkIsCancelAble.json',
+        data : param,
+        async: true,
+        success : function(data) {
+        	if (data.returnResult == '-1') {            
+				alert('수납취소가 불가능한 대상입니다.');
+				return;
 			} else {
-				alert('수납취소가 불가능합니다.');
+                if(param) {
+                	var result = confirm('수납취소하시겠습니까?');
+                	
+                	if (result) {
+                		insert(param) // 수납취소처리
+                	}
+                }
 			}
-		});
-	} 
-	
+        }
+    });
 }
 
 

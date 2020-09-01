@@ -9,6 +9,7 @@ public interface PaymentService {
 	 * @param procScopeFlag(A-입금/수납 처리,R-수납만 처리), pymAcntId, dpstSeqNo, depositInfo, inptMenuId, workId
 	 * @return
 	 */
-	int processReceipt(String procScopeFlag, String pymAcntId, String dpstSeqNo, DepositVO depositInfo, String inptMenuId, String workId) throws Exception;
+	//int processReceipt(String procScopeFlag, String pymAcntId, String dpstSeqNo, DepositVO depositInfo, String inptMenuId, String workId) throws Exception;
+	int processReceipt(String procScopeFlag, String pymAcntId, String dpstSeqNo, DepositVO depositInfo, String inptMenuId, String workId, String rdoDpstGubn) throws Exception;
 
 }

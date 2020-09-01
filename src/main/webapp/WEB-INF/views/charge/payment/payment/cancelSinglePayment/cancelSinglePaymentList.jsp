@@ -51,11 +51,11 @@ $(document).ready(function() {
 	
 	var fromDt = new Date();
 	fromDt.setDate(fromDt.getDate()-7);
-	$('#depositDtFrom').datepicker('setDate', fromDt);
-	$('#depositDtTo').datepicker('setDate', new Date());
+	$('#dpstDtFrom').datepicker('setDate', fromDt);
+	$('#dpstDtTo').datepicker('setDate', new Date());
 	
 	btnNonActive("printBtn");
-	btnNonActive("btn_cancel");
+	btnNonActive("btnCancel");
 	
 	// 영수사원
 	$('#btnSearchUser').on('click',function (e) {
@@ -85,38 +85,31 @@ $(document).ready(function() {
 	
 	//그리드1
 	$("#getCaseByCancelTable").jqGrid({
-		url:'getCaseByCancelListAction.json?',
+		url:'/charge/payment/payment/cancelSinglePayment/getCaseByCancelListAction.json?',
 		datatype: "local",
 		mtype:"POST",
 		postData: {},
 		//multiselect: true,
 		colModel: [
 			//차후 안쓰는 필드는 hidden처리
-			{ label: '<spring:message code="LAB.M08.LAB00172" />', name: 'depositSeqNo', width : 80, align:"center"},          //입금일련번호
-			{ label: '<spring:message code="LAB.M03.LAB00082" />', name: 'regId', width : 70, align:"center"},                    //등록자 ID
-			{ label: '<spring:message code="LAB.M03.LAB00084" />', name: 'registantNm', width : 79, align:"center", summaryTpl: "Total: {0}", summaryType: 'count'},      //등록자명
-			{ label: '<spring:message code="LAB.M03.LAB00079" />', name: 'registDate', width : 100, formatter:dateTypeFormatterYYYYMMDD, align:"center"},       //등록일
+			{ label: '<spring:message code="LAB.M08.LAB00172" />', name: 'dpstSeqNo', width : 80, align:"center"},          //입금일련번호
+			{ label: '<spring:message code="LAB.M03.LAB00082" />', name: 'regrId', width : 70, align:"center"},                    //등록자 ID
+			{ label: '<spring:message code="LAB.M03.LAB00084" />', name: 'regrNm', width : 79, align:"center", summaryTpl: "Total: {0}", summaryType: 'count'},      //등록자명
+			{ label: '<spring:message code="LAB.M03.LAB00079" />', name: 'regDate', width : 100, formatter:dateTypeFormatterYYYYMMDD, align:"center"},       //등록일
 			{ label: '<spring:message code="LAB.M02.LAB00006" />', name: 'pymAcntId', width : 90, align:"center"},        //납부계정ID
 			{ label: '<spring:message code="LAB.M02.LAB00018" />', name: 'pymAcntNm', width : 90, align:"center"},          //납부계정명
-			{ label: '<spring:message code="LAB.M02.LAB00017" />', name: 'pymAcntMethodNm', width : 75, align:"center"},   //납부방법명
-			{ label: '<spring:message code="LAB.M08.LAB00178" />', name: 'depositTypNm', width : 75, align:"center"},        //입금형태명
-			{ label: '<spring:message code="LAB.M08.LAB00167" />', name: 'depositOptionNm', width : 75, align:"center"},   //입금구분명
-			{ label: '<spring:message code="LAB.M08.LAB00170" />', name: 'financialInstitutionNm', width : 90, align:"center"},   //입금기관명
-			{ label: '<spring:message code="LAB.M01.LAB00198" />', name: 'financialInstitutionTypeNm', width : 90, align:"center"}, //입금유형명
+			{ label: '<spring:message code="LAB.M02.LAB00017" />', name: 'pymMthdNm', width : 75, align:"center"},   //납부방법명
+			{ label: '<spring:message code="LAB.M08.LAB00178" />', name: 'dpstTpNm', width : 75, align:"center"},        //입금형태명
+			{ label: '<spring:message code="LAB.M08.LAB00167" />', name: 'dpstClNm', width : 75, align:"center"},   //입금구분명
+			{ label: '<spring:message code="LAB.M08.LAB00170" />', name: 'payCorpTpNm', width : 90, align:"center"},   //입금기관명
+			{ label: '<spring:message code="LAB.M01.LAB00198" />', name: 'payCorpCdNm', width : 90, align:"center"}, //입금유형명
 			{ label: '<spring:message code="LAB.M01.LAB00042" />', name: 'acntCardNo', width : 90, align:"center"},      //계좌 및 카드번호
-			{ label: '<spring:message code="LAB.M08.LAB00171" />', name: 'depositAmt', formatter: 'integer', width : 70, align:"right", summaryTpl: "Total: {0}", summaryType: 'sum'},     //입금금액
-			{ label: '<spring:message code="LAB.M08.LAB00173" />', name: 'paymentDt', width : 70, formatter:stringTypeFormatterYYYYMMDD, align:"center"},     //고객납부일자
-			{ label: '<spring:message code="LAB.M08.LAB00127" />', name: 'transferDt', width : 70, formatter:stringTypeFormatterYYYYMMDD, align:"center"}, //이체일
-			{ label: '<spring:message code="LAB.M08.LAB00175" />', name: 'depositProcessingDt', width : 80, align:"center", formatter:stringTypeFormatterYYYYMMDD}, //입금처리일자
-			/* { label: '<spring:message code="LAB.M05.LAB00055" />', name: 'unknownPayment', width : 80, align:"center"},             //미확인입금대상
-			{ label: '<spring:message code="LAB.M07.LAB00191" />', name: 'overPaymentRecovered', width : 80, align:"center"},             //선수금대상 */
-			{ label: '<spring:message code="LAB.M07.LAB00243" />', name: 'rcptProcessingDt', width : 80, align:"center", formatter:stringTypeFormatterYYYYMMDD}, //수납처리일자
+			{ label: '<spring:message code="LAB.M08.LAB00171" />', name: 'dpstAmt', formatter: 'integer', width : 70, align:"right", summaryTpl: "Total: {0}", summaryType: 'sum'},     //입금금액
+			{ label: '<spring:message code="LAB.M08.LAB00173" />', name: 'dpstDt', width : 70, formatter:stringTypeFormatterYYYYMMDD, align:"center"},     //고객납부일자
+			{ label: '<spring:message code="LAB.M08.LAB00127" />', name: 'transDt', width : 70, formatter:stringTypeFormatterYYYYMMDD, align:"center"}, //이체일
+			{ label: '<spring:message code="LAB.M08.LAB00175" />', name: 'dpstProcDt', width : 80, align:"center", formatter:stringTypeFormatterYYYYMMDD}, //입금처리일자
+			{ label: '<spring:message code="LAB.M07.LAB00243" />', name: 'payProcDt', width : 80, align:"center", formatter:stringTypeFormatterYYYYMMDD}, //수납처리일자
 			{ label: '<spring:message code="LAB.M07.LAB00242" />', name: 'payProcYn', width : 80, align:"center"},             //수납처리여부
-			/* { label: '<spring:message code="LAB.M08.LAB00177" />', name: 'depositTyp', width : 60, align:"center"},         //입금형태
-			{ label: '<spring:message code="LAB.M08.LAB00166" />', name: 'depositOption', width : 60, align:"center"},    //입금구분
-			{ label: '<spring:message code="LAB.M08.LAB00169" />', name: 'financialInstitution', width : 60, align:"center"}, //입금기관
-			{ label: '<spring:message code="LAB.M01.LAB00197" />', name: 'financialInstitutionType', width : 60, align:"center"}, //기관유형
-			{ label: '<spring:message code="LAB.M02.LAB00016" />', name: 'pymAcntMethod', width : 60, align:"center"},     //납부방법 */
 			{ label: 'soId' , name: 'soId', hidden:true,width : 0},
 			{ label: 'chk' , name: 'chk', hidden:true,width : 0}
 		],
@@ -126,18 +119,8 @@ $(document).ready(function() {
 		rowNum:5,                   //한번에 노출되는 row 수
 		rowList:[5,10,20,30,50],    //선택시 노출되는 row 수
 		pager: '#getCaseByCancelPager',
-		/* 
-		grouping: true,
-		groupingView : {
-			groupField : ['chk'],
-			groupColumnShow: [false],
-			groupSummary : [true],
-			groupText : ['<b>{0}</b>'],
-			groupDataSorted: true
-		},
-		 */
 		onCellSelect : function(rowId, index, contents, event){
-			btnActive("btn_cancel");
+			btnActive("btnCancel");
 		},
        
 		loadComplete: function(obj){
@@ -166,7 +149,7 @@ $(document).ready(function() {
 	});
 	
 	// 입금취소시
-	$('#btn_cancel').click(function() {
+	$('#btnCancel').click(function() {
 		cancelPayment();
 	});
 	
@@ -181,14 +164,14 @@ $(document).ready(function() {
 	
    
 	function searchPayment(){
-		var depositDtFrom = dateFormatToStringYYYYMMDD($("#depositDtFrom").val());
-		var depositDtTo   = dateFormatToStringYYYYMMDD($("#depositDtTo").val());
+		var dpstDtFrom = dateFormatToStringYYYYMMDD($("#dpstDtFrom").val());
+		var dpstDtTo   = dateFormatToStringYYYYMMDD($("#dpstDtTo").val());
 	   	
-		if(depositDtFrom == '' || depositDtTo == ''){
+		if(dpstDtFrom == '' || dpstDtTo == ''){
 			alert('<spring:message code="MSG.M01.MSG00007"/>');
 			return;
 		}
-		if(depositDtFrom > depositDtTo){
+		if(dpstDtFrom > dpstDtTo){
 			alert('<spring:message code="MSG.M01.MSG00005"/>');
 			return;
 		}
@@ -197,11 +180,11 @@ $(document).ready(function() {
 			datatype: "json",
 			postData : {
 				soId : $("#searchSoId").val(),
-				depositDtFrom : dateFormatToStringYYYYMMDD($("#depositDtFrom").val()),
-				depositDtTo : dateFormatToStringYYYYMMDD($("#depositDtTo").val()),
-				depositOption : $("#depositOption").val(),
+				dpstDtFrom : dateFormatToStringYYYYMMDD($("#dpstDtFrom").val()),
+				dpstDtTo : dateFormatToStringYYYYMMDD($("#dpstDtTo").val()),
+				dpstCl : $("#dpstCl").val(),
 				payProcYn : $("#payProcYn").val(),
-				regId : $("#condUserId").val(),
+				regrId : $("#condUserId").val(),
 				acntCardNo : ''
 			}                
 		});
@@ -226,41 +209,129 @@ $(document).ready(function() {
   
 	function printExcel(){
 		var soId = $('#searchSoId').val();
-		var depositDtFrom = dateFormatToStringYYYYMMDD($("#depositDtFrom").val());
-		var depositDtTo   = dateFormatToStringYYYYMMDD($("#depositDtTo").val());
-		var depositOption = $("#depositOption").val();
+		var dpstDtFrom = dateFormatToStringYYYYMMDD($("#dpstDtFrom").val());
+		var dpstDtTo   = dateFormatToStringYYYYMMDD($("#dpstDtTo").val());
+		var dpstCl = $("#dpstCl").val();
 		var payProcYn     = $("#payProcYn").val();
-		var regId         = $("#condUserId").val();
+		var regrId         = $("#condUserId").val();
 		var acntCardNo    = '';
    	
-		if(depositDtFrom == '' || depositDtTo == ''){
+		if(dpstDtFrom == '' || dpstDtTo == ''){
 			alert('<spring:message code="MSG.M01.MSG00007"/>');
 			return;
 		}
-		if(depositDtFrom > depositDtTo){
+		if(dpstDtFrom > dpstDtTo){
 			alert('<spring:message code="MSG.M01.MSG00005"/>');
 			return;
 		}
 
-		var param = 'depositDtFrom=' + depositDtFrom;
-		param = param + '&depositDtTo=' + depositDtTo;
+		var param = 'dpstDtFrom=' + dpstDtFrom;
+		param = param + '&dpstDtTo=' + dpstDtTo;
 		param = param + '&soId=' + soId;
-		param = param + '&depositOption=' + depositOption;
+		param = param + '&dpstCl=' + dpstCl;
 		param = param + '&payProcYn=' + payProcYn;
-		param = param + '&regId=' + regId;
+		param = param + '&regrId=' + regrId;
 		param = param + '&acntCardNo=' + acntCardNo;
 	
 		$.download('getCaseByCancelListExcelAction.xlsx',param,'post');	
 	}
 	
 	
-	//입금등록 배치 호출
+	function cancelPayment() {
+    	var param = checkParam();
+    	
+    	$.ajax({
+            type : "post",
+            url : '/charge/payment/payment/cancelSinglePayment/cancelCheck.json',
+            data : param,
+            async: true,
+            success : function(data) {
+            	if (data.returnResult == '-1') {            
+					alert('건별입금취소가 불가능한 대상입니다.');
+					return;
+				} else {
+
+	                if(param) {
+	                	var result = confirm('<spring:message code="MSG.M09.MSG00008"/>');
+	                	
+	                	if (result) {
+	                		insert(param) // 수납취소처리
+	                	}
+	                }
+				}
+            }
+        });     	
+	}
+	
+	function checkParam() {
+		var param = new Object();
+
+		// 취소사유 없을시 호출 불가
+		if($("#cnclResn").val() == ''){
+			alert('<spring:message code="MSG.M10.MSG00036"/>'); //취소사유를 입력해 주세요
+			$("#cnclResn").focus();
+			return false;
+		}
+
+
+	   /* KB 할때 향후 살펴 봐야 함. 한광욱     
+	   if($("#dpstCl").val() == '04'){ // 신용카드인 경우,
+
+	        swal('카드수납취소 페이지에서 진행하세요.', "", "error");
+	        return false;
+	    }
+
+
+	    if($("#dpstCl").val() != '05' && $("#dpstCl").val() != '06' && $("#dpstCl").val() != '07' ){  // 05 06 07 만 가능
+
+	        swal('건별입금취소가 불가능한 대상입니다.', "", "error");
+	        return false;
+	    } 
+	    */
+		
+		//선택된 그리드 row
+		var rowId = $("#getCaseByCancelTable").getGridParam("selrow");
+		if (rowId == null || rowId == ''){
+			alert('<spring:message code="MSG.M10.MSG00048"/>');	//취소할 입금내역을 선택해주세요.
+			return;
+		}
+		
+		var data = $("#getCaseByCancelTable").getRowData(rowId);
+		param.dpstSeqNo = data.dpstSeqNo;
+		
+		param.cnclResn = $("#cnclResn").val();
+		param.inptMenuId = $('#headerCurMenuId').val();
+		
+		return param;
+		
+	}
+	
+	function insert(param) {
+    	$.ajax({
+            type : "post",
+            url : '/charge/payment/payment/cancelSinglePayment/insertAction.json',
+            data : param,
+            async: true,
+            success : function(data) {
+				alert('<spring:message code="MSG.M07.MSG00084"/>');
+				searchPayment();
+            },
+    		error: function() {
+    		    //에러메세지
+    		    alert('<spring:message code="MSG.M10.MSG00005"/>'); // MSG.M10.MSG00005=처리에 실패했습니다. 관리자에게 문의해 주세요.
+    		}
+    	})
+	}
+	
+	
+/* 	
+    //입금등록 배치 호출
 	function cancelPayment(){
 		
 		// 취소사유 없을시 호출 불가
-		if($("#rsnForCnsl").val() == ''){
+		if($("#cnclResn").val() == ''){
 			alert('<spring:message code="MSG.M10.MSG00036"/>'); //취소사유를 입력해 주세요
-			$("#rsnForCnsl").focus();
+			$("#cnclResn").focus();
 			return false;
 		}
 		
@@ -296,7 +367,7 @@ $(document).ready(function() {
 		args += "01" + "\|";					//5.빌싸이클
 		args += "${session_user.userId}" + "\|";	//6사용자ID
 		args += data.soId + "\|";				//7.so_id
-		args += $("#rsnForCnsl").val() + "\|";				//8.'Cancel Single Deposit'
+		args += $("#cnclResn").val() + "\|";				//8.'Cancel Single Deposit'
 		args += data.depositSeqNo + "\|";				//9.depositSeqNo
 		args += "00" + "\|";				//10. '00'
 		args += "1" + "\|";				//11. '00'
@@ -312,7 +383,8 @@ $(document).ready(function() {
 		});
 		
 		getCanCelBatchLog();
-	}
+	} 
+*/
 	
 	//로그테이블에서 데이터를 가지고와서 작업완료 될때까지 계속 호출 cancelPayment
 	function getCanCelBatchLog(){
@@ -450,9 +522,9 @@ $(document).ready(function() {
 	        <tr>
 		        <th><spring:message code="LAB.M08.LAB00166"/><!-- 입금구분 --></th>
 				<td>
-						<select id="depositOption" name="depositOption" class="w150">
-						<c:forEach items="${depositTp}" var="depositTpList" varStatus="status">
-							<option value="${depositTpList.commonCd}">${depositTpList.commonCdNm}</option>
+						<select id="dpstCl" name="dpstCl" class="w150">
+						<c:forEach items="${dpstTp}" var="dpstTpList" varStatus="status">
+							<option value="${dpstTpList.commonCd}">${dpstTpList.commonCdNm}</option>
 						</c:forEach>
 					</select>
 			    </td>
@@ -460,19 +532,19 @@ $(document).ready(function() {
 	            <td>
 	                <div class="date_box">
 	                    <div class="inp_date w150">
-	                        <input type="text" id="depositDtFrom" name="depositDtFrom" class="datepicker" readonly="readonly"/>
+	                        <input type="text" id="dpstDtFrom" name="dpstDtFrom" class="datepicker" readonly="readonly"/>
 	                        <a href="#" class="btn_cal"></a>
 	                    </div>
 	                    <span class="dash">~</span>
 	                    <div class="inp_date w150">
-	                        <input type="text" id="depositDtTo" name="depositDtTo" class="datepicker" readonly="readonly"/>
+	                        <input type="text" id="dpstDtTo" name="dpstDtTo" class="datepicker" readonly="readonly"/>
 	                        <a href="#" class="btn_cal"></a>
 	                    </div>
 	                </div>
 	            </td>
 	        </tr>
 	        <tr>
-	            <th><spring:message code="LAB.M03.LAB00082" /><!-- 등록자 --></th>
+	            <th><spring:message code="LAB.M08.LAB00024" /><!-- 영수사원 --></th>
 			    <td>
 				   <div class="inp_date w280">
                     <input type="text" id="condUserNm" name="condUserNm" class="w250" disabled="disabled" />
@@ -526,7 +598,7 @@ $(document).ready(function() {
 				<!--취소사유-->
 				<th><spring:message code="LAB.M10.LAB00093" /><span class="dot">*</span></th>
 			   <td rowspan="5">
-				  <textarea id="rsnForCnsl" name="rsnForCnsl" type="text" class="w900" style="height:50px" rows="3"></textarea>
+				  <textarea id="cnclResn" name="cnclResn" type="text" class="w900" style="height:50px" rows="3"></textarea>
 			   </td>
 			</tr>
 			<tr>
@@ -539,7 +611,7 @@ $(document).ready(function() {
 		<div class="fr">
 				<!--등록-->
 				<ntels:auth auth="${menuAuthC}">
-					<a class="grey-btn" href="#" id="btn_cancel"><span class="cancel_icon"><spring:message code="LAB.M08.LAB00176"/></span></a>
+					<a class="grey-btn" href="#" id="btnCancel"><span class="cancel_icon"><spring:message code="LAB.M08.LAB00176"/></span></a>
 				</ntels:auth>
 		</div>
 	</div>
