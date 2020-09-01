@@ -111,6 +111,7 @@
 			, PYM_ACNT_ID
 		FROM TBLIV_BILL
 		WHERE BILL_SEQ_NO =  #{billSeqNo}
+		AND   BILL_AMT - RCPT_AMT != 0 
 		ORDER BY BILL_AMT ASC
 	</select>	
 	
@@ -132,8 +133,8 @@
 	
 	<update id="updateBillRcptAmt">
 		UPDATE TBLIV_BILL SET
-			RCPT_AMT = RCPT_AMT + #{bill.rcptAmt}
-			, FULL_PAY_YN = CASE WHEN RCPT_AMT + #{bill.rcptAmt} = BILL_AMT THEN 'Y' ELSE 'N' END
+			 FULL_PAY_YN = CASE WHEN RCPT_AMT + #{bill.rcptAmt} = BILL_AMT THEN 'Y' ELSE 'N' END
+			, RCPT_AMT = RCPT_AMT + #{bill.rcptAmt}
 			, CHG_DATE = #{bill.chgDate}
 		WHERE BILL_SEQ_NO = #{bill.billSeqNo}
 		AND CHRG_ITM_CD = #{bill.chrgItmCd}
