@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.common.AmbgMapper">
+
+	<!-- 불명금 발생내역 조회 -->
+	<select id="getAmbgOcc" resultType="AmbgOcc">
+		SELECT
+		     T2.DPST_DT AS DPST_DT
+		     , T2.DPST_CL AS DPST_CL
+		     , T1.DPST_BNK_ACNT_CD AS DPST_BNK_ACNT_CD
+		     , T2.PAY_CORP_CD AS PAY_CORP_CD
+		     , T2.ACNT_CARD_NO AS ACNT_CARD_NO
+		     , T2.DPST_AMT AS AMBG_OCC_AMT
+		     , T2.DPST_AMT AS AMBG_BAL
+		     , T2.WON_DPST_AMT AS WON_AMBG_OCC_AMT
+		     , T2.CRNCY_CD AS CRNCY_CD
+		     , T2.EXRATE AS EXRATE
+		     , T2.EXRATE_APLY_DT AS EXRATE_APLY_DT
+		     , T2.SO_ID AS SO_ID
+		     , T2.TRANS_DT AS TRANS_DT
+		     , T2.SO_ID AS OCC_SO_ID
+		FROM TBLPY_EACH_DPST T1, TBLPY_DPST T2
+		WHERE T2.DPST_SEQ_NO = #{dpstSeqNo}
+		     AND T2.DPST_SEQ_NO = T1.DPST_SEQ_NO
+	</select>
+	
+	<insert id="insertAmbgOcc">
+		INSERT INTO TBLPY_AMBG_OCC
+		(
+		     AMBG_OCC_SEQ_NO
+		     , AMBG_OCC_DTTM
+		     , AMBG_OCC_TP
+		     , AMBG_OCC_RESN
+		     , DPST_TP_SEQ_NO
+		     , DPST_DT
+		     , DPST_PROC_DTTM
+		     , DPST_CL
+		     , DPST_BNK_ACNT_CD
+		     , PAY_CORP_CD
+		     , ACNT_CARD_NO
+		     , AMBG_PROC_STAT
+		     , AMBG_OCC_AMT
+		     , AMBG_TRANS_AMT
+		     , AMBG_BAL
+		     , TRANS_CMPL_YN
+		     , WON_AMBG_OCC_AMT
+		     , CRNCY_CD
+		     , EXRATE
+		     , EXRATE_APLY_DT
+		     , REGR_ID
+		     , REG_DATE
+		     , CNCL_YN
+		     , CNCL_DTTM
+		     , SO_ID
+		     , TRANS_DT
+		     , OCC_SO_ID
+		)
+		VALUES
+		(
+		     #{pyAmbgOcc.ambgOccSeqNo, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.ambgOccDttm, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.ambgOccTp, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.ambgOccResn, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.dpstTpSeqNo, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.dpstDt, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.dpstProcDttm, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.dpstCl, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.dpstBnkAcntCd, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.payCorpCd, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.acntCardNo, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.ambgProcStat, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.ambgOccAmt, jdbcType=DOUBLE}
+		     , #{pyAmbgOcc.ambgTransAmt, jdbcType=DOUBLE}
+		     , #{pyAmbgOcc.ambgBal, jdbcType=DOUBLE}
+		     , #{pyAmbgOcc.transCmplYn, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.wonAmbgOccAmt, jdbcType=DOUBLE}
+		     , #{pyAmbgOcc.crncyCd, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.exrate, jdbcType=DOUBLE}
+		     , #{pyAmbgOcc.exrateAplyDt, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.regrId, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.regDate, jdbcType=DATE}
+		     , #{pyAmbgOcc.cnclYn, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.cnclDttm, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.soId, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.transDt, jdbcType=VARCHAR}
+		     , #{pyAmbgOcc.occSoId, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+
+</mapper>

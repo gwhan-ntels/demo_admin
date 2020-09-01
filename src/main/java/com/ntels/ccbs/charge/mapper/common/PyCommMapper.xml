@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.common.PyCommMapper">
+
+	<select id="getExrateInfo" resultType="ExrateInfo">
+		SELECT 
+			T2.CRNCY_CD
+		    , T2.EXRATE_APLY_DT
+		    , T2.EXRATE
+		FROM
+		(
+		    SELECT MAX(EXRATE_APLY_DT) AS EXRATE_APLY_DT
+		    FROM TBLIV_EXRATE_INFO
+		    WHERE CRNCY_CD = #{crncyCd}
+		    AND EXRATE_APLY_DT &lt;= #{exrateAplyDt}
+		) T1, TBLIV_EXRATE_INFO T2
+		WHERE T1.EXRATE_APLY_DT = T2.EXRATE_APLY_DT
+		    AND T2.CRNCY_CD = #{crncyCd}
+	</select>
+	
+	<!-- 납부계정ID 조회 -->
+	<select id="getPymAcntCnt" resultType="int">
+		SELECT COUNT(*)
+		FROM IFNBRM_CUST_INFO
+		WHERE PYM_ACNT_ID = #{pymAcntId}
+	</select>
+
+</mapper>

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.common.ReceiptMapper">
+
+    <select id="getCancelYn" resultType="String">
+        SELECT CNCL_YN
+        FROM   TBLPY_RCPT
+        WHERE  PYM_SEQ_NO = #{pymSeqNo}
+    </select>
+
+    <select id="getReceiptDetailList" resultType="ReceiptDetail">
+        SELECT T2.BILL_SEQ_NO AS BILL_SEQ_NO
+             , T2.PYM_SEQ_NO AS PYM_SEQ_NO
+             , T2.USE_YYMM AS USE_YYMM
+             , T2.PROD_CMPS_ID AS PROD_CMPS_ID
+             , T2.SVC_CMPS_ID AS SVC_CMPS_ID
+             , T2.CHRG_ITM_CD AS CHRG_ITM_CD
+             , T2.BILL_AMT AS BILL_AMT
+             , T2.RCPT_AMT AS RCPT_AMT
+             , T2.CRNCY_CD AS CRNCY_CD
+             , T2.EXRATE AS EXRATE
+             , T2.EXRATE_APLY_DT AS EXRATE_APLY_DT
+        FROM   TBLPY_RCPT T1
+             , TBLPY_RCPT_DTL T2
+        WHERE  T1.PYM_SEQ_NO = T2.PYM_SEQ_NO
+            <if test="dpstSeqNo != null">
+        AND    T1.DPST_SEQ_NO = #{dpstSeqNo}
+            </if>
+            <if test="pymSeqNo != null">
+        AND    T1.PYM_SEQ_NO = #{pymSeqNo}
+            </if>
+    </select>
+    
+    <update id="updateReceiptCancel" parameterType="ReceiptDetail">
+        UPDATE TBLPY_RCPT
+        SET    CNCL_YN = 'Y'
+             , CHGR_ID = #{userId}
+             , CHG_DATE = now()
+        WHERE  1=1
+        AND
+        <choose>
+            <when test="dpstSeqNo != null">
+               DPST_SEQ_NO = #{dpstSeqNo}
+            </when>
+            <when test="pymSeqNo != null">
+               PYM_SEQ_NO = #{pymSeqNo}
+            </when>
+        </choose>
+    </update>
+        
+    <select id="getReceipt" resultType="Receipt">
+        SELECT *
+        FROM   TBLPY_RCPT
+        WHERE  PYM_SEQ_NO = #{pymSeqNo}
+    </select>
+    
+	
+	<insert id="insertReceiptCancelAppl">
+		INSERT INTO TBLPY_RCPT_CNCL_APPL
+		(
+		     PYM_SEQ_NO
+		     , PYM_ACNT_ID
+		     , PAY_PROC_DT
+		     , DPST_CL
+		     , RCPT_PSN_ID
+		     , RCPT_DTTM
+		     , APPR_REQR_ID
+		     , APPR_REQ_DTTM
+		     , DCSN_PROC_STAT
+		     , CNCL_RESN
+		     , REG_DATE
+		)
+		VALUES
+		(
+		     #{receiptCancelAppl.pymSeqNo}
+		     , #{receiptCancelAppl.pymAcntId}
+		     , #{receiptCancelAppl.payProcDt}
+		     , #{receiptCancelAppl.dpstCl}
+		     , #{receiptCancelAppl.rcptPsnId}
+		     , #{receiptCancelAppl.rcptDttm}
+		     , #{receiptCancelAppl.apprReqrId}
+		     , #{receiptCancelAppl.apprReqDttm}
+		     , #{receiptCancelAppl.dcsnProcStat}
+		     , #{receiptCancelAppl.cnclResn}
+		     , #{receiptCancelAppl.regDate}
+		)
+	</insert>
+	
+	
+	
+	<insert id="insertReceiptCancel">
+		INSERT INTO TBLPY_RCPT_CNCL
+		(
+		     PYM_SEQ_NO
+		     , BILL_SEQ_NO
+		     , BILL_YYMM
+		     , BILL_CYCL
+		     , BILL_DT
+		     , PYM_ACNT_ID
+<!-- 		     , RCPT_ID -->
+		     , PAY_PROC_DT
+		     , DPST_PROC_DT
+		     , DPST_DT
+		     , DPST_CL
+		     , PAY_OBJ_AMT
+		     , PAY_APLY_AMT
+		     , PREPAY_APLY_AMT
+		     , PAY_TP
+<!-- 		     , PREPAY_TRANS_SEQ_NO -->
+		     , AMBG_TRANS_SEQ_NO
+		     , DPST_TP_SEQ_NO
+		     , CRNCY_CD
+		     , EXRATE
+		     , EXRATE_APLY_DT
+		     , CNCLR_ID
+		     , CNCL_DTTM
+		     , CNCL_RESN
+		     , REG_DATE
+		)
+		VALUES
+		(
+		     #{receiptCancel.pymSeqNo, jdbcType=VARCHAR}
+		     , #{receiptCancel.billSeqNo, jdbcType=VARCHAR}
+		     , #{receiptCancel.billYymm, jdbcType=VARCHAR}
+		     , #{receiptCancel.billCycl, jdbcType=VARCHAR}
+		     , #{receiptCancel.billDt, jdbcType=VARCHAR}
+		     , #{receiptCancel.pymAcntId, jdbcType=VARCHAR}
+<!-- 		     , #{receiptCancel.rcptId, jdbcType=VARCHAR} -->
+		     , #{receiptCancel.payProcDt, jdbcType=VARCHAR}
+		     , #{receiptCancel.dpstProcDt, jdbcType=VARCHAR}
+		     , #{receiptCancel.dpstDt, jdbcType=VARCHAR}
+		     , #{receiptCancel.dpstCl, jdbcType=VARCHAR}
+		     , #{receiptCancel.payObjAmt, jdbcType=DOUBLE}
+		     , #{receiptCancel.payAplyAmt, jdbcType=DOUBLE}
+		     , #{receiptCancel.prepayAplyAmt, jdbcType=DOUBLE}
+		     , #{receiptCancel.payTp, jdbcType=VARCHAR}
+<!-- 		     , #{receiptCancel.prepayTransSeqNo, jdbcType=VARCHAR} -->
+		     , #{receiptCancel.ambgTransSeqNo, jdbcType=VARCHAR}
+		     , #{receiptCancel.dpstTpSeqNo, jdbcType=VARCHAR}
+		     , #{receiptCancel.crncyCd, jdbcType=VARCHAR}
+		     , #{receiptCancel.exrate, jdbcType=DOUBLE}
+		     , #{receiptCancel.exrateAplyDt, jdbcType=VARCHAR}
+		     , #{receiptCancel.cnclrId, jdbcType=VARCHAR}
+		     , #{receiptCancel.cnclDttm, jdbcType=VARCHAR}
+		     , #{receiptCancel.cnclResn, jdbcType=VARCHAR}
+		     , #{receiptCancel.regDate, jdbcType=DATE}
+		)
+	</insert>
+	
+	<select id="getReceiptDetail" resultType="ReceiptDetail">
+		SELECT
+			*
+		FROM TBLPY_RCPT_DTL
+		WHERE PYM_SEQ_NO = #{pymSeqNo}
+	</select>
+	
+	
+	
+	
+	
+	<insert id="insertReceiptCancelDetail">
+		INSERT INTO TBLPY_RCPT_CNCL_DTL
+		(
+		     PYM_SEQ_NO
+		     , USE_YYMM
+		     , PROD_CMPS_ID
+		     , SVC_CMPS_ID
+		     , CHRG_ITM_CD
+		     , SO_ID
+		     , GRP_ID
+		     , CUST_ID
+		     , CTRT_ID
+		     , BILL_AMT
+		     , RCPT_AMT
+		     , CRNCY_CD
+		     , EXRATE
+		     , EXRATE_APLY_DT
+		     , REG_DATE
+		)
+		VALUES
+		(
+		     #{receiptDetail.pymSeqNo, jdbcType=VARCHAR}
+		     , #{receiptDetail.useYymm, jdbcType=VARCHAR}
+		     , #{receiptDetail.prodCmpsId, jdbcType=VARCHAR}
+		     , #{receiptDetail.svcCmpsId, jdbcType=VARCHAR}
+		     , #{receiptDetail.chrgItmCd, jdbcType=VARCHAR}
+		     , #{receiptDetail.soId, jdbcType=VARCHAR}
+		     , #{receiptDetail.grpId, jdbcType=VARCHAR}
+		     , #{receiptDetail.custId, jdbcType=VARCHAR}
+		     , #{receiptDetail.ctrtId, jdbcType=VARCHAR}
+		     , #{receiptDetail.billAmt, jdbcType=DOUBLE}
+		     , #{receiptDetail.rcptAmt, jdbcType=DOUBLE}
+		     , #{receiptDetail.crncyCd, jdbcType=VARCHAR}
+		     , #{receiptDetail.exrate, jdbcType=DOUBLE}
+		     , #{receiptDetail.exrateAplyDt, jdbcType=VARCHAR}
+		     , #{receiptDetail.regDate, jdbcType=DATE}
+		)
+	</insert>
+	
+	
+	<insert id="insertReceipt">
+		INSERT INTO TBLPY_RCPT
+		(
+			PYM_SEQ_NO
+			, BILL_SEQ_NO
+			, BILL_YYMM
+			, BILL_CYCL
+			, BILL_DT
+			, PYM_ACNT_ID
+			, PAY_PROC_DT
+			, DPST_PROC_DT
+			, DPST_DT
+			, DPST_CL
+			, PAY_OBJ_AMT
+			, PAY_APLY_AMT
+			, PREPAY_APLY_AMT
+			, PAY_TP
+			, DPST_SEQ_NO
+			, PREPAY_TRANS_SEQ_NO
+			, AMBG_TRANS_SEQ_NO
+			, ASSR_TRANS_SEQ_NO
+			, CRNCY_CD
+			, EXRATE
+			, EXRATE_APLY_DT
+			, CNCL_YN
+			, REG_DATE
+			, PRE_RCPT_AMT
+			, RCPT_AMT
+			, TRANS_DT
+			, SO_ID
+			, PREPD_CTRT_ID
+			, REGR_ID
+		)
+		VALUES
+		(
+			#{receipt.pymSeqNo, jdbcType=VARCHAR}
+			, #{receipt.billSeqNo, jdbcType=VARCHAR}
+			, #{receipt.billYymm, jdbcType=VARCHAR}
+			, #{receipt.billCycl, jdbcType=VARCHAR}
+			, #{receipt.billDt, jdbcType=VARCHAR}
+			, #{receipt.pymAcntId, jdbcType=VARCHAR}
+			, #{receipt.payProcDt, jdbcType=VARCHAR}
+			, #{receipt.dpstProcDt, jdbcType=VARCHAR}
+			, #{receipt.dpstDt, jdbcType=VARCHAR}
+			, #{receipt.dpstCl, jdbcType=VARCHAR}
+			, #{receipt.payObjAmt, jdbcType=DOUBLE}
+			, #{receipt.payAplyAmt, jdbcType=DOUBLE}
+			, #{receipt.prepayAplyAmt, jdbcType=DOUBLE}
+			, #{receipt.payTp, jdbcType=VARCHAR}
+			, #{receipt.dpstSeqNo, jdbcType=VARCHAR}
+			, #{receipt.prepayTransSeqNo, jdbcType=VARCHAR}
+			, #{receipt.ambgTransSeqNo, jdbcType=VARCHAR}
+			, #{receipt.assrTransSeqNo, jdbcType=VARCHAR}
+			, #{receipt.crncyCd, jdbcType=VARCHAR}
+			, #{receipt.exrate, jdbcType=DOUBLE}
+			, #{receipt.exrateAplyDt, jdbcType=VARCHAR}
+			, #{receipt.cnclYn, jdbcType=VARCHAR}
+			, #{receipt.regDate, jdbcType=DATE}
+			, #{receipt.preRcptAmt, jdbcType=DOUBLE}
+			, #{receipt.rcptAmt, jdbcType=DOUBLE}
+			, #{receipt.transDt, jdbcType=VARCHAR}
+			, #{receipt.soId, jdbcType=VARCHAR}
+			, #{receipt.prepdCtrtId, jdbcType=VARCHAR}
+			, #{receipt.regrId, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 청구내역에 수정된 데이타를 수납상세내역에 등록한다. -->
+	<insert id="insertReceiptDetail">
+		INSERT INTO TBLPY_RCPT_DTL
+		(
+			PYM_SEQ_NO
+			, USE_YYMM
+			, PROD_CMPS_ID
+			, SVC_CMPS_ID
+			, CHRG_ITM_CD
+			, BILL_AMT
+			, PRE_RCPT_AMT
+			, RCPT_AMT
+			, PRE_SO_ID
+			, SO_ID
+			, GRP_ID
+			, CUST_ID
+			, CTRT_ID
+			, CRNCY_CD
+			, EXRATE
+			, EXRATE_APLY_DT
+			, REG_DATE
+			, BILL_SEQ_NO
+		)
+		VALUES
+		(
+			#{receiptDetail.pymSeqNo,jdbcType=VARCHAR}
+			, #{receiptDetail.useYymm,jdbcType=VARCHAR}
+			, #{receiptDetail.prodCmpsId,jdbcType=VARCHAR}
+			, #{receiptDetail.svcCmpsId,jdbcType=VARCHAR}
+			, #{receiptDetail.chrgItmCd,jdbcType=VARCHAR}
+			, #{receiptDetail.billAmt}
+			, #{receiptDetail.preRcptAmt}
+			, #{receiptDetail.rcptAmt}
+			, #{receiptDetail.preSoId,jdbcType=VARCHAR}
+			, #{receiptDetail.soId,jdbcType=VARCHAR}
+			, #{receiptDetail.grpId,jdbcType=VARCHAR}
+			, #{receiptDetail.custId,jdbcType=VARCHAR}
+			, #{receiptDetail.ctrtId,jdbcType=VARCHAR}
+			, #{receiptDetail.crncyCd,jdbcType=VARCHAR}
+			, #{receiptDetail.exrate}
+			, #{receiptDetail.exrateAplyDt,jdbcType=VARCHAR}
+			, #{receiptDetail.regDate}
+			, #{receiptDetail.billSeqNo,jdbcType=VARCHAR}
+		)
+	</insert>
+    
+    
+</mapper>

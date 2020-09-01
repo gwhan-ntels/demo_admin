@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ntels.ccbs.charge.mapper.common.PaymentMapper_1">
+
+    <select id="getBillRcptAmt" resultType="double">
+        SELECT RCPT_AMT
+        FROM   TBLIV_BILL
+        WHERE  BILL_SEQ_NO  = #{billSeqNo}
+        AND    USE_YYMM     = #{useYymm}
+        AND    PROD_CMPS_ID = #{prodCmpsId}
+        AND    SVC_CMPS_ID  = #{svcCmpsId}
+        AND    CHRG_ITM_CD  = #{chrgItmCd}
+    </select>
+	
+
+    <update id="updateBillCancel">
+        UPDATE TBLIV_BILL
+        SET    RCPT_AMT = RCPT_AMT - #{rcptAmt}
+             , FULL_PAY_YN =  'N'
+             , CHGR_ID = #{chgrId}
+             , CHG_DATE = #{chgDate}
+        WHERE  BILL_SEQ_NO = #{billSeqNo}
+        AND    USE_YYMM = #{useYymm}
+        AND    PROD_CMPS_ID = #{prodCmpsId}
+        AND    SVC_CMPS_ID = #{svcCmpsId}
+        AND    CHRG_ITM_CD = #{chrgItmCd}
+    </update>
+    
+
+    <update id="updateBillMastCancel">
+        UPDATE TBLIV_BILL_MAST 
+        SET    RCPT_AMT    = RCPT_AMT  - #{rcptAmt}
+             , UNPAY_AMT   = UNPAY_AMT + #{rcptAmt}
+             , FULL_PAY_YN = 'N'
+             , CHGR_ID     = #{chgrId}
+             , CHG_DATE    = #{chgDate}
+        WHERE  BILL_SEQ_NO = #{billSeqNo}
+    </update>
+    	
+    	
+	<select id="getBillSeqNo" resultType="Bill">
+    SELECT /* PaymentMapper.xml.getBillCnt, 양연희, 2017.12.04 */
+           BILL_YYMM, BILL_SEQ_NO
+    FROM   TBLIV_BILL_MAST
+    WHERE  1=1
+    AND    SO_ID = #{soId}
+    AND    FULL_PAY_YN = 'N'
+    AND    UNPAY_AMT != 0 
+    AND    PYM_ACNT_ID = #{pymAcntId}
+    ORDER  BY BILL_YYMM, BILL_SEQ_NO
+	</select>
+	
+	<select id="getPymAcntCnt" parameterType="String" resultType="int">
+    SELECT /* PaymentMapper.xml.getPymAcntCnt, 양연희, 2017.12.04 */
+          COUNT(*)
+    FROM  TCMCU_PYM_ACNT_INFO
+    WHERE PYM_ACNT_ID = #{pymAcntId}
+	</select>
+    	
+    	
+	<update id="updateDpstProc">
+		UPDATE TBLPY_DPST
+		<set>
+			<if test="deposit.payProcDt != null">
+				PAY_PROC_DT = #{deposit.payProcDt},
+			</if>
+			<if test="deposit.prepayTgtYn != null">
+				PREPAY_TGT_YN = #{deposit.prepayTgtYn},
+			</if>
+			<if test="deposit.ambgTgtYn != null">
+				AMBG_TGT_YN = #{deposit.ambgTgtYn},
+			</if>
+			<if test="deposit.payProcYn != null">
+				PAY_PROC_YN = #{deposit.payProcYn}
+			</if>
+		</set>
+		WHERE DPST_SEQ_NO = #{deposit.dpstSeqNo}
+	</update>
+	
+	
+	
+	<select id="getUnpayAmtFromBillMast" resultType="double">
+		SELECT UNPAY_AMT
+		FROM TBLIV_BILL_MAST
+		WHERE BILL_SEQ_NO = #{billSeqNo}
+	</select>
+    	
+	
+	<select id="getBillListByBillSeqNo" resultType="CBillComm">
+		SELECT
+			PROD_CMPS_ID
+			, SVC_CMPS_ID
+			, CHRG_ITM_CD
+			, BILL_AMT
+			, RCPT_AMT
+			, FULL_PAY_YN
+			, CRNCY_CD
+			, EXRATE
+			, EXRATE_APLY_DT
+			, BILL_SEQ_NO
+			, USE_YYMM
+			, BILL_YYMM
+			, BILL_CYCL
+			, BILL_DT
+			, SO_ID
+			, GRP_ID
+			, CUST_ID
+			, CTRT_ID
+			, PYM_ACNT_ID
+		FROM TBLIV_BILL
+		WHERE BILL_SEQ_NO =  #{billSeqNo}
+		ORDER BY BILL_AMT ASC
+	</select>	
+	
+	<update id="updateBillMastRcptAmt">
+		UPDATE TBLIV_BILL_MAST SET
+			RCPT_AMT = RCPT_AMT + #{bill.rcptAmt}
+			, UNPAY_AMT = UNPAY_AMT - #{bill.rcptAmt}
+			, FULL_PAY_YN = #{bill.fullPayYn}
+		WHERE BILL_SEQ_NO = #{bill.billSeqNo}
+	</update>	
+
+	<update id="updateFullPayBill">
+		UPDATE TBLIV_BILL SET
+			RCPT_AMT = RCPT_AMT + (BILL_AMT - RCPT_AMT)
+			, FULL_PAY_YN = 'Y'
+			, CHG_DATE = #{bill.chgDate}
+		WHERE BILL_SEQ_NO = #{bill.billSeqNo}
+	</update>
+	
+	<update id="updateBillRcptAmt">
+		UPDATE TBLIV_BILL SET
+			RCPT_AMT = RCPT_AMT + #{bill.rcptAmt}
+			, FULL_PAY_YN = CASE WHEN RCPT_AMT + #{bill.rcptAmt} = BILL_AMT THEN 'Y' ELSE 'N' END
+			, CHG_DATE = #{bill.chgDate}
+		WHERE BILL_SEQ_NO = #{bill.billSeqNo}
+		AND CHRG_ITM_CD = #{bill.chrgItmCd}
+		AND PROD_CMPS_ID = #{bill.prodCmpsId}
+		AND SVC_CMPS_ID = #{bill.svcCmpsId}
+	</update>
+    	
+    	
+	<select id="getBillDataList" parameterType="String" resultType="BillListVO">
+    SELECT /* PaymentMapper.xml.getBillDataList, 양연희, 2017.12.04 MySql 용*/
+           SO_ID
+         , BILL_SEQ_NO
+         , USE_YYMM
+         , SVC_CMPS_ID
+         , PROD_CMPS_ID
+         , CHRG_ITM_CD
+         -- , UPP_PROD_CMPS_ID
+         , BILL_YYMM
+         , BILL_CYCL
+         , CTRT_ID
+         , CUST_ID
+         , PYM_ACNT_ID
+         , BILL_AMT
+         -- , MNG_CNTER_ORG_ID
+         -- , MNG_BR_ORG_ID
+         -- , MNGR_ID
+         -- , ROW_NUMBER() OVER (PARTITION BY BILL_SEQ_NO ORDER BY APLY_ORDER1, APLY_ORDER2, BILL_SEQ_NO, APLY_ORDER3, APLY_ORDER4, APLY_ORDER5, CTRT_ID, USE_YYMM) AS RCPT_VAL
+         ,(@vBILL_SEQ_NO:=BILL_SEQ_NO) vBILL_SEQ_NO
+         , CASE @vBILL_SEQ_NO WHEN BILL_SEQ_NO THEN @rownum:=@rownum+1 ELSE @rownum+1 END  AS RCPT_VAL
+         , APLY_ORDER1
+         , APLY_ORDER2
+         , APLY_ORDER3
+         , APLY_ORDER4
+         , APLY_ORDER5
+    FROM ( SELECT A.SO_ID
+                , A.BILL_SEQ_NO
+                , A.USE_YYMM
+                , A.SVC_CMPS_ID
+                , A.PROD_CMPS_ID
+                , A.CHRG_ITM_CD
+                -- , A.UPP_PROD_CMPS_ID                  /* 수정컬럼 */
+                , A.BILL_YYMM
+                , A.BILL_CYCL
+                , A.CTRT_ID
+                , A.CUST_ID
+                , A.PYM_ACNT_ID
+                , A.BILL_AMT - A.RCPT_AMT AS BILL_AMT
+                -- , A.MNG_CNTER_ORG_ID                 /* 수정컬럼 */
+                -- , A.MNG_BR_ORG_ID                    /* 수정컬럼 */
+                -- , A.MNGR_ID                          /* 수정컬럼 */
+                , CASE WHEN A.USE_YYMM > A.BILL_YYMM THEN CONCAT(CAST('10' AS UNSIGNED ), A.USE_YYMM)/* TO_NUMBER('99' || A.USE_YYMM) */     /* 수정컬럼 */
+                       ELSE 1 
+                  END  AS APLY_ORDER1 
+                ,(SELECT COUNT(*)
+                  FROM   TBLIV_BILL X
+                      ,  VIFNBRM_SVC_RATE_ITM_INFO Y
+                  WHERE  X.PYM_ACNT_ID = A.PYM_ACNT_ID
+                  AND    X.BILL_SEQ_NO = A.BILL_SEQ_NO
+                  AND    X.BILL_AMT - X.RCPT_AMT > 0
+                  AND    Y.SVC_RATE_ITM_TYP_CD = X.CHRG_ITM_CD
+                  AND    Y.RATE_ITM_TYP_CD NOT IN ('CT101','CT117','CT103')) AS APLY_ORDER2  /* 김영숙님 요청 - 용역료, 부가세 제외하고 나머지는 후순위 수납 반영 */
+                -- , DECODE(SIGN(A.BILL_AMT - A.RCPT_AMT), -1, 1, 2) AS APLY_ORDER3        -- 마이너스 금액 먼저 입금반영 
+                -- , DECODE(A.CHRG_ITM_CD, 'SR013', 1, 2) AS APLY_ORDER4                   -- 부가세 먼저 입금반영     
+                -- , DECODE(B.RATE_ITM_TYP_CD, 'CT101', 1, 'CT117', 1, 'CT103', 1, 99) AS APLY_ORDER5
+                , CASE WHEN SIGN(A.BILL_AMT - A.RCPT_AMT) <![CDATA[ < ]]> 0 THEN 1 
+                       ELSE 2
+                  END  AS APLY_ORDER3 
+                , CASE WHEN A.CHRG_ITM_CD = 'SR008' THEN 1 
+                       ELSE 2
+                  END  AS APLY_ORDER4 
+                , CASE WHEN B.RATE_ITM_TYP_CD = 'CT101' THEN 1
+                       WHEN B.RATE_ITM_TYP_CD = 'CT103' THEN 1
+                       WHEN B.RATE_ITM_TYP_CD = 'CT117' THEN 1
+                       ELSE 99 
+                  END  AS APLY_ORDER5
+          FROM   TBLIV_BILL A
+              ,  VIFNBRM_SVC_RATE_ITM_INFO B
+              , (SELECT @vBILL_SEQ_NO:='', @rownum:=0 FROM DUAL) C
+          WHERE  A.PYM_ACNT_ID = #{spymAcntId}
+          <if test="sbillSeqNo != null">
+          AND    A.BILL_SEQ_NO = #{sbillSeqNo}
+          </if>
+          <if test="sctrtId != null">
+          AND    A.CTRT_ID = #{sctrtId}
+          </if>
+          AND    A.BILL_AMT - A.RCPT_AMT != 0
+          AND    A.USE_YYMM != '999912'
+          AND    B.SO_ID = A.SO_ID
+          AND    B.SVC_RATE_ITM_TYP_CD = A.CHRG_ITM_CD
+          AND    B.RATE_ITM_TYP_CD != 'CT111'                    /* 보증금은 수납대상에서 제외 */
+          ORDER BY APLY_ORDER1, APLY_ORDER2, BILL_SEQ_NO, APLY_ORDER3, APLY_ORDER4, APLY_ORDER5, CTRT_ID, USE_YYMM -- ,RCPT_VAL 
+      ) Z
+    ORDER BY APLY_ORDER1, APLY_ORDER2, BILL_SEQ_NO, APLY_ORDER3, APLY_ORDER4, APLY_ORDER5, CTRT_ID, USE_YYMM ,RCPT_VAL
+	</select>
+    
+    
+</mapper>
