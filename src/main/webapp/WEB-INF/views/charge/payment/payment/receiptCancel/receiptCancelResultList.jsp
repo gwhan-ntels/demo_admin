@@ -66,7 +66,7 @@ $(document).ready(function() {
 		},
 		colModel: [
 		    { label: 'soId', name: 'soId',hidden:true},
-		    { label: '<spring:message code="LAB.M07.LAB00338" />', name: 'cnclDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},	//수납취소일자
+		    { label: '<spring:message code="LAB.M07.LAB00338" />', name: 'cnclDttm', formatter:stringTypeFormatterYYYYMMDDHH24MISS, width : 100, align:"center"},	//수납취소일자
 		    { label: '<spring:message code="LAB.M10.LAB00095" />', name: 'cnclEmpNm', width : 100, align:"center"},		     //취소자명
 		    { label: '<spring:message code="LAB.M02.LAB00006" />', name: 'pymAcntId', width : 100, align:"center"},	         //남부계정ID
 		    { label: '<spring:message code="LAB.M02.LAB00008" />', name: 'acntNm', width : 150, align:"center"},			 //납부계정명

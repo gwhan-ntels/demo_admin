@@ -114,43 +114,43 @@ public class ReceiptCancelController {
 	
 	
 	
-//	@RequestMapping(value = "receiptCancelResultList", method = RequestMethod.POST)
-//	public String receiptCancelResultList(Model model, ReceiptCancelVO receiptCancelVO, HttpServletRequest request) throws Exception {
-//
-//		String lng = (String)request.getSession().getAttribute("sessionLanguage");
-//		model.addAttribute("dateTp", commonDataService.getCommonCodeList("BL00096", lng));	 //일자구분
-//
-//		
-//		return URL + "/receiptCancelResultList";
-//	}
-//	
-//	@RequestMapping(value = "receiptCancelResultListAction", method = RequestMethod.POST)
-//	public void receiptCancelResultListAction(
-//			ReceiptCancelVO receiptCancel
-//	      , Model model
-//	      , HttpServletRequest request
-//		  ) throws Exception {
-//		
-//		int page = Integer.parseInt(request.getParameter("page"));
-//        int perPageRow = Integer.parseInt(request.getParameter("rows"));
-//
-//		String lngTyp = request.getSession().getAttribute("sessionLanguage").toString();
-//		receiptCancel.setLngTyp(lngTyp);
-//		
-//		int count = 0;
-//		count = receiptCancelService.receiptCancelResultListCount(receiptCancel);
-//		
-//		List<ReceiptCancelVO> pymList = new ArrayList<ReceiptCancelVO>();
-//		if (count > 0){
-//			pymList = receiptCancelService.receiptCancelResultList(receiptCancel, page, perPageRow);
-//		}
-//		
-//		model.addAttribute("rows", pymList);	// 목록리스트
-//		model.addAttribute("total", Math.ceil((double)count / (double)perPageRow)); // 페이지 사이즈
-//		model.addAttribute("records", pymList.size()); //현화면의 리스트갯수		
-//		model.addAttribute("page", page); 			//현재 페이지
-//		model.addAttribute("perpage", perPageRow);
-//	}
-//
+	@RequestMapping(value = "receiptCancelResultList", method = RequestMethod.POST)
+	public String receiptCancelResultList(Model model, ReceiptCancelVO receiptCancelVO, HttpServletRequest request) throws Exception {
+
+		String lng = (String)request.getSession().getAttribute("sessionLanguage");
+		model.addAttribute("dateTp", commonDataService.getCommonCodeList("BL00096", lng));	 //일자구분
+
+		
+		return URL + "/receiptCancelResultList";
+	}
+	
+	@RequestMapping(value = "receiptCancelResultListAction", method = RequestMethod.POST)
+	public void receiptCancelResultListAction(
+			ReceiptCancelVO receiptCancel
+	      , Model model
+	      , HttpServletRequest request
+		  ) throws Exception {
+		
+		int page = Integer.parseInt(request.getParameter("page"));
+        int perPageRow = Integer.parseInt(request.getParameter("rows"));
+
+		String lngTyp = request.getSession().getAttribute("sessionLanguage").toString();
+		receiptCancel.setLngTyp(lngTyp);
+		
+		int count = 0;
+		count = receiptCancelService.receiptCancelResultListCount(receiptCancel);
+		
+		List<ReceiptCancelVO> pymList = new ArrayList<ReceiptCancelVO>();
+		if (count > 0){
+			pymList = receiptCancelService.receiptCancelResultList(receiptCancel, page, perPageRow);
+		}
+		
+		model.addAttribute("rows", pymList);	// 목록리스트
+		model.addAttribute("total", Math.ceil((double)count / (double)perPageRow)); // 페이지 사이즈
+		model.addAttribute("records", pymList.size()); //현화면의 리스트갯수		
+		model.addAttribute("page", page); 			//현재 페이지
+		model.addAttribute("perpage", perPageRow);
+	}
+
 	
 }

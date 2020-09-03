@@ -142,7 +142,7 @@
 	<!-- 수납취소 결과 조회 -->
     <select id="receiptCancelResultList" parameterType="com.ntels.ccbs.charge.domain.payment.payment.ReceiptCancelVO" resultType="com.ntels.ccbs.charge.domain.payment.payment.ReceiptCancelVO">
         <include refid="com.ntels.ccbs.system.mapper.common.service.CommonCfgMapper.paging_head"/>
-    SELECT C.CNCL_DT           AS CNCL_DT         /* 수납취소일시 */
+    SELECT C.CNCL_DTTM         AS CNCL_DTTM       /* 수납취소일시 */
          , E.USER_NAME         AS CNCL_EMP_NM     /* 취소자명 */
          , A.PYM_ACNT_ID       AS PYM_ACNT_ID     /* 납부계정ID */
          ,(SELECT DISTINCT BB.ACNT_NM
@@ -189,7 +189,7 @@
          , A.RCPT_AMT          AS RCPT_AMT        /* 수납금액 */
          , A.PAY_PROC_DT       AS PAY_PROC_DT     /* 수납처리일자 */
          , A.DPST_PROC_DT      AS DPST_PROC_DT    /* 입금처리일자 */
-         , C.CNCL_EMP_ID       AS CNCL_EMP_ID     /* 취소자 */
+         , C.CNCLR_ID          AS CNCLR_ID        /* 취소자 */
          , A.PYM_SEQ_NO        AS PYM_SEQ_NO      /* 수납일련번호 */
          , A.BILL_DT           AS BILL_DT         /* 청구일자 */
          , A.BILL_SEQ_NO       AS BILL_SEQ_NO     /* 청구일련번호 */
@@ -206,7 +206,7 @@
     AND    A.SO_ID            = #{receiptCancel.soId}                                    /* SO_ID */
     AND    A.PYM_SEQ_NO       = C.PYM_SEQ_NO
     AND    A.REGR_ID          = D.USER_ID
-    AND    C.CNCL_EMP_ID      = E.USER_ID
+    AND    C.CNCLR_ID         = E.USER_ID
     AND    A.DPST_CL <![CDATA[ <> ]]> '22' /* 필수조건 */
     AND    A.DPST_CL <![CDATA[ <> ]]> '40' /* 필수조건(청구차감된 원포인트는 수납취소불가) */
     <if test="receiptCancel.searchDateTp != null and receiptCancel.searchDateTp == '01'">  /* 입금일자 */
@@ -219,10 +219,10 @@
     AND    A.PAY_PROC_DT BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
     </if>
     <if test="receiptCancel.searchDateTp != null and receiptCancel.searchDateTp == '04'">  /* 취소일자 */
-    AND    C.CNCL_DT BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
+    AND    C.CNCL_DTTM BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
     </if>
     <if test="receiptCancel.searchCustId != null and receiptCancel.searchCustId != ''">
-    AND    C.CNCL_EMP_ID      = #{receiptCancel.searchCustId}      /* 취소자ID */
+    AND    C.CNCLR_ID      = #{receiptCancel.searchCustId}      /* 취소자ID */
     </if>
     <if test="receiptCancel.searchPymAcntId != null and receiptCancel.searchPymAcntId != ''">
     AND    C.PYM_ACNT_ID      = #{receiptCancel.searchPymAcntId}       /* 납부계정 */
@@ -243,7 +243,7 @@
     AND    A.SO_ID            = #{receiptCancel.soId}                                    /* SO_ID */
     AND    A.PYM_SEQ_NO       = C.PYM_SEQ_NO
     AND    A.REGR_ID          = D.USER_ID
-    AND    C.CNCL_EMP_ID      = E.USER_ID
+    AND    C.CNCLR_ID         = E.USER_ID
     AND    A.DPST_CL <![CDATA[ <> ]]> '22' /* 필수조건 */
     AND    A.DPST_CL <![CDATA[ <> ]]> '40' /* 필수조건(청구차감된 원포인트는 수납취소불가) */
     <if test="receiptCancel.searchDateTp != null and receiptCancel.searchDateTp == '01'">  /* 입금일자 */
@@ -256,10 +256,10 @@
     AND    A.PAY_PROC_DT BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
     </if>
     <if test="receiptCancel.searchDateTp != null and receiptCancel.searchDateTp == '04'">  /* 취소일자 */
-    AND    C.CNCL_DT BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
+    AND    C.CNCL_DTTM BETWEEN #{receiptCancel.searchStatDt} AND #{receiptCancel.searchEndDt}
     </if>
     <if test="receiptCancel.searchCustId != null and receiptCancel.searchCustId != ''">
-    AND    C.CNCL_EMP_ID      = #{receiptCancel.searchCustId}      /* 취소자ID */
+    AND    C.CNCLR_ID      = #{receiptCancel.searchCustId}      /* 취소자ID */
     </if>
     <if test="receiptCancel.searchPymAcntId != null and receiptCancel.searchPymAcntId != ''">
     AND    C.PYM_ACNT_ID      = #{receiptCancel.searchPymAcntId}       /* 납부계정 */

@@ -55,10 +55,6 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 	@Autowired
 	private AmbgService ambgService;
 
-//	
-//	@Autowired
-//	private PaymentCancelService paymentCancelService;
-
 	@Override
 	public int rcptListCnt(ReceiptCancelVO receiptCancel) {
 		return receiptCancelMapper.rcptListCnt(receiptCancel);
@@ -192,7 +188,7 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 				newPrepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
 				newPrepayOcc.setPymAcntId(receipt.getPymAcntId());
 				newPrepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
-				newPrepayOcc.setPrepayOccTp("1");
+				newPrepayOcc.setPrepayOccTp("3");	// TODO prepay_occ_tp 1(수납처리 과납)에서 3(수납취소)로 들어가야 하는게 아닌지 ? 2020.09.03
 				newPrepayOcc.setPrepayOccResn("5");
 				newPrepayOcc.setPrepayOccTgtSeqNo(receipt.getPymSeqNo());
 				newPrepayOcc.setDpstDt(receipt.getDpstDt());
@@ -233,7 +229,7 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 		// 5.TBLPY_RCPT_CNCL_APPL insert
 		receiptService.insertReceiptCancelAppl(pymSeqNo, userId);
 		// 6.TBLPY_RCPT_CNCL, TBLPY_RCPT_CNCl_DTL INSERT
-		receiptService.insertReceiptCancel(receiptCancelVO.getCnclResn(), pymSeqNo, "0000000000", payTp);
+		receiptService.insertReceiptCancel(receiptCancelVO.getCnclResn(), pymSeqNo, "0000000000", userId); // payTp 에서 userId 로 수정 2020.09.03
 
 		return returnFlag;
 	}
