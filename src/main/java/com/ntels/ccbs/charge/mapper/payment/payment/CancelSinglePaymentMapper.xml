@@ -130,20 +130,20 @@
     AND    A.AMBG_TGT_YN      = 'N'                    /* 무조건필수값(불명금은 취소안됨) */
     AND    A.CNCL_YN          = 'N'                    /* 무조건필수값(취소안된건만) */
     AND   (CASE WHEN A.PREPAY_TGT_YN = 'Y'
-                THEN (SELECT SUM( C.PREPAY_TRANS_AMT )
+                THEN (SELECT IFNULL(SUM( C.PREPAY_TRANS_AMT ), 0)
                       FROM   TBLPY_PREPAY_OCC C
                       WHERE  A.DPST_SEQ_NO      = C.PREPAY_OCC_TGT_SEQ_NO
                       AND    A.PYM_ACNT_ID      = C.PYM_ACNT_ID
-                      AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                      AND    C.PREPAY_PROC_STAT = '3')
                 ELSE 0
             END)
       +   (CASE WHEN A.PREPAY_TGT_YN = 'Y'
-                THEN (SELECT SUM( C.PREPAY_TRANS_AMT )
+                THEN (SELECT IFNULL(SUM( C.PREPAY_TRANS_AMT ), 0)
                       FROM   TBLPY_RCPT       B
                            , TBLPY_PREPAY_OCC C
                       WHERE  A.DPST_SEQ_NO      = B.DPST_SEQ_NO
                       AND    B.PYM_SEQ_NO       = C.PREPAY_OCC_TGT_SEQ_NO
-                      AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                      AND    C.PREPAY_PROC_STAT = '3')
                 ELSE 0
            END) = 0
     <if test="cancelSinglePaymentVO.soId != null and cancelSinglePaymentVO.soId != ''">
@@ -296,20 +296,20 @@
            AND    A.AMBG_TGT_YN      = 'N'                    /* 무조건필수값(불명금은 취소안됨) */
            AND    A.CNCL_YN          = 'N'                    /* 무조건필수값(취소안된건만) */
            AND   (CASE WHEN A.PREPAY_TGT_YN = 'Y'
-                       THEN (SELECT SUM( C.PREPAY_TRANS_AMT )
+                       THEN (SELECT IFNULL(SUM( C.PREPAY_TRANS_AMT ),0)
                              FROM   TBLPY_PREPAY_OCC C
                              WHERE  A.DPST_SEQ_NO      = C.PREPAY_OCC_TGT_SEQ_NO
                              AND    A.PYM_ACNT_ID      = C.PYM_ACNT_ID
-                             AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                             AND    C.PREPAY_PROC_STAT = '3')
                        ELSE 0
                    END)
              +   (CASE WHEN A.PREPAY_TGT_YN = 'Y'
-                       THEN (SELECT SUM( C.PREPAY_TRANS_AMT )
+                       THEN (SELECT IFNULL(SUM( C.PREPAY_TRANS_AMT ),0)
                              FROM   TBLPY_RCPT       B
                                   , TBLPY_PREPAY_OCC C
                              WHERE  A.DPST_SEQ_NO      = B.DPST_SEQ_NO
                              AND    B.PYM_SEQ_NO       = C.PREPAY_OCC_TGT_SEQ_NO
-                             AND    C.PREPAY_PROC_STAT = '02') /* GWHAN 02 완료로 변경*/
+                             AND    C.PREPAY_PROC_STAT = '3')
                        ELSE 0
                   END) = 0
            <if test="cancelSinglePaymentVO.soId != null and cancelSinglePaymentVO.soId != ''">

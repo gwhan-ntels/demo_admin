@@ -21,6 +21,14 @@ public interface PrepayService {
 	 * @return
 	 */
 	int updatePrepayTransHistory(String pymSeqNo, String prepayTransSeqNo, double payObjAmt);
+	
+
+	/**
+	 * 선수금대체이력및 선수금발생내역를 수정한다.
+	 * @param pymSeqNo
+	 * @return
+	 */
+	int updatePrepayOccCancel(String pymSeqNo);
 
 //	/**
 //	 * 선수금 발생내역을 등록한다.
@@ -51,12 +59,6 @@ public interface PrepayService {
 //	 */
 //	int updatePrepayCancel(String regrId, String dpstSeqNo);
 //	
-//	/**
-//	 * 선수금대체이력및 선수금발생내역를 수정한다.
-//	 * @param pymSeqNo
-//	 * @return
-//	 */
-//	int updatePrepayOccCancel(String pymSeqNo);
 //	
 //	/**
 //	 * 선수금 발생내역을 조회한다.

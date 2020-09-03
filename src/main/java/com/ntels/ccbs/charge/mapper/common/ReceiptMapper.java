@@ -31,4 +31,6 @@ public interface ReceiptMapper {
 	int insertReceipt(@Param("receipt") Receipt receipt);
 
 	int insertReceiptDetail(@Param("receiptDetail") ReceiptDetail receiptDetail);
+
+	List<Receipt> getReceiptBillInfo(@Param("dpstSeqNo") String dpstSeqNo);
 }

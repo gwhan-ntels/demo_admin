@@ -27,4 +27,7 @@ public interface ReceiptService {
 	
 	// 청구내역에 수정된 데이타를 수납상세내역에 등록한다.
 	int insertReceiptDetail(List<ReceiptDetail> receiptDetailList);
+	
+	// 수납대상금액에서 수납적용금액을 뺀 값을 조회
+	List<Receipt> getReceiptBillInfo(String dpstSeqNo);
 }

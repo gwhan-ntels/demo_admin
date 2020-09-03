@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.mysql.jdbc.StringUtils;
 import com.ntels.ccbs.charge.domain.common.Deposit;
+import com.ntels.ccbs.charge.domain.common.DepositCancel;
 import com.ntels.ccbs.charge.domain.common.EachDeposit;
 import com.ntels.ccbs.charge.mapper.common.DepositMapper;
 import com.ntels.ccbs.common.util.CUtil;
@@ -125,4 +126,50 @@ public class DepositServiceImpl implements DepositService {
 		return depositMapper.updatePayProcDt(dpstSeqNo, payProcDt);
 	}
 	
+	// 건별입금 취소
+	@Override
+	public Deposit updateCancelDeposit(String dpstSeqNo) {
+		if (StringUtils.isNullOrEmpty(dpstSeqNo)) {
+			logger.debug("dpstSeq값을 찾을 수 없어 입금금액을 조회 할 수 없습니다.");
+			throw new RuntimeException("dpstSeq값을 찾을 수 없어 입금금액을 조회 할 수 없습니다.");			
+		}
+		
+		// TODO FOR UPDATE NOWAIT 이라는 오라클 전용 sql을 사용하였는데 이를 어떻게 처리할지..
+		Deposit deposit = depositMapper.getDepositForCancel(dpstSeqNo);
+		
+		if (deposit.getCnclYn().equals("Y") == true) {
+			logger.debug("Payment had already been canceled.");
+			throw new RuntimeException("Payment had already been canceled.");
+		}
+		
+		// 입금내역에 취소상태를 취소(Y)로 업데이트
+		int update = depositMapper.updateCnclYn("Y", dpstSeqNo);
+		
+		if (update <= 0) {
+			logger.debug("Oracle Error: TBLPY_DPST(Update)");
+			throw new RuntimeException("Oracle Error: TBLPY_DPST(Update)");
+		}
+		
+		return deposit;
+	}
+	
+
+	/**
+	 * 취소된 입금내역을 TBLPY_DPST_CNCL에 등록한다.
+	 * @param regrId
+	 * @param reason
+	 * @param dpstSeqNo
+	 * @return
+	 */
+	@Override
+	public int insertDepositCancelInfo(String regrId, String cnclRsn, String dpstSeqNo) {
+		
+		DepositCancel depositCancel = depositMapper.getDepositCancelInfo(dpstSeqNo);
+		depositCancel.setCnclResn(cnclRsn);
+		depositCancel.setCnclDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(0));
+		depositCancel.setCnclrId(regrId);
+		depositCancel.setRegDate(new Timestamp(new Date().getTime()));
+		
+		return depositMapper.insertDepositCancel(depositCancel);
+	}
 }

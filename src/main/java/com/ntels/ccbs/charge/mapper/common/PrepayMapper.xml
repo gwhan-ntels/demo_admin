@@ -70,4 +70,48 @@
 		     , PROC_MEMO = PROC_MEMO||'-'||'22'
 		WHERE PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
 	</update>
+	
+	<!-- 선수금발생내역에 있으면서 선수금대체내역에 있는지 체크 -->
+	<select id="getPrepayCount" resultType="int">
+		SELECT COUNT(*)
+		FROM TBLPY_PREPAY_OCC T1,
+		     TBLPY_PREPAY_TRANS_HIST T2
+		WHERE T1.PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+		     AND T1.PREPAY_OCC_SEQ_NO = T2.PREPAY_OCC_SEQ_NO
+	</select>
+	
+	<update id="updatePrepayOccCancel">
+		UPDATE TBLPY_PREPAY_OCC SET 
+		     CNCL_YN = 'Y'
+		     ,CNCL_DTTM = #{cnclDttm}
+		WHERE PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+	</update>
+	
+	
+	
+	<select id="getPrepayOccSeqNoFromPrepayTransHistory" resultType="String">
+		SELECT
+		     PREPAY_OCC_SEQ_NO
+		FROM TBLPY_PREPAY_TRANS_HIST 
+		WHERE PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
+	</select>
+	
+	<update id="updatePrepayTransStat">
+		UPDATE TBLPY_PREPAY_OCC SET
+		     PREPAY_TRANS_AMT = PREPAY_TRANS_AMT - #{payObjAmt}
+		     , PREPAY_BAL = PREPAY_BAL + #{payObjAmt}
+		     , PREPAY_PROC_STAT = CASE WHEN PREPAY_PROC_STAT = '2' THEN PREPAY_PROC_STAT ELSE '1' END
+		     , TRANS_CMPL_YN = 'N'
+		     , CHG_DATE = NOW()
+		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+	</update>
+
+	<select id="getPrepayAmount" resultType="PrepayOcc">
+		SELECT
+			PREPAY_OCC_AMT
+		    , PREPAY_TRANS_AMT
+			, PREPAY_BAL
+		FROM TBLPY_PREPAY_OCC
+		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+	</select>
 </mapper>

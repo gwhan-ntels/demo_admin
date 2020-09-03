@@ -93,28 +93,38 @@ public abstract class Consts {
 		public static final String CH_CLC_WRK_NO	 = "CH001";		// TBLCH_CLC_MAIN의 CLC_WRK_NO
 		
 		//청구&수납
-        public static final String PY_DPST_NO = "PY001"; //입금일련번호
-        public static final String PY_EACH_NO = "PY002"; //개별입금번호-TBLPY_EACH_DPST의 EACH_DPST_SEQ
-        public static final String PY_RCPT_NO = "PY003"; //수납일련번호
-        public static final String PY_PRPY_NO = "PY004"; //선수금발생일련번호
-        public static final String PY_PRTR_NO = "PY005"; //선수금대체일련번호
-        public static final String PY_TRNS_NO = "PY006"; //대체신청번호-TBLPY_TRANS_APPL의  TRANS_APPL_NO
-        
-        public static final String BL_GWTD_NO = "BLN04"; //지로입금일련번호-TBLPY_GIRO_WTDRAW_REQ_RSLT의 WTDRAW_REQ_NO
-        public static final String BL_EWTD_NO = "BLN05"; //EDI입금일련번호
-        public static final String BL_CWTD_NO = "BLN06"; //카드입금일련번호-TBLPY_CARD_WTDRAW_REQ_RSLT, TBLPY_CARD_TM_WTDRAW_REQ_RSLT, TBLPY_CARD_APP_WTDRAW_REQ_RSLT의 WTDRAW_REQ_NO
-        public static final String BL_VWTD_NO = "BLN07"; //가상계좌입금일련번호
-        public static final String BL_AMBG_NO = "BLN08"; //불명금발생일련번호
-        public static final String BL_ASSR_NO = "BLN09"; //보증금발생일련번호
-        public static final String BL_AMTR_NO = "BLN11"; //불명금대체일련번호
-        public static final String BL_ASTR_NO = "BLN12"; //보증금대체일련번호
-
-        public static final String BL_FCRT_NO = "BLN15"; //파일 생성 일련번호-TBLIV_BILL_FILE_CRT의 FILE_CRT_SEQ_NO
-        public static final String BL_WTRQ_NO = "BLN16"; //자동이체(EDI)신청 데이터 일련번호
-        public static final String BL_CDBT_NO = "BLN17"; //카드 배치 요청 번호-TBLPY_CARD_BAT_WTDRAW_REQ_RSLT의 CARD_BAT_REQ_NO
-        public static final String BL_CASH_NO = "BLN18"; //현금영수증발행번호
-        public static final String BL_RFBT_NO = "BLN19"; //수납파일일괄처리번호
-        public static final String BL_RERP_NO = "BLN20"; //수납ERP전송일련번호-12자리
+		public static final String MOD_ID_DPST = "PY001";
+		public static final String MOD_ID_EACH_DPST = "PY002";
+		public static final String MOD_ID_PYM = "PY003";
+		public static final String MOD_ID_PREPAY_OCC = "PY004";
+		public static final String MOD_ID_AMBG_OCC = "PY005";
+		public static final String MOD_ID_PREPAY_TRANS = "PY006";
+		public static final String MOD_ID_AMBG_TRANS = "PY007";
+		
+		
+		
+//        public static final String PY_DPST_NO = "PY001"; //입금일련번호
+//        public static final String PY_EACH_NO = "PY002"; //개별입금번호-TBLPY_EACH_DPST의 EACH_DPST_SEQ
+//        public static final String PY_RCPT_NO = "PY003"; //수납일련번호
+//        public static final String PY_PRPY_NO = "PY004"; //선수금발생일련번호
+//        public static final String PY_PRTR_NO = "PY005"; //선수금대체일련번호
+//        public static final String PY_TRNS_NO = "PY006"; //대체신청번호-TBLPY_TRANS_APPL의  TRANS_APPL_NO
+//        
+//        public static final String BL_GWTD_NO = "BLN04"; //지로입금일련번호-TBLPY_GIRO_WTDRAW_REQ_RSLT의 WTDRAW_REQ_NO
+//        public static final String BL_EWTD_NO = "BLN05"; //EDI입금일련번호
+//        public static final String BL_CWTD_NO = "BLN06"; //카드입금일련번호-TBLPY_CARD_WTDRAW_REQ_RSLT, TBLPY_CARD_TM_WTDRAW_REQ_RSLT, TBLPY_CARD_APP_WTDRAW_REQ_RSLT의 WTDRAW_REQ_NO
+//        public static final String BL_VWTD_NO = "BLN07"; //가상계좌입금일련번호
+//        public static final String BL_AMBG_NO = "BLN08"; //불명금발생일련번호
+//        public static final String BL_ASSR_NO = "BLN09"; //보증금발생일련번호
+//        public static final String BL_AMTR_NO = "BLN11"; //불명금대체일련번호
+//        public static final String BL_ASTR_NO = "BLN12"; //보증금대체일련번호
+//
+//        public static final String BL_FCRT_NO = "BLN15"; //파일 생성 일련번호-TBLIV_BILL_FILE_CRT의 FILE_CRT_SEQ_NO
+//        public static final String BL_WTRQ_NO = "BLN16"; //자동이체(EDI)신청 데이터 일련번호
+//        public static final String BL_CDBT_NO = "BLN17"; //카드 배치 요청 번호-TBLPY_CARD_BAT_WTDRAW_REQ_RSLT의 CARD_BAT_REQ_NO
+//        public static final String BL_CASH_NO = "BLN18"; //현금영수증발행번호
+//        public static final String BL_RFBT_NO = "BLN19"; //수납파일일괄처리번호
+//        public static final String BL_RERP_NO = "BLN20"; //수납ERP전송일련번호-12자리
 		
 		
 		//Statistics 

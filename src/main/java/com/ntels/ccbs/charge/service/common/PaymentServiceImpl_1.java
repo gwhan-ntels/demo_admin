@@ -83,7 +83,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 			paymentResult.setFullPayYn("Y");
 			payAmt = unpayAmt;
 
-			// 수냅내역에 등록하기 위한 청구내역 조회
+			// 수냅내역에 등록하기 위한 청구내역 조회 TODO 납부우선순위 적용 시 쿼리 수정 해야 함.(현재는 납부금액이 큰순으로정렬)
 			logger.debug("수납내역에 등록하기위한 청구내역 조회 billSeqNo : " + billSeqNo);
 			List<CBillComm> billList = paymentMapper_1.getBillListByBillSeqNo(billSeqNo);
 
@@ -167,40 +167,40 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 			paymentResult.setFullPayYn("N");
 
 			List<CBillComm> billList = paymentMapper_1.getBillListByBillSeqNo(billSeqNo);
-			
+
 			if (billList.isEmpty() == true) {
 				throw new RuntimeException();
 			}
-			
+
 			payAmt = dpstAmt;
-			
+
 //			double payObjAmt = dpstAmt;
 			double sumBillAmt = 0;
 			double sumRcptAmt = 0;
 			double sumPreRcptAmt = 0;
-			
+
 			String billYymm = null;
 			String billCycl = null;
 			String billDt = null;
-			
+
 			for (CBillComm bill : billList) {
 
 				// 이미 완납이 된 청구이거나 입금금액이 더이상 남아있지 않다면 패스!
 				if ("Y".equals(bill.getFullPayYn()) == true || dpstAmt <= 0) {
 					continue;
 				}
-				
+
 				logger.debug("");
-				
+
 				// 청구금액
 				double billAmt = bill.getBillAmt();
 				// 이전 수납금액
 //				double preRcptAmt = bill.getRcptAmt();
 				// 수납금액
 				double rcptAmt = 0;
-				
+
 				if (billAmt < 0) {
-					// 청구금액이 0보다 작은 경우에는.. 
+					// 청구금액이 0보다 작은 경우에는..
 					rcptAmt = billAmt;
 					dpstAmt += (-1) * billAmt;
 				} else if (billAmt == dpstAmt) {
@@ -220,7 +220,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				logger.debug(" dpstAmt : " + dpstAmt);
 				logger.debug(" rcptAmt : " + rcptAmt);
 				logger.debug(" billAmt : " + billAmt);
-				
+
 				CBillComm updateBill = new CBillComm();
 				updateBill.setRcptAmt(rcptAmt);
 				updateBill.setChgDate(new Timestamp(new Date().getTime()));
@@ -257,7 +257,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				sumPreRcptAmt += bill.getRcptAmt();
 				sumRcptAmt += rcptAmt;
 				sumBillAmt += bill.getBillAmt();
-				
+
 				if (billYymm == null) {
 					billYymm = bill.getBillYymm();
 					billCycl = bill.getBillCycl();
@@ -266,14 +266,14 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				}
 
 			}
-			
+
 			// 수납내역 등록
 			Receipt receipt = callback.getReceipt();
-			
+
 			if (receipt.getPymAcntId() == null) {
 				receipt.setPymAcntId(pymAcntId);
 			}
-			
+
 			receipt.setPymSeqNo(pymSeqNo);
 			receipt.setBillSeqNo(billSeqNo);
 			receipt.setBillYymm(billYymm);
@@ -290,77 +290,46 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 			receipt.setRegDate(new Timestamp(new Date().getTime()));
 			receipt.setRcptAmt(sumRcptAmt);
 			receipt.setCnclYn("N");
-			
+
 			paymentResult.addReceipt(receipt);
 		}
 
 		CBillComm updateBill = new CBillComm();
-		
+
 		updateBill.setBillSeqNo(billSeqNo);
 		updateBill.setRcptAmt(payAmt);
 		updateBill.setChgDate(new Timestamp(new Date().getTime()));
 		updateBill.setFullPayYn(paymentResult.getFullPayYn());
 		paymentResult.setUpdateBillMast(updateBill);
-		
+
 		paymentResult.setPymAcntId(pymAcntId);
 
 //		clogService.writeLog("수납처리 완료");
 //		clogService.writeLog("결과 오브젝트 출력 : " + ToStringBuilder.reflectionToString(paymentResult, ToStringStyle.MULTI_LINE_STYLE));
 //		clogService.writeLog("==============================");
-		
+
 		return paymentResult;
 	}
 
 	@Override
 	public int updateBillMastRcptAmt(final List<CBillComm> billList) {
-		
-
 		int cnt = 0;
-		
+
 		for (CBillComm bill : billList) {
 			paymentMapper_1.updateBillMastRcptAmt(bill);
 			cnt++;
 		}
-		
+
 		return cnt;
-		
-//		return batchJob(PaymentMapper.class, new BatchJob<PaymentMapper>() {
-//
-//			@Override
-//			public int job(PaymentMapper mapper) {
-//				int cnt = 0;
-//				
-//				for (CBillComm bill : billList) {
-//					mapper.updateBillMastRcptAmt(bill);
-//					cnt++;
-//				}
-//				
-//				return cnt;
-//			}
-//		});
 	}
-	
 
 	@Override
 	public int updateFullPayBill(CBillComm bill) {
 		return paymentMapper_1.updateFullPayBill(bill);
 	}
-	
+
 	@Override
 	public int updateBillRcptAmt(CBillComm bill) {
 		return paymentMapper_1.updateBillRcptAmt(bill);
 	}
-	
-	
-	
-//	@Override
-//	public int getPymAcntCnt(String pymAcntId) {
-//		return paymentMapper_1.getPymAcntCnt(pymAcntId);
-//	}
-//	
-//	@Override
-//	public List<Bill> getBillDataList(String pymAcntId, String billSeqNo, String ctrtId) {
-//		return paymentMapper_1.getBillDataList(pymAcntId, billSeqNo, ctrtId);
-//	}
-
 }

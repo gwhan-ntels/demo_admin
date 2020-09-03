@@ -89,5 +89,45 @@
 		)
 	</insert>
 	
+	<!-- 불명금발생내역에 있으면서 불명금대체내역에 있는가.. 조회 -->
+	<select id="getAmbgCount" resultType="int">
+		SELECT COUNT(*)
+		FROM TBLPY_AMBG_OCC T1
+		     , TBLPY_AMBG_TRANS_HIST T2
+		WHERE T1.DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+		     AND T1.AMBG_OCC_SEQ_NO = T2.AMBG_OCC_SEQ_NO
+	</select>
+	
+	<update id="updateAmbgCancel">
+		UPDATE TBLPY_AMBG_OCC
+		SET CNCL_YN   = 'Y'
+		     ,CNCL_DTTM = #{cnclDttm}
+		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+	</update>
 
+	<update id="updateAmbgTransHistCancel">
+		UPDATE TBLPY_AMBG_TRANS_HIST SET
+		     CNCL_YN = 'Y'
+		     , CNCL_DTTM = #{cnclDttm}
+		WHERE AMBG_TRANS_SEQ_NO = #{ambgTransSeqNo}
+	</update>
+
+	<update id="updateAmbgOccStat">
+		UPDATE TBLPY_AMBG_OCC SET 
+		     AMBG_TRANS_AMT = AMBG_TRANS_AMT - #{payObjAmt}
+		     , AMBG_BAL = AMBG_BAL + #{payObjAmt}
+		     , AMBG_PROC_STAT = CASE AMBG_PROC_STAT WHEN '2' THEN AMBG_PROC_STAT ELSE '1' END
+		     , TRANS_CMPL_YN = 'N'
+		     , CHG_DATE = #{chgDate}
+		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+	</update>
+
+	<select id="getAmbgAmount" resultType="AmbgOcc">
+		SELECT
+		     AMBG_OCC_AMT
+		     , AMBG_TRANS_AMT
+		     , AMBG_BAL
+		FROM TBLPY_AMBG_OCC
+		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+	</select>
 </mapper>

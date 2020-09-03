@@ -92,8 +92,8 @@
          , A.RCPT_AMT              AS RCPT_AMT     /* 수납금액 */
          , A.PAY_PROC_DT           AS PAY_PROC_DT  /* 수납처리일자 */
          , A.DPST_PROC_DT          AS DPST_PROC_DT /* 입금처리일자 */
-         , B.CNCL_DT               AS CNCL_DT      /* 수납취소일시 */
-         , B.CNCL_EMP_ID           AS CNCL_EMP_ID  /* 취소자 */
+         , B.CNCL_DTTM             AS CNCL_DTTM    /* 수납취소일시 */
+         , B.CNCLR_ID              AS CNCLR_ID     /* 취소자 */
          , A.PYM_SEQ_NO            AS PYM_SEQ_NO   /* 수납일련번호 */
          , A.BILL_DT               AS BILL_DT      /* 청구일자 */
          , A.BILL_SEQ_NO           AS BILL_SEQ_NO  /* 청구일련번호 */

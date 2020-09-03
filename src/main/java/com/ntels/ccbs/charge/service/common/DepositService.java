@@ -23,6 +23,11 @@ public interface DepositService {
 
 	int updatePayProcDt(String dpstSeqNo, String payProcDt);
 	
+
+	Deposit updateCancelDeposit(String dpstSeqNo);
+	
+	int insertDepositCancelInfo(String regrId, String cnclRsn, String dpstSeqNo);
+	
 //
 //	/**
 //	 * 건별입금내역을 저장한다.

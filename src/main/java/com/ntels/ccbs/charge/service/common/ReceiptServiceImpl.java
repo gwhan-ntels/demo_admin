@@ -151,4 +151,14 @@ public class ReceiptServiceImpl implements ReceiptService {
 		
 		return cnt;
 	}
+
+	@Override
+	public List<Receipt> getReceiptBillInfo(String dpstSeqNo) {
+
+		if (StringUtils.isEmptyOrWhitespaceOnly(dpstSeqNo) == true) {
+			throw new RuntimeException("dpstSeqNo값이 없어서 조회할 수 없습니다.");
+		}
+		
+		return receiptMapper.getReceiptBillInfo(dpstSeqNo);
+	}
 }

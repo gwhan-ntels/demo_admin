@@ -23,45 +23,45 @@ public interface AmbgMapper {
 	 * @return
 	 */
 	int insertAmbgOcc(@Param("pyAmbgOcc") AmbgOcc pyAmbgOcc);
-//	
-//	/**
-//	 * 불명금발생내역에 있으면서 불명금대체내역에 있는가.. 조회
-//	 * @param dpstTpSeqNo
-//	 * @return
-//	 */
-//	int getAmbgCount(@Param("dpstTpSeqNo") String dpstTpSeqNo);
-//	
-//	/**
-//	 * 불명금 발생내역을 취소한다.
-//	 * @param cnclDttm
-//	 * @param dpstTpSeqNo
-//	 * @return
-//	 */
-//	int updateAmbgCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo);
-//	
-//	/**
-//	 * 불명금 대체내역을 취소처리한다.
-//	 * @param cnclDttm
-//	 * @param ambgTransSeqNo
-//	 * @return
-//	 */
-//	int updateAmbgTransHistCancel(@Param("cnclDttm") String cnclDttm, @Param("ambgTransSeqNo") String ambgTransSeqNo);
-//
-//	/**
-//	 * 불명금 발생이력의 상태 및 금액을 업데이트한다.
-//	 * @param payObjAmt
-//	 * @param chgDate
-//	 * @param dpstTpSeqNo
-//	 * @return
-//	 */
-//	int updateAmbgOccStat(@Param("payObjAmt") double payObjAmt, @Param("chgDate") Timestamp chgDate, @Param("dpstTpSeqNo") String dpstTpSeqNo);
-//
-//	/**
-//	 * 불명금 관련 금액들을 조회한다.
-//	 * @param dpstTpSeqNo
-//	 * @return
-//	 */
-//	AmbgOcc getAmbgAmount(@Param("dpstTpSeqNo") String dpstTpSeqNo);
+	
+	/**
+	 * 불명금발생내역에 있으면서 불명금대체내역에 있는가.. 조회
+	 * @param dpstTpSeqNo
+	 * @return
+	 */
+	int getAmbgCount(@Param("dpstTpSeqNo") String dpstTpSeqNo);
+	
+	/**
+	 * 불명금 발생내역을 취소한다.
+	 * @param cnclDttm
+	 * @param dpstTpSeqNo
+	 * @return
+	 */
+	int updateAmbgCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo);
+	
+	/**
+	 * 불명금 대체내역을 취소처리한다.
+	 * @param cnclDttm
+	 * @param ambgTransSeqNo
+	 * @return
+	 */
+	int updateAmbgTransHistCancel(@Param("cnclDttm") String cnclDttm, @Param("ambgTransSeqNo") String ambgTransSeqNo);
+
+	/**
+	 * 불명금 발생이력의 상태 및 금액을 업데이트한다.
+	 * @param payObjAmt
+	 * @param chgDate
+	 * @param dpstTpSeqNo
+	 * @return
+	 */
+	int updateAmbgOccStat(@Param("payObjAmt") double payObjAmt, @Param("chgDate") Timestamp chgDate, @Param("dpstTpSeqNo") String dpstTpSeqNo);
+
+	/**
+	 * 불명금 관련 금액들을 조회한다.
+	 * @param dpstTpSeqNo
+	 * @return
+	 */
+	AmbgOcc getAmbgAmount(@Param("dpstTpSeqNo") String dpstTpSeqNo);
 //	
 //	/**
 //	 * 불명금 조회

@@ -2,7 +2,7 @@ package com.ntels.ccbs.charge.domain.common;
 
 import java.sql.Timestamp;
 
-public class Deposit {
+public class DepositCancel {
 
 	/**
 	 * Table Sequence 번호
@@ -14,21 +14,6 @@ public class Deposit {
 	 * 청구일자DD(2) + 납부계정ID(10) + 일련번호(2)
 	 */
 	private String billSeqNo;
-	
-	/**
-	 * 청구년월
-	 */
-	private String billYymm;
-	
-	/**
-	 * 청구 주기
-	 */
-	private String billCycl;
-	
-	/**
-	 * 청구일자
-	 */
-	private String billDt;
 
 	/**
 	 * 통장에 입금된 일자(YYYYMMDD)
@@ -54,11 +39,6 @@ public class Deposit {
 	 * 납부계정ID
 	 */
 	private String pymAcntId;
-	
-	/**
-	 * 체크용 납부계정ID
-	 */
-	private String checkPymAcntId;
 
 	/**
 	 * 고객ID
@@ -111,16 +91,6 @@ public class Deposit {
 	 * 입금금액
 	 */
 	private double dpstAmt;
-	
-	/**
-	 * 수납금액
-	 */
-	private double rcptAmt;
-
-	/**
-	 * 고객이 입금하는 C 은행계좌 코드
-	 */
-	private String dpstBnkAcntCd;
 
 	/**
 	 * 수수료
@@ -138,7 +108,8 @@ public class Deposit {
 	private String payProcDt;
 
 	/**
-	 * 미납입금대상여부
+	 * 미납입금대상여부 Y: 미확인입금대상 N: 미확인입금비대상 - 건별입금 확정인 경우 미확인입금발생내역과 입금내역에 동시에
+	 * 입력된.(미확인입금대상여부를 'Y'로 처리)
 	 */
 	private String ambgTgtYn;
 
@@ -166,14 +137,19 @@ public class Deposit {
 	private String exrateAplyDt;
 
 	/**
-	 * 취소여부 N: 미취소(Default) Y: 취소
+	 * 취소자ID
 	 */
-	private String cnclYn;
+	private String cnclrId;
 
 	/**
-	 * 수납취소여부 Y: 수납취소 N: 정상
+	 * 취소일시(YYYYMMDDHHMMSS)
 	 */
-	private String payCnclYn;
+	private String cnclDttm;
+
+	/**
+	 * 취소사유
+	 */
+	private String cnclResn;
 
 	/**
 	 * 등록일
@@ -181,58 +157,9 @@ public class Deposit {
 	private Timestamp regDate;
 
 	/**
-	 * 선수금대상여부
-	 */
-	private String prepayTgtYn;
-
-	/**
 	 * 등록자ID
 	 */
 	private String regrId;
-	
-	private String fullPayYn;
-	
-	/**
-	 * 청구금액
-	 */
-	private double billAmt;
-	
-	private String prepayOccSeqNo; 
-	private String ambgOccSeqNo; 
-	private String assrOccSeqNo;	
-	private String assrTgtYn;
-
-	public String getAssrTgtYn() {
-		return assrTgtYn;
-	}
-
-	public void setAssrTgtYn(String assrTgtYn) {
-		this.assrTgtYn = assrTgtYn;
-	}
-
-	public String getPrepayOccSeqNo() {
-		return prepayOccSeqNo;
-	}
-
-	public void setPrepayOccSeqNo(String prepayOccSeqNo) {
-		this.prepayOccSeqNo = prepayOccSeqNo;
-	}
-
-	public String getAmbgOccSeqNo() {
-		return ambgOccSeqNo;
-	}
-
-	public void setAmbgOccSeqNo(String ambgOccSeqNo) {
-		this.ambgOccSeqNo = ambgOccSeqNo;
-	}
-
-	public String getAssrOccSeqNo() {
-		return assrOccSeqNo;
-	}
-
-	public void setAssrOccSeqNo(String assrOccSeqNo) {
-		this.assrOccSeqNo = assrOccSeqNo;
-	}
 
 	public String getDpstSeqNo() {
 		return dpstSeqNo;
@@ -248,42 +175,6 @@ public class Deposit {
 
 	public void setBillSeqNo(String billSeqNo) {
 		this.billSeqNo = billSeqNo;
-	}
-
-	public String getBillYymm() {
-		return billYymm;
-	}
-
-	public void setBillYymm(String billYymm) {
-		this.billYymm = billYymm;
-	}
-
-	/**
-	 * @return the billCycl
-	 */
-	public String getBillCycl() {
-		return billCycl;
-	}
-
-	/**
-	 * @param billCycl the billCycl to set
-	 */
-	public void setBillCycl(String billCycl) {
-		this.billCycl = billCycl;
-	}
-
-	/**
-	 * @return the billDt
-	 */
-	public String getBillDt() {
-		return billDt;
-	}
-
-	/**
-	 * @param billDt the billDt to set
-	 */
-	public void setBillDt(String billDt) {
-		this.billDt = billDt;
 	}
 
 	public String getTransDt() {
@@ -324,14 +215,6 @@ public class Deposit {
 
 	public void setPymAcntId(String pymAcntId) {
 		this.pymAcntId = pymAcntId;
-	}
-
-	public String getCheckPymAcntId() {
-		return checkPymAcntId;
-	}
-
-	public void setCheckPymAcntId(String checkPymAcntId) {
-		this.checkPymAcntId = checkPymAcntId;
 	}
 
 	public String getCustId() {
@@ -414,22 +297,6 @@ public class Deposit {
 		this.dpstAmt = dpstAmt;
 	}
 
-	public double getRcptAmt() {
-		return rcptAmt;
-	}
-
-	public void setRcptAmt(double rcptAmt) {
-		this.rcptAmt = rcptAmt;
-	}
-
-	public String getDpstBnkAcntCd() {
-		return dpstBnkAcntCd;
-	}
-
-	public void setDpstBnkAcntCd(String dpstBnkAcntCd) {
-		this.dpstBnkAcntCd = dpstBnkAcntCd;
-	}
-
 	public double getFeeAmt() {
 		return feeAmt;
 	}
@@ -494,20 +361,28 @@ public class Deposit {
 		this.exrateAplyDt = exrateAplyDt;
 	}
 
-	public String getCnclYn() {
-		return cnclYn;
+	public String getCnclrId() {
+		return cnclrId;
 	}
 
-	public void setCnclYn(String cnclYn) {
-		this.cnclYn = cnclYn;
+	public void setCnclrId(String cnclrId) {
+		this.cnclrId = cnclrId;
 	}
 
-	public String getPayCnclYn() {
-		return payCnclYn;
+	public String getCnclDttm() {
+		return cnclDttm;
 	}
 
-	public void setPayCnclYn(String payCnclYn) {
-		this.payCnclYn = payCnclYn;
+	public void setCnclDttm(String cnclDttm) {
+		this.cnclDttm = cnclDttm;
+	}
+
+	public String getCnclResn() {
+		return cnclResn;
+	}
+
+	public void setCnclResn(String cnclResn) {
+		this.cnclResn = cnclResn;
 	}
 
 	public Timestamp getRegDate() {
@@ -518,42 +393,12 @@ public class Deposit {
 		this.regDate = regDate;
 	}
 
-	public String getPrepayTgtYn() {
-		return prepayTgtYn;
-	}
-
-	public void setPrepayTgtYn(String prepayTgtYn) {
-		this.prepayTgtYn = prepayTgtYn;
-	}
-
 	public String getRegrId() {
 		return regrId;
 	}
 
 	public void setRegrId(String regrId) {
 		this.regrId = regrId;
-	}
-
-	public String getFullPayYn() {
-		return fullPayYn;
-	}
-
-	public void setFullPayYn(String fullPayYn) {
-		this.fullPayYn = fullPayYn;
-	}
-
-	/**
-	 * @return the billAmt
-	 */
-	public double getBillAmt() {
-		return billAmt;
-	}
-
-	/**
-	 * @param billAmt the billAmt to set
-	 */
-	public void setBillAmt(double billAmt) {
-		this.billAmt = billAmt;
 	}
 
 }

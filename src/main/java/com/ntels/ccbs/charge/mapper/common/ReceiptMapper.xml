@@ -313,5 +313,14 @@
 		)
 	</insert>
     
+	<select id="getReceiptBillInfo" resultType="Receipt">
+		SELECT
+		     PYM_SEQ_NO
+		     , BILL_SEQ_NO
+		     , RCPT_AMT
+		     , PAY_OBJ_AMT - PREPAY_APLY_AMT AS PAY_OBJ_AMT
+		FROM TBLPY_RCPT
+		WHERE DPST_SEQ_NO = #{dpstSeqNo}
+	</select>
     
 </mapper>

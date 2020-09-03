@@ -199,39 +199,55 @@ function searchReceipt(){
 function setCnclReceipt() {
 	var param = checkValidation();	
 
-	$.ajax({
-        type : "post",
-        url : '/charge/payment/payment/receiptCancel/chkIsCancelAble.json',
-        data : param,
-        async: true,
-        success : function(data) {
-        	if (data.returnResult == '-1') {            
-				alert('수납취소가 불가능한 대상입니다.');
-				return;
-			} else {
-                if(param) {
-                	var result = confirm('수납취소하시겠습니까?');
-                	
-                	if (result) {
-                		insert(param) // 수납취소처리
-                	}
-                }
-			}
-        }
-    });
+	if (param) {
+		$.ajax({
+	        type : "post",
+	        url : '/charge/payment/payment/receiptCancel/chkIsCancelAble.json',
+	        data : param,
+	        async: true,
+	        success : function(data) {
+	        	if (data.returnResult == '-1') {            
+					alert('수납취소가 불가능한 대상입니다.');
+					return;
+				} else {
+	                if(param) {
+	                	var result = confirm('수납취소하시겠습니까?');
+	                	
+	                	if (result) {
+	                		insert(param) // 수납취소처리
+	                	}
+	                }
+				}
+	        }
+	    });
+	}
 }
 
 
 //수납취소 처리
 function insert(param) {
-	pageDisable();
-	
+
+	$.ajax({
+        type : "post",
+        url : '/charge/payment/payment/receiptCancel/insertAction.json',
+        data : param,
+        async: true,
+        success : function(data) {
+			alert('<spring:message code="MSG.M07.MSG00084"/>');
+			searchReceipt();
+        },
+		error: function() {
+		    //에러메세지
+		    alert('<spring:message code="MSG.M10.MSG00005"/>'); // MSG.M10.MSG00005=처리에 실패했습니다. 관리자에게 문의해 주세요.
+		}
+	})
+	/* 
 	$.ajax({
 		url:'/charge/payment/payment/receiptCancel/insertAction.json',
 		type:'POST',
 		data : param,
 		dataType: 'json',
-		async: false,
+		async: true,
 		success: function(data){
 			if(data.data === 1) {
 				pageEnable();
@@ -247,7 +263,7 @@ function insert(param) {
 			pageEnable();
 			alert('<spring:message code="MSG.M10.MSG00005"/>'); // 처리에 실패했습니다. 관리자에게 문의해 주세요.
 		}
-	});
+	}); */
 }
 
 

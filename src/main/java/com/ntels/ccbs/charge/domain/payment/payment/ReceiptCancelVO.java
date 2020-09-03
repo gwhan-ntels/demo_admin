@@ -87,7 +87,21 @@ public class ReceiptCancelVO extends PagingValue {
 	private String cnclEmpId;
 	private String dpstProcDt;
 	private String cnclEmpNm;
+	private String cnclDttm;
+	private String cnclrId;
 
+	public String getCnclrId() {
+		return cnclrId;
+	}
+	public void setCnclrId(String cnclrId) {
+		this.cnclrId = cnclrId;
+	}
+	public String getCnclDttm() {
+		return cnclDttm;
+	}
+	public void setCnclDttm(String cnclDttm) {
+		this.cnclDttm = cnclDttm;
+	}
 	public String getCnclEmpNm() {
 		return cnclEmpNm;
 	}

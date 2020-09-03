@@ -52,12 +52,6 @@
     ORDER  BY BILL_YYMM, BILL_SEQ_NO
 	</select>
 	
-	<select id="getPymAcntCnt" parameterType="String" resultType="int">
-    SELECT /* PaymentMapper.xml.getPymAcntCnt, 양연희, 2017.12.04 */
-          COUNT(*)
-    FROM  TCMCU_PYM_ACNT_INFO
-    WHERE PYM_ACNT_ID = #{pymAcntId}
-	</select>
     	
     	
 	<update id="updateDpstProc">
@@ -69,8 +63,20 @@
 			<if test="deposit.prepayTgtYn != null">
 				PREPAY_TGT_YN = #{deposit.prepayTgtYn},
 			</if>
+			<if test="deposit.prepayOccSeqNo != null">
+				PREPAY_OCC_SEQ_NO = #{deposit.prepayOccSeqNo},
+			</if>
 			<if test="deposit.ambgTgtYn != null">
 				AMBG_TGT_YN = #{deposit.ambgTgtYn},
+			</if>
+			<if test="deposit.ambgOccSeqNo != null">
+				AMBG_OCC_SEQ_NO = #{deposit.ambgOccSeqNo},
+			</if>
+			<if test="deposit.assrTgtYn != null">
+				ASSR_TGT_YN = #{deposit.assrTgtYn},
+			</if>
+			<if test="deposit.assrOccSeqNo != null">
+				ASSR_OCC_SEQ_NO = #{deposit.assrOccSeqNo},
 			</if>
 			<if test="deposit.payProcYn != null">
 				PAY_PROC_YN = #{deposit.payProcYn}

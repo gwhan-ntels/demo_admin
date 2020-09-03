@@ -240,27 +240,29 @@ $(document).ready(function() {
 	function cancelPayment() {
     	var param = checkParam();
     	
-    	$.ajax({
-            type : "post",
-            url : '/charge/payment/payment/cancelSinglePayment/cancelCheck.json',
-            data : param,
-            async: true,
-            success : function(data) {
-            	if (data.returnResult == '-1') {            
-					alert('건별입금취소가 불가능한 대상입니다.');
-					return;
-				} else {
-
-	                if(param) {
-	                	var result = confirm('<spring:message code="MSG.M09.MSG00008"/>');
-	                	
-	                	if (result) {
-	                		insert(param) // 수납취소처리
-	                	}
-	                }
-				}
-            }
-        });     	
+    	if (param) {    	
+	    	$.ajax({
+	            type : "post",
+	            url : '/charge/payment/payment/cancelSinglePayment/cancelCheck.json',
+	            data : param,
+	            async: true,
+	            success : function(data) {
+	            	if (data.returnResult == '-1') {            
+						alert('건별입금취소가 불가능한 대상입니다.');
+						return;
+					} else {
+	
+		                if(param) {
+		                	var result = confirm('<spring:message code="MSG.M09.MSG00008"/>');
+		                	
+		                	if (result) {
+		                		insert(param) // 수납취소처리
+		                	}
+		                }
+					}
+	            }
+	        });    
+    	}
 	}
 	
 	function checkParam() {
