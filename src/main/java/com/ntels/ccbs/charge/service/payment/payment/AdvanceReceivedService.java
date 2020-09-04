@@ -3,6 +3,7 @@ package com.ntels.ccbs.charge.service.payment.payment;
 import java.util.List;
 
 import com.ntels.ccbs.charge.domain.billing.billing.BillingStatisticsVO;
+import com.ntels.ccbs.charge.domain.common.PrepayOcc;
 import com.ntels.ccbs.charge.domain.payment.advanceReceived.AdvanceReceivedVO;
 
 public interface AdvanceReceivedService {
@@ -17,5 +18,5 @@ public interface AdvanceReceivedService {
 
 	int getRefundAppliedCnt(String seqNo);
 
-	int insertAction(BillingStatisticsVO billingStatisticsVO);
+	int insertAction(PrepayOcc prepayOcc);
 }

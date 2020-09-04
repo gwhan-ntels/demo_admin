@@ -1,6 +1,7 @@
 package com.ntels.ccbs.charge.domain.payment.advanceReceived;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class AdvanceReceivedVO implements Serializable{
 
@@ -16,8 +17,8 @@ public class AdvanceReceivedVO implements Serializable{
 	private String prepayOccAmt;		//PREPAY_OCC_AMT
 	private String prepayTransAmt;		//PREPAY_TRANS_AMT
 	private String prepayBal;			//PREPAY_BAL
-	private String regDate;				//REG_DATE
-	private String chgDate;				//CHG_DATE
+	private Timestamp regDate;				//REG_DATE
+	private Timestamp chgDate;				//CHG_DATE
 	private String prepayOccTp;			//PREPAY_OCC_TP
 	private String prepayProcStat;		//PREPAY_PROC_STAT
 	private String dpstCl;				//DPST_CL
@@ -119,19 +120,19 @@ public class AdvanceReceivedVO implements Serializable{
 		this.prepayBal = prepayBal;
 	}
 
-	public String getRegDate() {
+	public Timestamp getRegDate() {
 		return regDate;
 	}
 
-	public void setRegDate(String regDate) {
+	public void setRegDate(Timestamp regDate) {
 		this.regDate = regDate;
 	}
 
-	public String getChgDate() {
+	public Timestamp getChgDate() {
 		return chgDate;
 	}
 
-	public void setChgDate(String chgDate) {
+	public void setChgDate(Timestamp chgDate) {
 		this.chgDate = chgDate;
 	}
 

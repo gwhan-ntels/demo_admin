@@ -108,7 +108,7 @@ public abstract class Consts {
 //        public static final String PY_RCPT_NO = "PY003"; //수납일련번호
 //        public static final String PY_PRPY_NO = "PY004"; //선수금발생일련번호
 //        public static final String PY_PRTR_NO = "PY005"; //선수금대체일련번호
-//        public static final String PY_TRNS_NO = "PY006"; //대체신청번호-TBLPY_TRANS_APPL의  TRANS_APPL_NO
+        public static final String PY_TRNS_NO = "PY006"; //대체신청번호-TBLPY_TRANS_APPL의  TRANS_APPL_NO
 //        
 //        public static final String BL_GWTD_NO = "BLN04"; //지로입금일련번호-TBLPY_GIRO_WTDRAW_REQ_RSLT의 WTDRAW_REQ_NO
 //        public static final String BL_EWTD_NO = "BLN05"; //EDI입금일련번호

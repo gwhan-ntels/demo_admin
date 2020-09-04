@@ -131,7 +131,7 @@ $(document).ready(function() {
 		],
 		viewrecords: true,  
 		shrinkToFit:false,
-		height: 300,
+		height: 250,
 		sortable : true,  //드래그로 컬럼간의 위치 변경 가능 여부
 		rowList:[5,10,20,30,50],    //선택시 노출되는 row 수
 		rowNum:10,      //한번에 노출되는 row 수

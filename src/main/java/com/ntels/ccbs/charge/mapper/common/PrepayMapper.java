@@ -1,11 +1,13 @@
 package com.ntels.ccbs.charge.mapper.common;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import com.ntels.ccbs.charge.domain.common.PrepayOcc;
+import com.ntels.ccbs.charge.domain.common.PrepayTransHistory;
 
 @Component
 public interface PrepayMapper {
@@ -53,4 +55,37 @@ public interface PrepayMapper {
 	 * @return
 	 */
 	PrepayOcc getPrepayAmount(@Param("prepayOccSeqNo") String prepayOccSeqNo);
+
+	List<String> getBillSeqNoCheck(@Param("billSeqNo") String billSeqNo);
+
+	/**
+	 * 선수금 발생이력 조회
+	 * @param prepayOccSeqNo
+	 * @return
+	 */
+	PrepayOcc getPrepayOcc(@Param("prepayOccSeqNo") String prepayOccSeqNo);
+	
+	/**
+	 * 선수금 진행 상태 조회
+	 * @param prepayOccSeqNo
+	 * @return
+	 */
+	String getPrepayProcStat(@Param("prepayOccSeqNo") String prepayOccSeqNo);
+	
+
+	/**
+	 * 선수금발생내역을 수정한다.
+	 * @param prepayOcc
+	 * @return
+	 */
+	int updatePrepayOcc(@Param("prepayOcc") PrepayOcc prepayOcc);
+	
+
+	/**
+	 * 선수금대체이력에 등록한다.
+	 * @param prepayTransHistory
+	 * @return
+	 */
+	int insertPrepayTransHistory(@Param("prepayTransHistory") PrepayTransHistory prepayTransHistory);
+	
 }

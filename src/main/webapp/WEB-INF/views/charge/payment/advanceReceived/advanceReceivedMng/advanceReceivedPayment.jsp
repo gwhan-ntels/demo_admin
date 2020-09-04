@@ -418,8 +418,41 @@ function insert() {
 	}
 	
 	var param = new Object();
+	
 
-	//선택된 Row data 가져오기
+    //선택된 Row Data 가져오기
+	var mainRowId = $("#mainGrid").jqGrid('getGridParam', "selrow" );
+	var mainData = $("#mainGrid").getRowData(mainRowId);
+
+	//선택된 Row dtlData 가져오기
+	var dtlRowId = $("#dtlGird").jqGrid('getGridParam', "selrow" );
+	var dtlData = $("#dtlGird").getRowData(dtlRowId);
+
+	param.soId = mainData.soId;	
+	param.prepayOccSeqNo = mainData.prepayOccSeqNo;   	
+   	param.prepayBal = mainData.prepayBal;    // 대체 신청 가능액 = 잔액
+    param.transTp = $("#transTp").val();
+   	param.pymAcntId = $("#pymAcntId").val();
+   	
+   	if ( $("#transTp").val() == '01') { // 선택 청구
+   	   	param.billSeqNo = dtlData.billSeqNo; 
+   	} else {	// 납부계정별 2 
+   	   	param.billSeqNo = null; 
+   	}
+   	
+	if (param) {
+       var check = confirm("대체수납 처리하시겠습니까?"); 
+       if(!check){
+           return;
+       }
+       console.log (param);
+   	   insertAction(param);
+	}
+   	
+   	
+
+/*
+    //선택된 Row data 가져오기
 	var mainRowId = $("#mainGrid").jqGrid('getGridParam', "selrow" );
 	var mainData = $("#mainGrid").getRowData(mainRowId);
 
@@ -452,6 +485,7 @@ function insert() {
        }
    	   insertAction(param);
 	}
+*/
 }
 
 function chkIsRefundApplied() {
@@ -476,6 +510,26 @@ function chkIsRefundApplied() {
 }
 
 function insertAction(param){	 
+
+	if(param) {
+    	$.ajax({
+            type : "post",
+            url : '/charge/payment/advanceReceived/advanceReceivedMng/insertAction.json',
+            data : param,
+            async: true,
+            success : function(data) {
+				alert('<spring:message code="MSG.M07.MSG00084"/>');
+				searchGridList();
+            },
+    		error: function() {
+    		    //에러메세지
+    		    alert('<spring:message code="MSG.M10.MSG00005"/>'); // MSG.M10.MSG00005=처리에 실패했습니다. 관리자에게 문의해 주세요.
+    		}
+        });
+	}
+	
+	/* 
+	
 	if (param) {
 		$.post('/charge/payment/advanceReceived/advanceReceivedMng/insertAction.json', param, function (response) {
 			if (response.success == true) {
@@ -486,7 +540,7 @@ function insertAction(param){
 			}
 		});
 	}
-
+ */
 /*	
     $.post({
         url:'/charge/payment/advanceReceived/advanceReceivedMng/insertAction.json',

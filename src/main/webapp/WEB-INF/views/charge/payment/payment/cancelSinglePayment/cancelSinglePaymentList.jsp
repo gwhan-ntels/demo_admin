@@ -546,7 +546,7 @@ $(document).ready(function() {
 	            </td>
 	        </tr>
 	        <tr>
-	            <th><spring:message code="LAB.M08.LAB00024" /><!-- 영수사원 --></th>
+	            <th><spring:message code="LAB.M03.LAB00083" /><!-- 등록자ID --></th>
 			    <td>
 				   <div class="inp_date w280">
                     <input type="text" id="condUserNm" name="condUserNm" class="w250" disabled="disabled" />

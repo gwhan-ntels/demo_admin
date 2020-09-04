@@ -187,7 +187,7 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 				newPrepayOcc.setSoId(receipt.getSoId());
 				newPrepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
 				newPrepayOcc.setPymAcntId(receipt.getPymAcntId());
-				newPrepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
+				newPrepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(0));
 				newPrepayOcc.setPrepayOccTp("3");	// TODO prepay_occ_tp 1(수납처리 과납)에서 3(수납취소)로 들어가야 하는게 아닌지 ? 2020.09.03
 				newPrepayOcc.setPrepayOccResn("5");
 				newPrepayOcc.setPrepayOccTgtSeqNo(receipt.getPymSeqNo());

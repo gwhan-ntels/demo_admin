@@ -114,4 +114,102 @@
 		FROM TBLPY_PREPAY_OCC
 		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
 	</select>
+	
+	
+	<select id="getBillSeqNoCheck" resultType="String">
+		SELECT BILL_SEQ_NO
+		FROM   TBLIV_BILL_MAST
+		WHERE  BILL_SEQ_NO = #{billSeqNo}
+		AND    FULL_PAY_YN = 'N'
+	</select>
+	
+	<select id="getPrepayOcc" resultType="PrepayOcc">
+		SELECT
+			DPST_DT
+			, DPST_CL
+<!-- 			, DPST_PROC_DTTM -->
+			, DPST_PROC_DT
+			, CRNCY_CD
+			, EXRATE
+			, EXRATE_APLY_DT
+			, SO_ID
+			, PREPAY_BAL
+			, PREPAY_OCC_TGT_SEQ_NO
+			, PYM_ACNT_ID
+			, TRANS_DT
+		FROM TBLPY_PREPAY_OCC
+		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+	</select>
+	
+	
+	<select id="getPrepayProcStat" resultType="String">
+		SELECT
+			PREPAY_PROC_STAT
+		FROM TBLPY_PREPAY_OCC
+		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+	</select>
+	
+	
+	<update id="updatePrepayOcc">
+		UPDATE TBLPY_PREPAY_OCC SET
+			PREPAY_TRANS_AMT = PREPAY_TRANS_AMT + #{prepayOcc.prepayBal}
+			, PREPAY_BAL = PREPAY_BAL - #{prepayOcc.prepayBal}
+			, PREPAY_PROC_STAT = '3'
+			, TRANS_CMPL_YN = CASE WHEN PREPAY_BAL - #{prepayOcc.prepayBal} = 0 THEN 'Y' ELSE 'N' END
+			, CHGR_ID = #{prepayOcc.chgrId}
+			, CHG_DATE = #{prepayOcc.chgDate}
+		WHERE PREPAY_OCC_SEQ_NO = #{prepayOcc.prepayOccSeqNo}
+	</update>
+	
+	
+	<insert id="insertPrepayTransHistory">
+    INSERT INTO TBLPY_PREPAY_TRANS_HIST
+    (
+        SO_ID
+      , PREPAY_OCC_SEQ_NO
+      , PREPAY_TRANS_SEQ_NO
+      , TRANS_PROC_DTTM
+      , PREPAY_REPL_TP
+      , TRANS_PROC_AMT
+      , PROC_MEMO
+      , WON_REPL_PROC_AMT
+      , CRNCY_CD
+      , EXRATE
+      , EXRATE_APLY_DT
+      , REGR_ID
+      , REG_DATE
+      , APPR_REQR_ID
+      , APPR_REQ_DTTM
+      , DCSN_PROC_STAT
+      , APPRR_ID
+      , APPR_DTTM
+      , CNCL_YN
+      , CNCL_DTTM
+      , BAL_AMT
+    )
+    VALUES
+    (
+        #{prepayTransHistory.soId, jdbcType=VARCHAR}
+      , #{prepayTransHistory.prepayOccSeqNo, jdbcType=VARCHAR}
+      , #{prepayTransHistory.prepayTransSeqNo, jdbcType=VARCHAR}
+      , #{prepayTransHistory.transProcDttm, jdbcType=VARCHAR}
+      , #{prepayTransHistory.prepayReplTp, jdbcType=VARCHAR}
+      , #{prepayTransHistory.transProcAmt, jdbcType=DOUBLE}
+      , #{prepayTransHistory.procMemo, jdbcType=VARCHAR}
+      , #{prepayTransHistory.wonReplProcAmt, jdbcType=DOUBLE}
+      , #{prepayTransHistory.crncyCd, jdbcType=VARCHAR}
+      , #{prepayTransHistory.exrate, jdbcType=DOUBLE}
+      , #{prepayTransHistory.exrateAplyDt, jdbcType=VARCHAR}
+      , #{prepayTransHistory.regrId, jdbcType=VARCHAR}
+      , #{prepayTransHistory.regDate, jdbcType=DATE}
+      , #{prepayTransHistory.apprReqrId, jdbcType=VARCHAR}
+      , #{prepayTransHistory.apprReqDttm, jdbcType=VARCHAR}
+      , #{prepayTransHistory.dcsnProcStat, jdbcType=VARCHAR}
+      , #{prepayTransHistory.apprrId, jdbcType=VARCHAR}
+      , #{prepayTransHistory.apprDttm, jdbcType=VARCHAR}
+      , #{prepayTransHistory.cnclYn, jdbcType=VARCHAR}
+      , #{prepayTransHistory.cnclDttm, jdbcType=VARCHAR}
+      , #{prepayTransHistory.balAmt, jdbcType=DOUBLE}
+    )
+	</insert>
 </mapper>

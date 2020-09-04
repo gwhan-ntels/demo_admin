@@ -346,14 +346,17 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 			String prepayOccSeqNo = sequenceService.createNewSequence(Consts.SEQ_CODE.MOD_ID_PREPAY_OCC, 10);
 
 			PrepayOcc prepayOcc = new PrepayOcc();
+
+			prepayOcc.setSoId(lastReceipt.getSoId());
 			prepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
 			prepayOcc.setPymAcntId(lastReceipt.getPymAcntId());
-			prepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
+			prepayOcc.setPrepayOccDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(0));
 			prepayOcc.setPrepayOccTp("1");
 			prepayOcc.setPrepayOccResn("1");
 			prepayOcc.setPrepayOccTgtSeqNo(lastReceipt.getPymSeqNo()); // 마지막 수납일련번호가 들어감
 			prepayOcc.setDpstDt(lastReceipt.getDpstDt());
-			prepayOcc.setDpstProcDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
+			// prepayOcc.setDpstProcDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
+			prepayOcc.setDpstProcDt(DateUtil.getDateStringYYYYMMDD(0));
 			prepayOcc.setDpstCl(lastReceipt.getDpstCl());
 			prepayOcc.setPrepayProcStat("1"); // 선수금발생코드
 			prepayOcc.setPrepayOccAmt(dpstAmt);
@@ -368,7 +371,6 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 			prepayOcc.setRegDate(new Timestamp(new Date().getTime()));
 			prepayOcc.setCnclYn("N");
 			prepayOcc.setCnclDttm("");
-			prepayOcc.setSoId(lastReceipt.getSoId());
 			prepayOcc.setTransDt(lastReceipt.getTransDt());
 
 			// 9-1. TBLPY_PREPAY_OCC insert

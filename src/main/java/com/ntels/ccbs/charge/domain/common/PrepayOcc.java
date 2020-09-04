@@ -149,6 +149,45 @@ public class PrepayOcc {
 	 */
 	private String transDt;
 
+	private String transTp; // 대체처리구분 1.선택청구 2. 납부계정
+	private String billSeqNo;
+
+	private String[] billSeqArray;
+	private String[] billYymmArray;
+
+	
+	public String[] getBillSeqArray() {
+		return billSeqArray;
+	}
+
+	public void setBillSeqArray(String[] billSeqArray) {
+		this.billSeqArray = billSeqArray;
+	}
+
+	public String[] getBillYymmArray() {
+		return billYymmArray;
+	}
+
+	public void setBillYymmArray(String[] billYymmArray) {
+		this.billYymmArray = billYymmArray;
+	}
+
+	public String getTransTp() {
+		return transTp;
+	}
+
+	public void setTransTp(String transTp) {
+		this.transTp = transTp;
+	}
+
+	public String getBillSeqNo() {
+		return billSeqNo;
+	}
+
+	public void setBillSeqNo(String billSeqNo) {
+		this.billSeqNo = billSeqNo;
+	}
+
 	public String getPrepayOccSeqNo() {
 		return prepayOccSeqNo;
 	}

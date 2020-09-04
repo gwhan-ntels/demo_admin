@@ -1,5 +1,7 @@
 package com.ntels.ccbs.charge.service.common;
 
+import java.util.List;
+
 import com.ntels.ccbs.charge.domain.common.PrepayOcc;
 
 public interface PrepayService {
@@ -29,6 +31,54 @@ public interface PrepayService {
 	 * @return
 	 */
 	int updatePrepayOccCancel(String pymSeqNo);
+	
+
+	/**
+	 * 선수금 대체금액 및 선수금 잔액을 조회한다.
+	 * @param prepayOccSeqNo
+	 * @return
+	 */
+	PrepayOcc getPrepayAmount(String prepayOccSeqNo);
+	
+
+	List<String> getBillSeqNoCheck(String billSeqNo);
+	
+
+	/**
+	 * 선수금 발생이력 조회
+	 * @param prepayOccSeqNo
+	 * @return
+	 */
+	PrepayOcc getPrepayOcc(String prepayOccSeqNo);
+	
+
+	/**
+	 * 선수금발생내역을 수정한다.
+	 * @param prepayOccSeqNo
+	 * @param payAplyAmt
+	 * @return
+	 */
+	int updatePrepayOcc(PrepayOcc prepayOcc);
+
+	/**
+	 * 선수금대체이력에 등록한다.
+	 * @param prepayOccSeqNo
+	 * @param payAplyAmt
+	 * @param prepayReplTp
+	 * @param regrId
+	 * @return
+	 */
+	String insertPrepayTransHistory(PrepayOcc prepayOcc);
+	
+	
+
+	/**
+	 * 기존의 선수금발생 내역의 데이터를 가지고 새로운 선수금 발생내역을 등록한다.
+	 * @param prepayOccSeqNo
+	 * @return
+	 */
+	String insertNewPrepayOccFromPrepayOcc(PrepayOcc prepayOcc);
+	
 
 //	/**
 //	 * 선수금 발생내역을 등록한다.
@@ -75,20 +125,7 @@ public interface PrepayService {
 //	int updatePrepayOccByPrepayTransSeqNo(String prepayTransSeqNo);
 //	
 //	
-//	/**
-//	 * 선수금 대체금액 및 선수금 잔액을 조회한다.
-//	 * @param prepayOccSeqNo
-//	 * @return
-//	 */
-//	PrepayOcc getPrepayAmount(String prepayOccSeqNo);
 //	
-//	/**
-//	 * 선수금발생내역을 수정한다.
-//	 * @param prepayOccSeqNo
-//	 * @param payAplyAmt
-//	 * @return
-//	 */
-//	int updatePrepayOcc(PrepayOcc prepayOcc);
 //	
 //	/**
 //	 * 
@@ -104,15 +141,6 @@ public interface PrepayService {
 //	 */
 //	int updatePrepayOccTransAmt(List<PrepayOcc> prepayOccList);
 //	
-//	/**
-//	 * 선수금대체이력에 등록한다.
-//	 * @param prepayOccSeqNo
-//	 * @param payAplyAmt
-//	 * @param prepayReplTp
-//	 * @param regrId
-//	 * @return
-//	 */
-//	String insertPrepayTransHistory(PrepayOcc prepayOcc);
 //	
 //	/**
 //	 * 선수금대체이력에 등록한다.
@@ -121,19 +149,7 @@ public interface PrepayService {
 //	 */
 //	int insertPrepayTransHistory(List<PrepayTransHistory> prepayTransHistory);
 //	
-//	/**
-//	 * 기존의 선수금발생 내역의 데이터를 가지고 새로운 선수금 발생내역을 등록한다.
-//	 * @param prepayOccSeqNo
-//	 * @return
-//	 */
-//	String insertNewPrepayOccFromPrepayOcc(PrepayOcc prepayOcc);
 //
-//	/**
-//	 * 선수금 발생이력 조회
-//	 * @param prepayOccSeqNo
-//	 * @return
-//	 */
-//	PrepayOcc getPrepayOcc(String prepayOccSeqNo);
 //	
 //	/**
 //	 * 수납이 완료되지 않은 청구건에 대해 선수금 발생내역을 조회한다.

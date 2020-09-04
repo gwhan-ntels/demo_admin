@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ntels.ccbs.charge.domain.billing.billing.BillingStatisticsVO;
+import com.ntels.ccbs.charge.domain.common.PrepayOcc;
 import com.ntels.ccbs.charge.domain.payment.advanceReceived.AdvanceReceivedVO;
 import com.ntels.ccbs.charge.service.payment.payment.AdvanceReceivedService;
 import com.ntels.ccbs.system.service.common.service.CommonDataService;
@@ -148,15 +149,23 @@ public class AdvanceReceivedController {
 	 *   @return
 	 */
 	@RequestMapping(value = "insertAction", method = { RequestMethod.POST })
-	public void insertAction(Model model, BillingStatisticsVO billingStatisticsVO) {
+	public String insertAction(Model model, PrepayOcc prepayOcc) {
 
-		try {
-			advanceReceivedService.insertAction(billingStatisticsVO);
-			model.addAttribute("success", true);
-		} catch (Exception e) {
-			model.addAttribute("success", false);
-			model.addAttribute("message", e.getMessage());
-		}
+		
+		int result = advanceReceivedService.insertAction(prepayOcc);		
+		
+		model.addAttribute("result", result);
+		
+		return  URL + "/ajax/advanceReceivedPayment"; 
+		
+//
+//		try {
+//			advanceReceivedService.insertAction(billingStatisticsVO);
+//			model.addAttribute("success", true);
+//		} catch (Exception e) {
+//			model.addAttribute("success", false);
+//			model.addAttribute("message", e.getMessage());
+//		}
 	}
 
 }
