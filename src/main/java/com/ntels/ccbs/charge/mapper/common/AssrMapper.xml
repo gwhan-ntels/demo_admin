@@ -4,142 +4,147 @@
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ntels.ccbs.charge.mapper.common.AssrMapper">
 
-	<!-- 보증금발생내역 테이블에 등록한다. -->
-	<insert id="insertAssrOcc">
-		INSERT INTO TBLPY_ASSR_OCC
-		(
-			ASSR_OCC_SEQ_NO
-			, CHRG_ITM_CD
-			, SVC_CMPS_ID
-			, PROD_CMPS_ID
-			, PYM_SEQ_NO
-			, SO_ID
-			, GRP_ID
-			, PYM_ACNT_ID
-			, CTRT_ID
-			, CUST_ID
-			, ASSR_OCC_DTTM
-			, DPST_TP_SEQ_NO
-			, DPST_DT
-			, DPST_PROC_DTTM
-			, DPST_CL
-			, ASSR_PROC_STAT
-			, ASSR_OCC_AMT
-			, ASSR_TRANS_AMT
-			, ASSR_BAL
-			, TRANS_CMPL_YN
-			, WON_ASSR_OCC_AMT
-			, CRNCY_CD
-			, EXRATE
-			, EXRATE_APLY_DT
-			, REGR_ID
-			, REG_DATE
-			, CNCL_YN
-			, CNCL_DTTM
-			, CHG_DATE
-			, TRANS_DT
-		)
-		VALUES
-		(
-			#{assrOcc.assrOccSeqNo}
-			, #{assrOcc.chrgItmCd}
-			, #{assrOcc.svcCmpsId}
-			, #{assrOcc.prodCmpsId}
-			, #{assrOcc.pymSeqNo}
-			, #{assrOcc.soId}
-			, #{assrOcc.grpId}
-			, #{assrOcc.pymAcntId}
-			, #{assrOcc.ctrtId}
-			, #{assrOcc.custId}
-			, #{assrOcc.assrOccDttm}
-			, #{assrOcc.dpstTpSeqNo}
-			, #{assrOcc.dpstDt}
-			, #{assrOcc.dpstProcDttm}
-			, #{assrOcc.dpstCl}
-			, #{assrOcc.assrProcStat}
-			, #{assrOcc.assrOccAmt}
-			, #{assrOcc.assrTransAmt}
-			, #{assrOcc.assrBal}
-			, #{assrOcc.transCmplYn}
-			, #{assrOcc.wonAssrOccAmt}
-			, #{assrOcc.crncyCd}
-			, #{assrOcc.exrate}
-			, #{assrOcc.exrateAplyDt}
-			, #{assrOcc.regrId}
-			, #{assrOcc.regDate}
-			, #{assrOcc.cnclYn}
-			, #{assrOcc.cnclDttm}
-			, #{assrOcc.chgDate}
-			, #{assrOcc.transDt}
-		)
-	</insert>
-	
-	<!-- 보증금발생내역에 있으면서 보증금대체내역에 있는지 체크 -->
-	<select id="getAssrCount" resultType="int">
-		SELECT COUNT(*)
-		FROM TBLPY_ASSR_OCC T1
-		     ,TBLPY_ASSR_TRANS_HIST T2
-		WHERE T1.DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-		     AND T1.ASSR_OCC_SEQ_NO = T2.ASSR_OCC_SEQ_NO
-	</select>
-	
-	<!-- 보증금발생내역(취소여부, 취소일자)을 수정한다. -->
-	<update id="updateAssrOccCancel">
-		UPDATE TBLPY_ASSR_OCC SET
-		     CNCL_YN = 'Y'
-		     , CNCL_DTTM = #{cnclDttm}
-		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-	</update>
-	
-	<update id="updateAssrOccCancelByAssrOccSeqNo">
-		UPDATE TBLPY_ASSR_OCC SET
-		     CNCL_YN = 'Y'
-		     , CNCL_DTTM = #{assrOcc.cnclDttm}
-		     , CHG_DATE = #{assrOcc.chgDate}
-		WHERE ASSR_OCC_SEQ_NO = #{assrOcc.assrOccSeqNo}
-	</update>
-	
-	<select id="getAssrOccByPymSeqNo" resultType="AssrOcc">
-		SELECT 
-		     ASSR_OCC_SEQ_NO
-		     , ASSR_OCC_AMT
-		     , ASSR_TRANS_AMT
-		     , ASSR_BAL
-		FROM TBLPY_ASSR_OCC
-		WHERE PYM_SEQ_NO = #{pymSeqNo}
-	</select>
-	
-	<update id="updateAssrTransHistCancel">
-		UPDATE TBLPY_ASSR_TRANS_HIST SET
-		     CNCL_YN = 'Y'
-		     , CNCL_DTTM = #{cnclDttm}
-		WHERE ASSR_TRANS_SEQ_NO = #{assrTransSeqNo}
-	</update>
+    <!-- 보증금발생내역 테이블에 등록한다. -->
+    <insert id="insertAssrOcc">
+        INSERT INTO TBLPY_ASSR_OCC
+        (
+            SO_ID
+          , ASSR_OCC_SEQ_NO
+          , CHRG_ITM_CD
+          , SVC_CMPS_ID
+          , PROD_CMPS_ID
+          , PYM_SEQ_NO
+          , GRP_ID
+          , PYM_ACNT_ID
+          , CTRT_ID
+          , CUST_ID
+          , ASSR_OCC_DTTM
+          , DPST_TP_SEQ_NO
+          , DPST_DT
+          , DPST_PROC_DTTM
+          , DPST_CL
+          , ASSR_PROC_STAT
+          , ASSR_OCC_AMT
+          , ASSR_TRANS_AMT
+          , ASSR_BAL
+          , TRANS_CMPL_YN
+          , WON_ASSR_OCC_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , CNCL_YN
+          , CNCL_DTTM
+          , TRANS_DT
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{assrOcc.soId}
+          , #{assrOcc.assrOccSeqNo}
+          , #{assrOcc.chrgItmCd}
+          , #{assrOcc.svcCmpsId}
+          , #{assrOcc.prodCmpsId}
+          , #{assrOcc.pymSeqNo}
+          , #{assrOcc.grpId}
+          , #{assrOcc.pymAcntId}
+          , #{assrOcc.ctrtId}
+          , #{assrOcc.custId}
+          , #{assrOcc.assrOccDttm}
+          , #{assrOcc.dpstTpSeqNo}
+          , #{assrOcc.dpstDt}
+          , #{assrOcc.dpstProcDttm}
+          , #{assrOcc.dpstCl}
+          , #{assrOcc.assrProcStat}
+          , #{assrOcc.assrOccAmt}
+          , #{assrOcc.assrTransAmt}
+          , #{assrOcc.assrBal}
+          , #{assrOcc.transCmplYn}
+          , #{assrOcc.wonAssrOccAmt}
+          , #{assrOcc.crncyCd}
+          , #{assrOcc.exrate}
+          , #{assrOcc.exrateAplyDt}
+          , #{assrOcc.cnclYn}
+          , #{assrOcc.cnclDttm}
+          , #{assrOcc.transDt}
+          , #{assrOcc.regrId}
+          , #{assrOcc.regDate}
+          , #{assrOcc.chgrId}
+          , #{assrOcc.chgDate}
+        )
+    </insert>
 
-	<select id="getAssrOccSeqNoByAssrTransSeqNo" resultType="String">
-		SELECT
-		     ASSR_OCC_SEQ_NO
-		FROM TBLPY_ASSR_TRANS_HIST
-		WHERE ASSR_TRANS_SEQ_NO = #{assrTransSeqNo}
-	</select>
+    <!-- 보증금발생내역에 있으면서 보증금대체내역에 있는지 체크 -->
+    <select id="getAssrCount" resultType="int">
+        SELECT COUNT(*)
+        FROM   TBLPY_ASSR_OCC T1
+             , TBLPY_ASSR_TRANS_HIST T2
+        WHERE  T1.DPST_TP_SEQ_NO  = #{dpstTpSeqNo}
+        AND    T1.ASSR_OCC_SEQ_NO = T2.ASSR_OCC_SEQ_NO
+    </select>
 
-	<select id="getAssrAmountByAssrOccSeqNo" resultType="AssrOcc">
-		SELECT
-			ASSR_OCC_AMT
-			, ASSR_TRANS_AMT
-			, ASSR_BAL
-		FROM TBLPY_ASSR_OCC
-		WHERE ASSR_OCC_SEQ_NO = #{assrOccSeqNo}
-	</select>
+    <!-- 보증금발생내역(취소여부, 취소일자)을 수정한다. -->
+    <update id="updateAssrOccCancel">
+        UPDATE TBLPY_ASSR_OCC
+         SET   CNCL_YN        = 'Y'
+             , CNCL_DTTM      = #{cnclDttm}
+             , CHGR_ID        = #{chgrId}
+             , CHG_DATE       = #{chgDate}
+        WHERE  DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+    </update>
 
-	<update id="updateAssrOccStat">
-		UPDATE TBLPY_ASSR_OCC SET
-			ASSR_TRANS_AMT = ASSR_TRANS_AMT - #{payObjAmt}
-			, ASSR_BAL = ASSR_BAL + #{payObjAmt}
-			, ASSR_PROC_STAT = CASE ASSR_PROC_STAT WHEN '2' THEN ASSR_PROC_STAT ELSE '1' END
-			, TRANS_CMPL_YN = 'N'
-			, CHG_DATE = #{chgDate}
-		WHERE ASSR_OCC_SEQ_NO = #{assrOccSeqNo}
-	</update>
+    <update id="updateAssrOccCancelByAssrOccSeqNo">
+        UPDATE TBLPY_ASSR_OCC
+        SET    CNCL_YN        = 'Y'
+             , CNCL_DTTM      = #{assrOcc.cnclDttm}
+             , CHGR_ID        = #{assrOcc.chgrId}
+             , CHG_DATE       = #{assrOcc.chgDate}
+        WHERE ASSR_OCC_SEQ_NO = #{assrOcc.assrOccSeqNo}
+    </update>
+
+    <select id="getAssrOccByPymSeqNo" resultType="AssrOcc">
+        SELECT ASSR_OCC_SEQ_NO
+             , ASSR_OCC_AMT
+             , ASSR_TRANS_AMT
+             , ASSR_BAL
+        FROM   TBLPY_ASSR_OCC
+        WHERE  PYM_SEQ_NO = #{pymSeqNo}
+    </select>
+
+    <update id="updateAssrTransHistCancel">
+        UPDATE TBLPY_ASSR_TRANS_HIST
+        SET    CNCL_YN           = 'Y'
+             , CNCL_DTTM         = #{cnclDttm}
+             , CHGR_ID           = #{assrOcc.chgrId}
+             , CHG_DATE          = #{assrOcc.chgDate}
+        WHERE  ASSR_TRANS_SEQ_NO = #{assrTransSeqNo}
+    </update>
+
+    <select id="getAssrOccSeqNoByAssrTransSeqNo" resultType="String">
+        SELECT ASSR_OCC_SEQ_NO
+        FROM   TBLPY_ASSR_TRANS_HIST
+        WHERE  ASSR_TRANS_SEQ_NO = #{assrTransSeqNo}
+    </select>
+
+  <select id="getAssrAmountByAssrOccSeqNo" resultType="AssrOcc">
+      SELECT ASSR_OCC_AMT
+           , ASSR_TRANS_AMT
+           , ASSR_BAL
+      FROM   TBLPY_ASSR_OCC
+      WHERE  ASSR_OCC_SEQ_NO = #{assrOccSeqNo}
+  </select>
+
+  <update id="updateAssrOccStat">
+      UPDATE TBLPY_ASSR_OCC
+      SET    ASSR_TRANS_AMT = ASSR_TRANS_AMT - #{payObjAmt}
+           , ASSR_BAL       = ASSR_BAL + #{payObjAmt}
+           , ASSR_PROC_STAT = CASE ASSR_PROC_STAT WHEN '2' THEN ASSR_PROC_STAT ELSE '1' END
+           , TRANS_CMPL_YN  = 'N'
+           , CHGR_ID        = #{chgrId}
+           , CHG_DATE       = #{chgDate}
+      WHERE ASSR_OCC_SEQ_NO = #{assrOccSeqNo}
+  </update>
 
 </mapper>

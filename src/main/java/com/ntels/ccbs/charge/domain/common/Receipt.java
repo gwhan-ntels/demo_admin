@@ -120,11 +120,6 @@ public class Receipt {
 	private String cnclYn;
 
 	/**
-	 * 등록일
-	 */
-	private Timestamp regDate;
-
-	/**
 	 * 이전수납금액
 	 */
 	private double preRcptAmt;
@@ -153,6 +148,26 @@ public class Receipt {
 	 * 등록자ID
 	 */
 	private String regrId;
+	private Timestamp regDate;
+	private String chgrId;
+	private Timestamp chgDate;
+	
+
+	public String getChgrId() {
+		return chgrId;
+	}
+
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
 
 	public String getPymSeqNo() {
 		return pymSeqNo;

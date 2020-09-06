@@ -22,7 +22,7 @@ public interface PrepayService {
 	 * @param payObjAmt
 	 * @return
 	 */
-	int updatePrepayTransHistory(String pymSeqNo, String prepayTransSeqNo, double payObjAmt);
+	int updatePrepayTransHistory(String pymSeqNo, String prepayTransSeqNo, double payObjAmt, String chgrId);
 	
 
 	/**
@@ -30,7 +30,7 @@ public interface PrepayService {
 	 * @param pymSeqNo
 	 * @return
 	 */
-	int updatePrepayOccCancel(String pymSeqNo);
+	int updatePrepayOccCancel(String pymSeqNo, String chgrId);
 	
 
 	/**

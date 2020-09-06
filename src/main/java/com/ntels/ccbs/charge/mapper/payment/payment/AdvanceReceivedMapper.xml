@@ -73,7 +73,7 @@
                                                                 AND NAME.LNG_TYP      = #{advanceReceivedVO.lngTyp}
                                                                 AND MAST.COMMON_GRP   ='BL00071'
                                                                 AND DETAIL.COMMON_CD = A.PREPAY_OCC_TP
-                                                       ) AS PREPAY_OCC_NM /* 발생구분코드(BL00071) */
+                                                       ) AS PREPAY_OCC_TP_NM /* 발생구분코드(BL00071) */
 				, A.PREPAY_PROC_STAT   AS PREPAY_PROC_STAT    /* 처리상태코드(BLPY028) */
 				, (SELECT  NAME.CODE_NM AS COMMON_CD_NM
                                                         FROM 	TSYCO_CODE_MAST MAST

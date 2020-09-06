@@ -1,5 +1,7 @@
 package com.ntels.ccbs.charge.service.payment.payment.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -87,7 +89,7 @@ public class CancelSinglePaymentServiceImpl implements CancelSinglePaymentServic
 		String cnclResn = cancelSinglePaymentVO.getCnclResn();
 
 		// 1. TBLPY_DPST CNCL_YN = 'Y' update 취소처리
-		Deposit deposit = depositService.updateCancelDeposit(dpstSeqNo);
+		Deposit deposit = depositService.updateCancelDeposit(dpstSeqNo, userId);
 
 		// 2. TBLPY_DPST_CNCL insert
 		int insertCount = depositService.insertDepositCancelInfo(userId, cnclResn, dpstSeqNo);
@@ -114,7 +116,7 @@ public class CancelSinglePaymentServiceImpl implements CancelSinglePaymentServic
 
 		if (deposit.getPayProcYn().equals("N") == true) {
 			// kb는 불명금 없음.
-			ambgService.updateAmbgCancel(dpstSeqNo);
+			ambgService.updateAmbgCancel(dpstSeqNo, userId);
 		} else if (deposit.getPayProcYn().equals("Y") == true) {
 			// 수납 상세내역 조회
 			List<ReceiptDetail> receiptDetailList = receiptService.getReceiptDetailList(cancelSinglePaymentVO.getDpstSeqNo(), null);
@@ -163,15 +165,15 @@ public class CancelSinglePaymentServiceImpl implements CancelSinglePaymentServic
 			for (Receipt receipt : billInfoReceiptList) {
 				// 선수금발생내역에 있으면서 선수금대체내역에 있는지 체크 후 대체가 있으면 에러 , 없으면 UPDATE
 				// 6. TBLPY_PREPAY_OCC CNCL_YN = 'Y', CNCL_DTTM = SYSDATE update.
-				prepayService.updatePrepayOccCancel(receipt.getPymSeqNo());
+				prepayService.updatePrepayOccCancel(receipt.getPymSeqNo(), userId);
 
 				// kb 보증금 없음. 보증금발생내역를 수정한다.
-				assrService.updateAssrOccCancel(dpstSeqNo);
+				assrService.updateAssrOccCancel(dpstSeqNo, userId);
 			}
 		}
 
 		if (existReceiptData == false) {
-			prepayService.updatePrepayOccCancel(dpstSeqNo);
+			prepayService.updatePrepayOccCancel(dpstSeqNo, userId);
 		}
 
 		return returnFlag;

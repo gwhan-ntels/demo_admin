@@ -4,130 +4,137 @@
  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ntels.ccbs.charge.mapper.common.AmbgMapper">
 
-	<!-- 불명금 발생내역 조회 -->
-	<select id="getAmbgOcc" resultType="AmbgOcc">
-		SELECT
-		     T2.DPST_DT AS DPST_DT
-		     , T2.DPST_CL AS DPST_CL
-		     , T1.DPST_BNK_ACNT_CD AS DPST_BNK_ACNT_CD
-		     , T2.PAY_CORP_CD AS PAY_CORP_CD
-		     , T2.ACNT_CARD_NO AS ACNT_CARD_NO
-		     , T2.DPST_AMT AS AMBG_OCC_AMT
-		     , T2.DPST_AMT AS AMBG_BAL
-		     , T2.WON_DPST_AMT AS WON_AMBG_OCC_AMT
-		     , T2.CRNCY_CD AS CRNCY_CD
-		     , T2.EXRATE AS EXRATE
-		     , T2.EXRATE_APLY_DT AS EXRATE_APLY_DT
-		     , T2.SO_ID AS SO_ID
-		     , T2.TRANS_DT AS TRANS_DT
-		     , T2.SO_ID AS OCC_SO_ID
-		FROM TBLPY_EACH_DPST T1, TBLPY_DPST T2
-		WHERE T2.DPST_SEQ_NO = #{dpstSeqNo}
-		     AND T2.DPST_SEQ_NO = T1.DPST_SEQ_NO
-	</select>
-	
-	<insert id="insertAmbgOcc">
-		INSERT INTO TBLPY_AMBG_OCC
-		(
-		     AMBG_OCC_SEQ_NO
-		     , AMBG_OCC_DTTM
-		     , AMBG_OCC_TP
-		     , AMBG_OCC_RESN
-		     , DPST_TP_SEQ_NO
-		     , DPST_DT
-		     , DPST_PROC_DTTM
-		     , DPST_CL
-		     , DPST_BNK_ACNT_CD
-		     , PAY_CORP_CD
-		     , ACNT_CARD_NO
-		     , AMBG_PROC_STAT
-		     , AMBG_OCC_AMT
-		     , AMBG_TRANS_AMT
-		     , AMBG_BAL
-		     , TRANS_CMPL_YN
-		     , WON_AMBG_OCC_AMT
-		     , CRNCY_CD
-		     , EXRATE
-		     , EXRATE_APLY_DT
-		     , REGR_ID
-		     , REG_DATE
-		     , CNCL_YN
-		     , CNCL_DTTM
-		     , SO_ID
-		     , TRANS_DT
-		     , OCC_SO_ID
-		)
-		VALUES
-		(
-		     #{pyAmbgOcc.ambgOccSeqNo, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.ambgOccDttm, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.ambgOccTp, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.ambgOccResn, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.dpstTpSeqNo, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.dpstDt, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.dpstProcDttm, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.dpstCl, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.dpstBnkAcntCd, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.payCorpCd, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.acntCardNo, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.ambgProcStat, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.ambgOccAmt, jdbcType=DOUBLE}
-		     , #{pyAmbgOcc.ambgTransAmt, jdbcType=DOUBLE}
-		     , #{pyAmbgOcc.ambgBal, jdbcType=DOUBLE}
-		     , #{pyAmbgOcc.transCmplYn, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.wonAmbgOccAmt, jdbcType=DOUBLE}
-		     , #{pyAmbgOcc.crncyCd, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.exrate, jdbcType=DOUBLE}
-		     , #{pyAmbgOcc.exrateAplyDt, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.regrId, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.regDate, jdbcType=DATE}
-		     , #{pyAmbgOcc.cnclYn, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.cnclDttm, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.soId, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.transDt, jdbcType=VARCHAR}
-		     , #{pyAmbgOcc.occSoId, jdbcType=VARCHAR}
-		)
-	</insert>
-	
-	<!-- 불명금발생내역에 있으면서 불명금대체내역에 있는가.. 조회 -->
-	<select id="getAmbgCount" resultType="int">
-		SELECT COUNT(*)
-		FROM TBLPY_AMBG_OCC T1
-		     , TBLPY_AMBG_TRANS_HIST T2
-		WHERE T1.DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-		     AND T1.AMBG_OCC_SEQ_NO = T2.AMBG_OCC_SEQ_NO
-	</select>
-	
-	<update id="updateAmbgCancel">
-		UPDATE TBLPY_AMBG_OCC
-		SET CNCL_YN   = 'Y'
-		     ,CNCL_DTTM = #{cnclDttm}
-		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-	</update>
+    <!-- 불명금 발생내역 조회 -->
+    <select id="getAmbgOcc" resultType="AmbgOcc">
+        SELECT T2.DPST_DT AS DPST_DT
+             , T2.DPST_CL AS DPST_CL
+             , T1.DPST_BNK_ACNT_CD AS DPST_BNK_ACNT_CD
+             , T2.PAY_CORP_CD AS PAY_CORP_CD
+             , T2.ACNT_CARD_NO AS ACNT_CARD_NO
+             , T2.DPST_AMT AS AMBG_OCC_AMT
+             , T2.DPST_AMT AS AMBG_BAL
+             , T2.WON_DPST_AMT AS WON_AMBG_OCC_AMT
+             , T2.CRNCY_CD AS CRNCY_CD
+             , T2.EXRATE AS EXRATE
+             , T2.EXRATE_APLY_DT AS EXRATE_APLY_DT
+             , T2.SO_ID AS SO_ID
+             , T2.TRANS_DT AS TRANS_DT
+             , T2.SO_ID AS OCC_SO_ID
+        FROM   TBLPY_EACH_DPST T1, TBLPY_DPST T2
+        WHERE  T2.DPST_SEQ_NO = #{dpstSeqNo}
+        AND    T2.DPST_SEQ_NO = T1.DPST_SEQ_NO
+    </select>
 
-	<update id="updateAmbgTransHistCancel">
-		UPDATE TBLPY_AMBG_TRANS_HIST SET
-		     CNCL_YN = 'Y'
-		     , CNCL_DTTM = #{cnclDttm}
-		WHERE AMBG_TRANS_SEQ_NO = #{ambgTransSeqNo}
-	</update>
+    <insert id="insertAmbgOcc">
+        INSERT INTO TBLPY_AMBG_OCC
+        (
+            SO_ID
+          , AMBG_OCC_SEQ_NO
+          , AMBG_OCC_DTTM
+          , AMBG_OCC_TP
+          , AMBG_OCC_RESN
+          , DPST_TP_SEQ_NO
+          , DPST_DT
+          , DPST_PROC_DTTM
+          , DPST_CL
+          , DPST_BNK_ACNT_CD
+          , PAY_CORP_CD
+          , ACNT_CARD_NO
+          , AMBG_PROC_STAT
+          , AMBG_OCC_AMT
+          , AMBG_TRANS_AMT
+          , AMBG_BAL
+          , TRANS_CMPL_YN
+          , WON_AMBG_OCC_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , CNCL_YN
+          , CNCL_DTTM
+          , TRANS_DT
+          , OCC_SO_ID
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{pyAmbgOcc.soId, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgOccSeqNo, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgOccDttm, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgOccTp, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgOccResn, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.dpstTpSeqNo, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.dpstDt, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.dpstProcDttm, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.dpstCl, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.dpstBnkAcntCd, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.payCorpCd, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.acntCardNo, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgProcStat, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.ambgOccAmt, jdbcType=DOUBLE}
+          , #{pyAmbgOcc.ambgTransAmt, jdbcType=DOUBLE}
+          , #{pyAmbgOcc.ambgBal, jdbcType=DOUBLE}
+          , #{pyAmbgOcc.transCmplYn, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.wonAmbgOccAmt, jdbcType=DOUBLE}
+          , #{pyAmbgOcc.crncyCd, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.exrate, jdbcType=DOUBLE}
+          , #{pyAmbgOcc.exrateAplyDt, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.cnclYn, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.cnclDttm, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.transDt, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.occSoId, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.regrId, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.regDate, jdbcType=DATE}
+          , #{pyAmbgOcc.chgrId, jdbcType=VARCHAR}
+          , #{pyAmbgOcc.chgDate, jdbcType=DATE}
+        )
+    </insert>
 
-	<update id="updateAmbgOccStat">
-		UPDATE TBLPY_AMBG_OCC SET 
-		     AMBG_TRANS_AMT = AMBG_TRANS_AMT - #{payObjAmt}
-		     , AMBG_BAL = AMBG_BAL + #{payObjAmt}
-		     , AMBG_PROC_STAT = CASE AMBG_PROC_STAT WHEN '2' THEN AMBG_PROC_STAT ELSE '1' END
-		     , TRANS_CMPL_YN = 'N'
-		     , CHG_DATE = #{chgDate}
-		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-	</update>
+    <!-- 불명금발생내역에 있으면서 불명금대체내역에 있는가.. 조회 -->
+    <select id="getAmbgCount" resultType="int">
+        SELECT COUNT(*)
+        FROM   TBLPY_AMBG_OCC T1
+             , TBLPY_AMBG_TRANS_HIST T2
+        WHERE  T1.DPST_TP_SEQ_NO  = #{dpstTpSeqNo}
+        AND    T1.AMBG_OCC_SEQ_NO = T2.AMBG_OCC_SEQ_NO
+    </select>
 
-	<select id="getAmbgAmount" resultType="AmbgOcc">
-		SELECT
-		     AMBG_OCC_AMT
-		     , AMBG_TRANS_AMT
-		     , AMBG_BAL
-		FROM TBLPY_AMBG_OCC
-		WHERE DPST_TP_SEQ_NO = #{dpstTpSeqNo}
-	</select>
+    <update id="updateAmbgCancel">
+        UPDATE TBLPY_AMBG_OCC
+        SET    CNCL_YN        = 'Y'
+             , CNCL_DTTM      = #{cnclDttm}
+             , CHGR_ID        = #{chgrId}
+             , CHG_DATE       = #{chgDate}
+        WHERE  DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+    </update>
+
+    <update id="updateAmbgTransHistCancel">
+        UPDATE TBLPY_AMBG_TRANS_HIST
+        SET    CNCL_YN          = 'Y'
+             , CNCL_DTTM        = #{cnclDttm}
+             , CHGR_ID          = #{chgrId}
+             , CHG_DATE         = #{chgDate}
+        WHERE AMBG_TRANS_SEQ_NO = #{ambgTransSeqNo}
+    </update>
+
+    <update id="updateAmbgOccStat">
+        UPDATE TBLPY_AMBG_OCC
+        SET    AMBG_TRANS_AMT = AMBG_TRANS_AMT - #{payObjAmt}
+             , AMBG_BAL       = AMBG_BAL + #{payObjAmt}
+             , AMBG_PROC_STAT = CASE AMBG_PROC_STAT WHEN '2' THEN AMBG_PROC_STAT ELSE '1' END
+             , TRANS_CMPL_YN  = 'N'
+             , CHGR_ID        = #{chgrId}
+             , CHG_DATE       = #{chgDate}
+        WHERE DPST_TP_SEQ_NO  = #{dpstTpSeqNo}
+    </update>
+
+    <select id="getAmbgAmount" resultType="AmbgOcc">
+        SELECT AMBG_OCC_AMT
+             , AMBG_TRANS_AMT
+             , AMBG_BAL
+        FROM   TBLPY_AMBG_OCC
+        WHERE  DPST_TP_SEQ_NO = #{dpstTpSeqNo}
+    </select>
 </mapper>

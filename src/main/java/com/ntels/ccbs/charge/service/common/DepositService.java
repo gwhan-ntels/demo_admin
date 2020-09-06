@@ -1,5 +1,7 @@
 package com.ntels.ccbs.charge.service.common;
 
+import java.sql.Timestamp;
+
 import com.ntels.ccbs.charge.domain.common.Deposit;
 import com.ntels.ccbs.charge.domain.common.EachDeposit;
 
@@ -21,10 +23,10 @@ public interface DepositService {
 	 */
 	Deposit getDepositForRcpt(String dpstSeqNo);
 
-	int updatePayProcDt(String dpstSeqNo, String payProcDt);
+	int updatePayProcDt(String dpstSeqNo, String payProcDt, String chgrId);
 	
 
-	Deposit updateCancelDeposit(String dpstSeqNo);
+	Deposit updateCancelDeposit(String dpstSeqNo, String chgrId);
 	
 	int insertDepositCancelInfo(String regrId, String cnclRsn, String dpstSeqNo);
 	

@@ -77,10 +77,6 @@ public class ReceiptDetail {
 	 */
 	private String exrateAplyDt;
 
-	/**
-	 * 등록일
-	 */
-	private Timestamp regDate;
 
 	/**
 	 * 이전수납금액
@@ -93,6 +89,36 @@ public class ReceiptDetail {
 	private String preSoId;
 
 	private String dpstSeqNo;
+	private String regrId;
+	private Timestamp regDate;
+	private String chgrId;
+	private Timestamp chgDate;
+	
+	
+	public String getRegrId() {
+		return regrId;
+	}
+
+	public void setRegrId(String regrId) {
+		this.regrId = regrId;
+	}
+
+	public String getChgrId() {
+		return chgrId;
+	}
+
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
+
 	public String getDpstSeqNo() {
 		return dpstSeqNo;
 	}

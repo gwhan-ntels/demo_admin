@@ -67,6 +67,18 @@ public class PrepayTransHistory {
 	 * 등록일
 	 */
 	private Timestamp regDate;
+	
+
+	/**
+	 * 등록자ID
+	 */
+	private String chgrId;
+
+	/**
+	 * 등록일
+	 */
+	private Timestamp chgDate;
+	
 
 	/**
 	 * 결재요청자ID
@@ -108,174 +120,143 @@ public class PrepayTransHistory {
 	 */
 	private double balAmt;
 	private String soId;
-	
-
-	public String getSoId() {
-		return soId;
-	}
-
-	public void setSoId(String soId) {
-		this.soId = soId;
-	}
-
 	public String getPrepayOccSeqNo() {
 		return prepayOccSeqNo;
 	}
-
 	public void setPrepayOccSeqNo(String prepayOccSeqNo) {
 		this.prepayOccSeqNo = prepayOccSeqNo;
 	}
-
 	public String getPrepayTransSeqNo() {
 		return prepayTransSeqNo;
 	}
-
 	public void setPrepayTransSeqNo(String prepayTransSeqNo) {
 		this.prepayTransSeqNo = prepayTransSeqNo;
 	}
-
 	public String getTransProcDttm() {
 		return transProcDttm;
 	}
-
 	public void setTransProcDttm(String transProcDttm) {
 		this.transProcDttm = transProcDttm;
 	}
-
 	public String getPrepayReplTp() {
 		return prepayReplTp;
 	}
-
 	public void setPrepayReplTp(String prepayReplTp) {
 		this.prepayReplTp = prepayReplTp;
 	}
-
 	public double getTransProcAmt() {
 		return transProcAmt;
 	}
-
 	public void setTransProcAmt(double transProcAmt) {
 		this.transProcAmt = transProcAmt;
 	}
-
 	public String getProcMemo() {
 		return procMemo;
 	}
-
 	public void setProcMemo(String procMemo) {
 		this.procMemo = procMemo;
 	}
-
 	public double getWonReplProcAmt() {
 		return wonReplProcAmt;
 	}
-
 	public void setWonReplProcAmt(double wonReplProcAmt) {
 		this.wonReplProcAmt = wonReplProcAmt;
 	}
-
 	public String getCrncyCd() {
 		return crncyCd;
 	}
-
 	public void setCrncyCd(String crncyCd) {
 		this.crncyCd = crncyCd;
 	}
-
 	public double getExrate() {
 		return exrate;
 	}
-
 	public void setExrate(double exrate) {
 		this.exrate = exrate;
 	}
-
 	public String getExrateAplyDt() {
 		return exrateAplyDt;
 	}
-
 	public void setExrateAplyDt(String exrateAplyDt) {
 		this.exrateAplyDt = exrateAplyDt;
 	}
-
 	public String getRegrId() {
 		return regrId;
 	}
-
 	public void setRegrId(String regrId) {
 		this.regrId = regrId;
 	}
-
 	public Timestamp getRegDate() {
 		return regDate;
 	}
-
 	public void setRegDate(Timestamp regDate) {
 		this.regDate = regDate;
 	}
-
+	public String getChgrId() {
+		return chgrId;
+	}
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
 	public String getApprReqrId() {
 		return apprReqrId;
 	}
-
 	public void setApprReqrId(String apprReqrId) {
 		this.apprReqrId = apprReqrId;
 	}
-
 	public String getApprReqDttm() {
 		return apprReqDttm;
 	}
-
 	public void setApprReqDttm(String apprReqDttm) {
 		this.apprReqDttm = apprReqDttm;
 	}
-
 	public String getDcsnProcStat() {
 		return dcsnProcStat;
 	}
-
 	public void setDcsnProcStat(String dcsnProcStat) {
 		this.dcsnProcStat = dcsnProcStat;
 	}
-
 	public String getApprrId() {
 		return apprrId;
 	}
-
 	public void setApprrId(String apprrId) {
 		this.apprrId = apprrId;
 	}
-
 	public String getApprDttm() {
 		return apprDttm;
 	}
-
 	public void setApprDttm(String apprDttm) {
 		this.apprDttm = apprDttm;
 	}
-
 	public String getCnclYn() {
 		return cnclYn;
 	}
-
 	public void setCnclYn(String cnclYn) {
 		this.cnclYn = cnclYn;
 	}
-
 	public String getCnclDttm() {
 		return cnclDttm;
 	}
-
 	public void setCnclDttm(String cnclDttm) {
 		this.cnclDttm = cnclDttm;
 	}
-
 	public double getBalAmt() {
 		return balAmt;
 	}
-
 	public void setBalAmt(double balAmt) {
 		this.balAmt = balAmt;
+	}
+	public String getSoId() {
+		return soId;
+	}
+	public void setSoId(String soId) {
+		this.soId = soId;
 	}
 
 }

@@ -15,7 +15,7 @@ public interface PrepayMapper {
 
 	int insertPrepayOcc(@Param("prepayOcc") PrepayOcc prepayOcc);
 	
-	int updatePrepayTransHistoryCancel(@Param("prepayTransSeqNo") String prepayTransSeqNo);
+	int updatePrepayTransHistoryCancel(@Param("prepayTransSeqNo") String prepayTransSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 
 	
@@ -32,7 +32,7 @@ public interface PrepayMapper {
 	 * @param prepayOccTgtSeqNo
 	 * @return
 	 */
-	int updatePrepayOccCancel(@Param("cnclDttm") String cnclDttm, @Param("prepayOccTgtSeqNo") String prepayOccTgtSeqNo);
+	int updatePrepayOccCancel(@Param("cnclDttm") String cnclDttm, @Param("prepayOccTgtSeqNo") String prepayOccTgtSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	/**
 	 * prepayTransSeqNo로 prepayOccSeqNo를 조회한다.
@@ -47,7 +47,7 @@ public interface PrepayMapper {
 	 * @param prepayOccSeqNo
 	 * @return
 	 */
-	int updatePrepayTransStat(@Param("payObjAmt") double payObjAmt, @Param("chgDate") Timestamp chgDate, @Param("prepayOccSeqNo") String prepayOccSeqNo);
+	int updatePrepayTransStat(@Param("payObjAmt") double payObjAmt, @Param("prepayOccSeqNo") String prepayOccSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	/**
 	 * 선수금 대체금액 및 선수금 잔액을 조회한다.

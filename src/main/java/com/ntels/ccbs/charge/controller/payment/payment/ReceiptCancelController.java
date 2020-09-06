@@ -91,23 +91,6 @@ public class ReceiptCancelController {
 		model.addAttribute("result", result);
 
 		return  URL + "/ajax/receiptCancelList"; 
-		
-//
-//		SessionUser sessionUser = CommonUtil.getSessionManager();
-//
-//		String pymSeqNo = receiptCancelVO.getPymSeqNo();
-//		String cnclResnTxt = receiptCancelVO.getCnclResn();
-//		String inptMenuId = receiptCancelVO.getInptMenuId();
-//
-//		int result = -1;
-//		try {
-//			result = receiptCancelService.processReceiptCancelMain(pymSeqNo, cnclResnTxt, inptMenuId, sessionUser.getUserId());
-//		} catch (Exception e) {
-//			throw new ServiceException("MSG.M10.MSG00005"); // MSG.M10.MSG00005=처리에 실패했습니다. 관리자에게 문의해 주세요.
-//		}
-//		model.addAttribute("data", result);
-//
-//		return URL + "/ajax/eachDepositRegList";
 	}
 
 	

@@ -37,7 +37,7 @@ public interface AmbgMapper {
 	 * @param dpstTpSeqNo
 	 * @return
 	 */
-	int updateAmbgCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo);
+	int updateAmbgCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 	
 	/**
 	 * 불명금 대체내역을 취소처리한다.
@@ -45,7 +45,7 @@ public interface AmbgMapper {
 	 * @param ambgTransSeqNo
 	 * @return
 	 */
-	int updateAmbgTransHistCancel(@Param("cnclDttm") String cnclDttm, @Param("ambgTransSeqNo") String ambgTransSeqNo);
+	int updateAmbgTransHistCancel(@Param("cnclDttm") String cnclDttm, @Param("ambgTransSeqNo") String ambgTransSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	/**
 	 * 불명금 발생이력의 상태 및 금액을 업데이트한다.
@@ -54,7 +54,7 @@ public interface AmbgMapper {
 	 * @param dpstTpSeqNo
 	 * @return
 	 */
-	int updateAmbgOccStat(@Param("payObjAmt") double payObjAmt, @Param("chgDate") Timestamp chgDate, @Param("dpstTpSeqNo") String dpstTpSeqNo);
+	int updateAmbgOccStat(@Param("payObjAmt") double payObjAmt, @Param("dpstTpSeqNo") String dpstTpSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	/**
 	 * 불명금 관련 금액들을 조회한다.

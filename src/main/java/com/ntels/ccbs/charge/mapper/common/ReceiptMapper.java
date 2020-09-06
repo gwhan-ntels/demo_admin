@@ -1,5 +1,6 @@
 package com.ntels.ccbs.charge.mapper.common;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +16,7 @@ public interface ReceiptMapper {
 
 	List<ReceiptDetail> getReceiptDetailList(@Param("dpstSeqNo") String dpstSeqNo, @Param("pymSeqNo") String pymSeqNo);
 
-	int updateReceiptCancel(@Param("dpstSeqNo") String dpstSeqNo, @Param("pymSeqNo") String pymSeqNo, @Param("userId") String userId);
+	int updateReceiptCancel(@Param("dpstSeqNo") String dpstSeqNo, @Param("pymSeqNo") String pymSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	Receipt getReceipt(@Param("pymSeqNo") String pymSeqNo);
 

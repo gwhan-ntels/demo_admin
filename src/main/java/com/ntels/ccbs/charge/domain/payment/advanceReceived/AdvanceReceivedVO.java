@@ -20,16 +20,16 @@ public class AdvanceReceivedVO implements Serializable{
 	private Timestamp regDate;				//REG_DATE
 	private Timestamp chgDate;				//CHG_DATE
 	private String prepayOccTp;			//PREPAY_OCC_TP
+	private String prepayOccTpNm;		
 	private String prepayProcStat;		//PREPAY_PROC_STAT
+	private String prepayProcStatNm;	//PREPAY_PROC_STAT_NM
 	private String dpstCl;				//DPST_CL
+	private String dpstClNm;			//DPST_CL_NM
 	private String prepayOccResn;		//PREPAY_OCC_RESN
+	private String prepayOccResnNm;		//PREPAY_OCC_RESN_NM
 	private String regrId;		//REGR_ID
 	private String chgrId;		//CHGR_ID
 	
-	private String prepayOccNm;			//PREPAY_OCC_NM
-	private String prepayProcStatNm;	//PREPAY_PROC_STAT_NM
-	private String dpstClNm;			//DPST_CL_NM
-	private String prepayOccResnNm;		//PREPAY_OCC_RESN_NM
 	
 	private String regrNm;		//REGR_NM
 	private String chgrNm;		//CHGR_NM
@@ -144,12 +144,28 @@ public class AdvanceReceivedVO implements Serializable{
 		this.prepayOccTp = prepayOccTp;
 	}
 
+	public String getPrepayOccTpNm() {
+		return prepayOccTpNm;
+	}
+
+	public void setPrepayOccTpNm(String prepayOccTpNm) {
+		this.prepayOccTpNm = prepayOccTpNm;
+	}
+
 	public String getPrepayProcStat() {
 		return prepayProcStat;
 	}
 
 	public void setPrepayProcStat(String prepayProcStat) {
 		this.prepayProcStat = prepayProcStat;
+	}
+
+	public String getPrepayProcStatNm() {
+		return prepayProcStatNm;
+	}
+
+	public void setPrepayProcStatNm(String prepayProcStatNm) {
+		this.prepayProcStatNm = prepayProcStatNm;
 	}
 
 	public String getDpstCl() {
@@ -160,12 +176,28 @@ public class AdvanceReceivedVO implements Serializable{
 		this.dpstCl = dpstCl;
 	}
 
+	public String getDpstClNm() {
+		return dpstClNm;
+	}
+
+	public void setDpstClNm(String dpstClNm) {
+		this.dpstClNm = dpstClNm;
+	}
+
 	public String getPrepayOccResn() {
 		return prepayOccResn;
 	}
 
 	public void setPrepayOccResn(String prepayOccResn) {
 		this.prepayOccResn = prepayOccResn;
+	}
+
+	public String getPrepayOccResnNm() {
+		return prepayOccResnNm;
+	}
+
+	public void setPrepayOccResnNm(String prepayOccResnNm) {
+		this.prepayOccResnNm = prepayOccResnNm;
 	}
 
 	public String getRegrId() {
@@ -182,38 +214,6 @@ public class AdvanceReceivedVO implements Serializable{
 
 	public void setChgrId(String chgrId) {
 		this.chgrId = chgrId;
-	}
-
-	public String getPrepayOccNm() {
-		return prepayOccNm;
-	}
-
-	public void setPrepayOccNm(String prepayOccNm) {
-		this.prepayOccNm = prepayOccNm;
-	}
-
-	public String getPrepayProcStatNm() {
-		return prepayProcStatNm;
-	}
-
-	public void setPrepayProcStatNm(String prepayProcStatNm) {
-		this.prepayProcStatNm = prepayProcStatNm;
-	}
-
-	public String getDpstClNm() {
-		return dpstClNm;
-	}
-
-	public void setDpstClNm(String dpstClNm) {
-		this.dpstClNm = dpstClNm;
-	}
-
-	public String getPrepayOccResnNm() {
-		return prepayOccResnNm;
-	}
-
-	public void setPrepayOccResnNm(String prepayOccResnNm) {
-		this.prepayOccResnNm = prepayOccResnNm;
 	}
 
 	public String getRegrNm() {
@@ -262,6 +262,10 @@ public class AdvanceReceivedVO implements Serializable{
 
 	public void setLngTyp(String lngTyp) {
 		this.lngTyp = lngTyp;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	

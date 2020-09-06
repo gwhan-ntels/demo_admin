@@ -1,5 +1,8 @@
 package com.ntels.ccbs.charge.service.common;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +43,7 @@ public class AssrServiceImpl implements AssrService {
 	 * @return
 	 */
 	@Override
-	public int updateAssrOccCancel(String seqNo) {
+	public int updateAssrOccCancel(String seqNo, String chgrId) {
 		if (StringUtils.isEmptyOrWhitespaceOnly(seqNo) == true) {
 			throw new RuntimeException("seqNo값이 없어서 조회할 수 없습니다.");
 		}
@@ -53,8 +56,9 @@ public class AssrServiceImpl implements AssrService {
 		}
 		
 		String cnclDttm = DateUtil.getDateStringYYYYMMDDHH24MISS(0);
+		Timestamp chgDate = new Timestamp(new Date().getTime());
 		
-		return assrMapper.updateAssrOccCancel(cnclDttm, seqNo);
+		return assrMapper.updateAssrOccCancel(cnclDttm, seqNo, chgrId, chgDate);
 	}
 	
 	

@@ -46,7 +46,7 @@ public class PrepayServiceImpl implements PrepayService {
 	 * @return
 	 */
 	@Override
-	public int updatePrepayOccCancel(String pymSeqNo) {
+	public int updatePrepayOccCancel(String pymSeqNo, String chgrId) {
 
 		if (StringUtils.isEmptyOrWhitespaceOnly(pymSeqNo) == true) {
 			throw new RuntimeException("pymSeqNo값이 없어서 조회할 수 없습니다.");
@@ -60,8 +60,9 @@ public class PrepayServiceImpl implements PrepayService {
 		}
 
 		String cnclDttm = DateUtil.getDateStringYYYYMMDDHH24MISS(0);
+		Timestamp chgDate = new Timestamp(new Date().getTime());
 
-		return prepayMapper.updatePrepayOccCancel(cnclDttm, pymSeqNo);
+		return prepayMapper.updatePrepayOccCancel(cnclDttm, pymSeqNo, chgrId, chgDate);
 
 	}
 
@@ -74,7 +75,7 @@ public class PrepayServiceImpl implements PrepayService {
 	 * @return
 	 */
 	@Override
-	public int updatePrepayTransHistory(String pymSeqNo, String prepayTransSeqNo, double payObjAmt) {
+	public int updatePrepayTransHistory(String pymSeqNo, String prepayTransSeqNo, double payObjAmt, String chgrId) {
 		if (StringUtils.isEmptyOrWhitespaceOnly(pymSeqNo) == true) {
 			throw new RuntimeException("pymSeqNo값이 없어서 조회할 수 없습니다.");
 		}
@@ -82,18 +83,17 @@ public class PrepayServiceImpl implements PrepayService {
 		if (StringUtils.isEmptyOrWhitespaceOnly(prepayTransSeqNo) == true) {
 			throw new RuntimeException("prepayTransSeqNo값이 없어서 조회할 수 없습니다.");
 		}
-
-		int check = prepayMapper.updatePrepayTransHistoryCancel(prepayTransSeqNo);
+		
+		// TBLPY_PREPAY_TRANS_HIST cncl_yn. cncl_dttm. proc_memo update
+		Timestamp chgDate = new Timestamp(new Date().getTime());
+		int check = prepayMapper.updatePrepayTransHistoryCancel(prepayTransSeqNo, chgrId, chgDate);
 
 		if (check < 0) {
 			// TODO 갱신된 항목이 없다.. 어떻게 할 것인가?? 지금은 아무것도 하지 않음
 		}
 
 		String prepayOccSeqNo = prepayMapper.getPrepayOccSeqNoFromPrepayTransHistory(prepayTransSeqNo);
-
-		Timestamp chgDate = new Timestamp(new Date().getTime());
-
-		check = prepayMapper.updatePrepayTransStat(payObjAmt, chgDate, prepayOccSeqNo);
+		check = prepayMapper.updatePrepayTransStat(payObjAmt, prepayOccSeqNo, chgrId, chgDate);
 
 		if (check < 0) {
 			// TODO 갱신된 항목이 없다.. 어떻게 할 것인가?? 지금은 아무것도 하지 않음
@@ -203,14 +203,16 @@ public class PrepayServiceImpl implements PrepayService {
 		prepayTransHistory.setCrncyCd(exrateInfo.getCrncyCd());
 		prepayTransHistory.setExrate(exrateInfo.getExrate());
 		prepayTransHistory.setExrateAplyDt(exrateInfo.getExrateAplyDt());
-		prepayTransHistory.setRegrId(prepayOcc.getRegrId());
-		prepayTransHistory.setRegDate(new Timestamp(new Date().getTime()));
 		prepayTransHistory.setApprReqrId(prepayOcc.getRegrId());
 		prepayTransHistory.setApprReqDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(0));
 		prepayTransHistory.setDcsnProcStat("01");
 		prepayTransHistory.setCnclYn("N");
 		prepayTransHistory.setCnclDttm("");
 		prepayTransHistory.setBalAmt(balAmt);
+		prepayTransHistory.setRegrId(prepayOcc.getRegrId());
+		prepayTransHistory.setRegDate(new Timestamp(new Date().getTime()));
+		prepayTransHistory.setChgrId(prepayOcc.getRegrId());
+		prepayTransHistory.setChgDate(new Timestamp(new Date().getTime()));
 
 		prepayMapper.insertPrepayTransHistory(prepayTransHistory);
 
@@ -244,16 +246,17 @@ public class PrepayServiceImpl implements PrepayService {
 		newPrepayOcc.setPrepayBal(prepayOcc.getPrepayBal());
 		newPrepayOcc.setTransCmplYn("N");
 		newPrepayOcc.setWonPrepayOccAmt(0.0);
-		newPrepayOcc.setRegrId(prepayOcc.getRegrId());
-		newPrepayOcc.setRegDate(new Timestamp(new Date().getTime()));
 		newPrepayOcc.setCnclYn("N");
 		newPrepayOcc.setCnclDttm("");
 		// newPrepayOcc.setTransDt(prepayOcc.getTransDt());
+		newPrepayOcc.setRegrId(prepayOcc.getRegrId());
+		newPrepayOcc.setRegDate(new Timestamp(new Date().getTime()));
+		newPrepayOcc.setChgrId(prepayOcc.getRegrId());
+		newPrepayOcc.setChgDate(new Timestamp(new Date().getTime()));
 
 		prepayMapper.insertPrepayOcc(newPrepayOcc);
 
 		return newPrepayOccSeqNo;
-
 	}
 
 	public static void copyObjectValue(Object src, Object dest) {

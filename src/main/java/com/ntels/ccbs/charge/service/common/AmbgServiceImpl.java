@@ -44,10 +44,12 @@ public class AmbgServiceImpl implements AmbgService {
 		ambgOcc.setAmbgProcStat("1");
 		ambgOcc.setAmbgTransAmt(0.0);
 		ambgOcc.setTransCmplYn("N");
-		ambgOcc.setRegrId(regrId);
-		ambgOcc.setRegDate(new Timestamp(new Date().getTime()));
 		ambgOcc.setCnclYn("N");
 		ambgOcc.setCnclDttm("");
+		ambgOcc.setRegrId(regrId);
+		ambgOcc.setRegDate(new Timestamp(new Date().getTime()));
+		ambgOcc.setChgrId(regrId);
+		ambgOcc.setChgDate(new Timestamp(new Date().getTime()));
 		
 		return ambgMapper.insertAmbgOcc(ambgOcc);
 	}
@@ -85,7 +87,7 @@ public class AmbgServiceImpl implements AmbgService {
 	}
 	
 	@Override
-	public int updateAmbgCancel(String dpstSeqNo) {
+	public int updateAmbgCancel(String dpstSeqNo, String chgrId) {
 		int count = ambgMapper.getAmbgCount(dpstSeqNo);
 
 		if (count > 0) {
@@ -93,8 +95,9 @@ public class AmbgServiceImpl implements AmbgService {
 		}
 
 		String cnclDttm = DateUtil.getDateStringYYYYMMDDHH24MISS(0);
+		Timestamp chgDate =  new Timestamp(new Date().getTime());
 
-		return ambgMapper.updateAmbgCancel(cnclDttm, dpstSeqNo);
+		return ambgMapper.updateAmbgCancel(cnclDttm, dpstSeqNo, chgrId, chgDate);
 	}
 	
 
@@ -106,7 +109,7 @@ public class AmbgServiceImpl implements AmbgService {
 	 * @return
 	 */
 	@Override
-	public int updateAmbg(String dpstSeqNo, String ambgTransSeqNo, double payObjAmt) {
+	public int updateAmbg(String dpstSeqNo, String ambgTransSeqNo, double payObjAmt, String chgrId) {
 		if (StringUtils.isEmptyOrWhitespaceOnly(dpstSeqNo) == true) {
 			throw new RuntimeException("dpstSeqNo또는 pymSeqNo값이 없어서 조회할 수 없습니다.");
 		}
@@ -114,8 +117,12 @@ public class AmbgServiceImpl implements AmbgService {
 			throw new RuntimeException("ambgTransSeqNo값이 없어서 조회할 수 없습니다.");
 		}
 		
-		ambgMapper.updateAmbgTransHistCancel(DateUtil.getDateStringYYYYMMDDHH24MISS(0), ambgTransSeqNo);
-		ambgMapper.updateAmbgOccStat(payObjAmt, new Timestamp(new Date().getTime()), dpstSeqNo);
+		String cnclDttm = DateUtil.getDateStringYYYYMMDDHH24MISS(0); 
+		Timestamp chgDate = new Timestamp(new Date().getTime());
+		
+		// 
+		ambgMapper.updateAmbgTransHistCancel(cnclDttm, ambgTransSeqNo, chgrId, chgDate);
+		ambgMapper.updateAmbgOccStat(payObjAmt, dpstSeqNo,  chgrId, chgDate);
 		
 		AmbgOcc ambgAmount = ambgMapper.getAmbgAmount(dpstSeqNo);
 		

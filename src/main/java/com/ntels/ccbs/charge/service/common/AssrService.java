@@ -9,7 +9,7 @@ public interface AssrService {
 	 * @param seqNo
 	 * @return
 	 */
-	int updateAssrOccCancel(String seqNo);
+	int updateAssrOccCancel(String seqNo, String chgrId);
 
 //	/**
 //	 * 보증금발생내역 테이블에 등록한다.

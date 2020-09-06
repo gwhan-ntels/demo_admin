@@ -29,39 +29,43 @@ public class DepositServiceImpl implements DepositService {
 		return depositMapper.insertEachDeposit(eachDeposit);
 	}
 	
-	
 	@Override
 	public int insertDepositFromEachDeposit(EachDeposit eachDeposit) {
 		String dpstSeqNo = eachDeposit.getDpstSeqNo();
-		
-		eachDeposit = getEachDeposit(eachDeposit);		
-		eachDeposit.setDpstSeqNo(dpstSeqNo);
-		
+
 		// 가져온 데이터를 바탕으로 PyDpst객체를 생성한다.
 		Deposit deposit = new Deposit();
-		
+
+		deposit.setRegrId(eachDeposit.getRegrId());
+		deposit.setRegDate(eachDeposit.getRegDate());
+		deposit.setChgrId(eachDeposit.getChgrId());
+		deposit.setChgDate(eachDeposit.getChgDate());
+
+		eachDeposit = getEachDeposit(eachDeposit);
+		eachDeposit.setDpstSeqNo(dpstSeqNo);
+
 		CUtil.copyObjectValue(eachDeposit, deposit);
-		
+
 		deposit.setDpstProcDt(DateUtil.getDateStringYYYYMMDD(0)); // date YYYYMMDD
 		deposit.setDpstTp("3");
 		deposit.setDpstTpSeqNo(eachDeposit.getEachDpstSeq());
-		
+
 		if (eachDeposit.getDpstCl().equals("05") == true) { // 카드
 			deposit.setPayCorpTp("02"); // 카드
 		} else if (eachDeposit.getDpstCl().equals("11") == true) {
-			deposit.setPayCorpTp("");    // deposit.setPayCorpTp("03"); 에서 수정  2020.08.31 GWHAN
+			deposit.setPayCorpTp(""); // deposit.setPayCorpTp("03"); 에서 수정 2020.08.31 GWHAN
 		} else {
 			deposit.setPayCorpTp("01");
 		}
-		
+
 		if (!StringUtils.isNullOrEmpty(eachDeposit.getDpstBnkAcntCd())) {
 			if (eachDeposit.getDpstCl().equals("05") == true) {
 				deposit.setPayCorpCd(eachDeposit.getDpstBnkAcntCd().substring(0, 2));
 			} else {
 				deposit.setPayCorpCd(eachDeposit.getDpstBnkAcntCd().substring(0, 3));
-			}	
+			}
 		}
-		
+
 		// TODO 고객 카드 번호 암호화 추가 필요함
 		deposit.setAcntCardNo(eachDeposit.getAcntCardNo());
 		deposit.setPayProcYn("N");
@@ -69,9 +73,8 @@ public class DepositServiceImpl implements DepositService {
 		deposit.setAmbgTgtYn("N");
 		deposit.setCnclYn("N");
 		deposit.setPayCnclYn("N");
-		deposit.setRegDate(new Timestamp(new Date().getTime()));
 		deposit.setPrepayTgtYn("N");
-		
+
 		return depositMapper.insertDeposit(deposit);
 	}
 
@@ -122,13 +125,14 @@ public class DepositServiceImpl implements DepositService {
 	}
 	
 	@Override
-	public int updatePayProcDt(String dpstSeqNo, String payProcDt) {
-		return depositMapper.updatePayProcDt(dpstSeqNo, payProcDt);
+	public int updatePayProcDt(String dpstSeqNo, String payProcDt, String chgrId) {
+		Timestamp chgDate = new Timestamp(new Date().getTime());
+		return depositMapper.updatePayProcDt(dpstSeqNo, payProcDt, chgrId, chgDate);
 	}
 	
 	// 건별입금 취소
 	@Override
-	public Deposit updateCancelDeposit(String dpstSeqNo) {
+	public Deposit updateCancelDeposit(String dpstSeqNo, String chgrId) {
 		if (StringUtils.isNullOrEmpty(dpstSeqNo)) {
 			logger.debug("dpstSeq값을 찾을 수 없어 입금금액을 조회 할 수 없습니다.");
 			throw new RuntimeException("dpstSeq값을 찾을 수 없어 입금금액을 조회 할 수 없습니다.");			
@@ -143,7 +147,7 @@ public class DepositServiceImpl implements DepositService {
 		}
 		
 		// 입금내역에 취소상태를 취소(Y)로 업데이트
-		int update = depositMapper.updateCnclYn("Y", dpstSeqNo);
+		int update = depositMapper.updateCnclYn("Y", dpstSeqNo, chgrId, new Timestamp(new Date().getTime()));
 		
 		if (update <= 0) {
 			logger.debug("Oracle Error: TBLPY_DPST(Update)");
@@ -168,7 +172,10 @@ public class DepositServiceImpl implements DepositService {
 		depositCancel.setCnclResn(cnclRsn);
 		depositCancel.setCnclDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(0));
 		depositCancel.setCnclrId(regrId);
+		depositCancel.setRegrId(regrId);
 		depositCancel.setRegDate(new Timestamp(new Date().getTime()));
+		depositCancel.setChgrId(regrId);
+		depositCancel.setChgDate(new Timestamp(new Date().getTime()));
 		
 		return depositMapper.insertDepositCancel(depositCancel);
 	}

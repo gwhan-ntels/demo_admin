@@ -59,7 +59,9 @@ public class ReceiptServiceImpl implements ReceiptService {
 			throw new RuntimeException("dpstSeqNo또는 pymSeqNo값이 없어서 조회할 수 없습니다.");
 		}
 		
-		return receiptMapper.updateReceiptCancel(dpstSeqNo, pymSeqNo, userId);
+		Timestamp chgDate = new Timestamp(new Date().getTime());
+		
+		return receiptMapper.updateReceiptCancel(dpstSeqNo, pymSeqNo, userId, chgDate);
 		
 	}
 
@@ -86,8 +88,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receiptCancelAppl.setApprReqrId(regrId);
 		receiptCancelAppl.setApprReqDttm(DateUtil.getDateStringYYYYMMDDHH24MISS(1));
 		receiptCancelAppl.setDcsnProcStat("01");
-		receiptCancelAppl.setCnclResn("RECEIPT CANCELLATIONI");
+		receiptCancelAppl.setCnclResn("RECEIPT CANCELLATIONI");		
+		receiptCancelAppl.setRegrId(regrId);
 		receiptCancelAppl.setRegDate(new Timestamp(new Date().getTime()));
+		receiptCancelAppl.setChgrId(regrId);
+		receiptCancelAppl.setChgDate(new Timestamp(new Date().getTime()));
 		
 		return receiptMapper.insertReceiptCancelAppl(receiptCancelAppl);
 	}
@@ -100,12 +105,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 		if (StringUtils.isEmptyOrWhitespaceOnly(receiptId) == true) {
 			throw new RuntimeException("receiptId값이 없어서 조회할 수 없습니다.");
 		}
-		
+
 		Receipt receipt = receiptMapper.getReceipt(pymSeqNo);
-		
+
 		ReceiptCancel receiptCancel = new ReceiptCancel();
 		CUtil.copyObjectValue(receipt, receiptCancel);
-		
+
 //		receiptCancel.setRcptId(receiptId);
 		receiptCancel.setDpstTpSeqNo(receipt.getDpstSeqNo() == null ? "0000000000" : receipt.getDpstSeqNo());
 		receiptCancel.setCnclrId(regrId);
@@ -113,15 +118,17 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receiptCancel.setCnclResn(cnclResn);
 		receiptCancel.setRegrId(regrId);
 		receiptCancel.setRegDate(new Timestamp(new Date().getTime()));
-		
+		receiptCancel.setChgrId(regrId);
+		receiptCancel.setChgDate(new Timestamp(new Date().getTime()));
+
 		receiptMapper.insertReceiptCancel(receiptCancel);
-		
+
 		List<ReceiptDetail> receiptDetailList = receiptMapper.getReceiptDetail(pymSeqNo);
-//		
+
 		for (ReceiptDetail receiptDetail : receiptDetailList) {
 			receiptMapper.insertReceiptCancelDetail(receiptDetail);
 		}
-		
+
 		// TODO 성공 실패여부..
 		return 0;
 	}

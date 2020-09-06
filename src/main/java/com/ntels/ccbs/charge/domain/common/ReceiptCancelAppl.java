@@ -64,113 +64,106 @@ public class ReceiptCancelAppl {
 	 */
 	private String cnclResn;
 
-	/**
-	 * 등록일
-	 */
+	private String regrId;
 	private Timestamp regDate;
+	private String chgrId;
+	private Timestamp chgDate;
 
 	public String getPymSeqNo() {
 		return pymSeqNo;
 	}
-
 	public void setPymSeqNo(String pymSeqNo) {
 		this.pymSeqNo = pymSeqNo;
 	}
-
 	public String getPymAcntId() {
 		return pymAcntId;
 	}
-
 	public void setPymAcntId(String pymAcntId) {
 		this.pymAcntId = pymAcntId;
 	}
-
 	public String getPayProcDt() {
 		return payProcDt;
 	}
-
 	public void setPayProcDt(String payProcDt) {
 		this.payProcDt = payProcDt;
 	}
-
 	public String getDpstCl() {
 		return dpstCl;
 	}
-
 	public void setDpstCl(String dpstCl) {
 		this.dpstCl = dpstCl;
 	}
-
 	public String getRcptPsnId() {
 		return rcptPsnId;
 	}
-
 	public void setRcptPsnId(String rcptPsnId) {
 		this.rcptPsnId = rcptPsnId;
 	}
-
 	public String getRcptDttm() {
 		return rcptDttm;
 	}
-
 	public void setRcptDttm(String rcptDttm) {
 		this.rcptDttm = rcptDttm;
 	}
-
 	public String getApprReqrId() {
 		return apprReqrId;
 	}
-
 	public void setApprReqrId(String apprReqrId) {
 		this.apprReqrId = apprReqrId;
 	}
-
 	public String getApprReqDttm() {
 		return apprReqDttm;
 	}
-
 	public void setApprReqDttm(String apprReqDttm) {
 		this.apprReqDttm = apprReqDttm;
 	}
-
 	public String getDcsnProcStat() {
 		return dcsnProcStat;
 	}
-
 	public void setDcsnProcStat(String dcsnProcStat) {
 		this.dcsnProcStat = dcsnProcStat;
 	}
-
 	public String getApprrId() {
 		return apprrId;
 	}
-
 	public void setApprrId(String apprrId) {
 		this.apprrId = apprrId;
 	}
-
 	public String getApprDttm() {
 		return apprDttm;
 	}
-
 	public void setApprDttm(String apprDttm) {
 		this.apprDttm = apprDttm;
 	}
-
 	public String getCnclResn() {
 		return cnclResn;
 	}
-
 	public void setCnclResn(String cnclResn) {
 		this.cnclResn = cnclResn;
 	}
-
+	public String getRegrId() {
+		return regrId;
+	}
+	public void setRegrId(String regrId) {
+		this.regrId = regrId;
+	}
 	public Timestamp getRegDate() {
 		return regDate;
 	}
-
 	public void setRegDate(Timestamp regDate) {
 		this.regDate = regDate;
+	}
+	public String getChgrId() {
+		return chgrId;
+	}
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
 	}
 
 }

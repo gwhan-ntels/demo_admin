@@ -3,213 +3,221 @@
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ntels.ccbs.charge.mapper.common.PrepayMapper">
+    <insert id="insertPrepayOcc">
+        INSERT INTO TBLPY_PREPAY_OCC
+        (
+            SO_ID
+          , PREPAY_OCC_SEQ_NO
+          , PYM_ACNT_ID
+          , PREPAY_OCC_DTTM
+          , PREPAY_OCC_TP
+          , PREPAY_OCC_RESN
+          , PREPAY_OCC_TGT_SEQ_NO
+          , DPST_DT
+<!--          , DPST_PROC_DTTM -->
+          , DPST_PROC_DT
+          , DPST_CL
+          , PREPAY_PROC_STAT
+          , PREPAY_OCC_AMT
+          , PREPAY_TRANS_AMT
+          , PREPAY_BAL
+          , TRANS_CMPL_YN
+          , WON_PREPAY_OCC_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , CNCL_YN
+          , CNCL_DTTM
+          , TRANS_DT
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{prepayOcc.soId,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccSeqNo,jdbcType=VARCHAR}
+          , #{prepayOcc.pymAcntId,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccDttm,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccTp,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccResn,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccTgtSeqNo,jdbcType=VARCHAR}
+          , #{prepayOcc.dpstDt,jdbcType=VARCHAR}
+<!--          , #{prepayOcc.dpstProcDttm,jdbcType=VARCHAR} -->
+          , #{prepayOcc.dpstProcDt,jdbcType=VARCHAR}
+          , #{prepayOcc.dpstCl,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayProcStat,jdbcType=VARCHAR}
+          , #{prepayOcc.prepayOccAmt}
+          , #{prepayOcc.prepayTransAmt}
+          , #{prepayOcc.prepayBal}
+          , #{prepayOcc.transCmplYn,jdbcType=VARCHAR}
+          , #{prepayOcc.wonPrepayOccAmt}
+          , #{prepayOcc.crncyCd,jdbcType=VARCHAR}
+          , #{prepayOcc.exrate}
+          , #{prepayOcc.exrateAplyDt,jdbcType=VARCHAR}
+          , #{prepayOcc.cnclYn,jdbcType=VARCHAR}
+          , #{prepayOcc.cnclDttm,jdbcType=VARCHAR}
+          , #{prepayOcc.transDt,jdbcType=VARCHAR}
+          , #{prepayOcc.regrId,jdbcType=VARCHAR}
+          , #{prepayOcc.regDate}
+          , #{prepayOcc.chgrId,jdbcType=VARCHAR}
+          , #{prepayOcc.chgDate}
+        )
+    </insert>
 
-	<insert id="insertPrepayOcc">
-		INSERT INTO TBLPY_PREPAY_OCC
-		(
-			PREPAY_OCC_SEQ_NO
-			, PYM_ACNT_ID
-			, PREPAY_OCC_DTTM
-			, PREPAY_OCC_TP
-			, PREPAY_OCC_RESN
-			, PREPAY_OCC_TGT_SEQ_NO
-			, DPST_DT
-<!-- 			, DPST_PROC_DTTM -->
-			, DPST_PROC_DT
-			, DPST_CL
-			, PREPAY_PROC_STAT
-			, PREPAY_OCC_AMT
-			, PREPAY_TRANS_AMT
-			, PREPAY_BAL
-			, TRANS_CMPL_YN
-			, WON_PREPAY_OCC_AMT
-			, CRNCY_CD
-			, EXRATE
-			, EXRATE_APLY_DT
-			, REGR_ID
-			, REG_DATE
-			, CNCL_YN
-			, CNCL_DTTM
-			, SO_ID
-			, TRANS_DT
-		)
-		VALUES
-		(
-			#{prepayOcc.prepayOccSeqNo,jdbcType=VARCHAR}
-			, #{prepayOcc.pymAcntId,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayOccDttm,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayOccTp,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayOccResn,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayOccTgtSeqNo,jdbcType=VARCHAR}
-			, #{prepayOcc.dpstDt,jdbcType=VARCHAR}
-<!-- 			, #{prepayOcc.dpstProcDttm,jdbcType=VARCHAR} -->
-			, #{prepayOcc.dpstProcDt,jdbcType=VARCHAR}
-			, #{prepayOcc.dpstCl,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayProcStat,jdbcType=VARCHAR}
-			, #{prepayOcc.prepayOccAmt}
-			, #{prepayOcc.prepayTransAmt}
-			, #{prepayOcc.prepayBal}
-			, #{prepayOcc.transCmplYn,jdbcType=VARCHAR}
-			, #{prepayOcc.wonPrepayOccAmt}
-			, #{prepayOcc.crncyCd,jdbcType=VARCHAR}
-			, #{prepayOcc.exrate}
-			, #{prepayOcc.exrateAplyDt,jdbcType=VARCHAR}
-			, #{prepayOcc.regrId,jdbcType=VARCHAR}
-			, #{prepayOcc.regDate}
-			, #{prepayOcc.cnclYn,jdbcType=VARCHAR}
-			, #{prepayOcc.cnclDttm,jdbcType=VARCHAR}
-			, #{prepayOcc.soId,jdbcType=VARCHAR}
-			, #{prepayOcc.transDt,jdbcType=VARCHAR}
-		)
-	</insert>
-	
-	<update id="updatePrepayTransHistoryCancel">
-		UPDATE TBLPY_PREPAY_TRANS_HIST SET
-		     CNCL_YN = 'Y'
-		     , CNCL_DTTM = TO_CHAR( SYSDATE, 'YYYYMMDDHH24MISS' )
-		     , PROC_MEMO = PROC_MEMO||'-'||'22'
-		WHERE PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
-	</update>
-	
-	<!-- 선수금발생내역에 있으면서 선수금대체내역에 있는지 체크 -->
-	<select id="getPrepayCount" resultType="int">
-		SELECT COUNT(*)
-		FROM TBLPY_PREPAY_OCC T1,
-		     TBLPY_PREPAY_TRANS_HIST T2
-		WHERE T1.PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
-		     AND T1.PREPAY_OCC_SEQ_NO = T2.PREPAY_OCC_SEQ_NO
-	</select>
-	
-	<update id="updatePrepayOccCancel">
-		UPDATE TBLPY_PREPAY_OCC SET 
-		     CNCL_YN = 'Y'
-		     ,CNCL_DTTM = #{cnclDttm}
-		WHERE PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
-	</update>
-	
-	
-	
-	<select id="getPrepayOccSeqNoFromPrepayTransHistory" resultType="String">
-		SELECT
-		     PREPAY_OCC_SEQ_NO
-		FROM TBLPY_PREPAY_TRANS_HIST 
-		WHERE PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
-	</select>
-	
-	<update id="updatePrepayTransStat">
-		UPDATE TBLPY_PREPAY_OCC SET
-		     PREPAY_TRANS_AMT = PREPAY_TRANS_AMT - #{payObjAmt}
-		     , PREPAY_BAL = PREPAY_BAL + #{payObjAmt}
-		     , PREPAY_PROC_STAT = CASE WHEN PREPAY_PROC_STAT = '2' THEN PREPAY_PROC_STAT ELSE '1' END
-		     , TRANS_CMPL_YN = 'N'
-		     , CHG_DATE = NOW()
-		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
-	</update>
+    <update id="updatePrepayTransHistoryCancel">
+        UPDATE TBLPY_PREPAY_TRANS_HIST 
+        SET    CNCL_YN   = 'Y'
+             , CNCL_DTTM = TO_CHAR( SYSDATE, 'YYYYMMDDHH24MISS' )
+             , PROC_MEMO = PROC_MEMO||'-'||'22'
+             , CHGR_ID   = #{chgrId}
+             , CHG_DATE  = #{chgDate}
+        WHERE PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
+    </update>
+    
+    <!-- 선수금발생내역에 있으면서 선수금대체내역에 있는지 체크 -->
+    <select id="getPrepayCount" resultType="int">
+      SELECT COUNT(*)
+      FROM   TBLPY_PREPAY_OCC T1
+           , TBLPY_PREPAY_TRANS_HIST T2
+      WHERE  T1.PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+      AND    T1.PREPAY_OCC_SEQ_NO     = T2.PREPAY_OCC_SEQ_NO
+    </select>
 
-	<select id="getPrepayAmount" resultType="PrepayOcc">
-		SELECT
-			PREPAY_OCC_AMT
-		    , PREPAY_TRANS_AMT
-			, PREPAY_BAL
-		FROM TBLPY_PREPAY_OCC
-		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
-	</select>
-	
-	
-	<select id="getBillSeqNoCheck" resultType="String">
-		SELECT BILL_SEQ_NO
-		FROM   TBLIV_BILL_MAST
-		WHERE  BILL_SEQ_NO = #{billSeqNo}
-		AND    FULL_PAY_YN = 'N'
-	</select>
-	
-	<select id="getPrepayOcc" resultType="PrepayOcc">
-		SELECT
-			DPST_DT
-			, DPST_CL
-<!-- 			, DPST_PROC_DTTM -->
-			, DPST_PROC_DT
-			, CRNCY_CD
-			, EXRATE
-			, EXRATE_APLY_DT
-			, SO_ID
-			, PREPAY_BAL
-			, PREPAY_OCC_TGT_SEQ_NO
-			, PYM_ACNT_ID
-			, TRANS_DT
-		FROM TBLPY_PREPAY_OCC
-		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
-	</select>
-	
-	
-	<select id="getPrepayProcStat" resultType="String">
-		SELECT
-			PREPAY_PROC_STAT
-		FROM TBLPY_PREPAY_OCC
-		WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
-	</select>
-	
-	
-	<update id="updatePrepayOcc">
-		UPDATE TBLPY_PREPAY_OCC SET
-			PREPAY_TRANS_AMT = PREPAY_TRANS_AMT + #{prepayOcc.prepayBal}
-			, PREPAY_BAL = PREPAY_BAL - #{prepayOcc.prepayBal}
-			, PREPAY_PROC_STAT = '3'
-			, TRANS_CMPL_YN = CASE WHEN PREPAY_BAL - #{prepayOcc.prepayBal} = 0 THEN 'Y' ELSE 'N' END
-			, CHGR_ID = #{prepayOcc.chgrId}
-			, CHG_DATE = #{prepayOcc.chgDate}
-		WHERE PREPAY_OCC_SEQ_NO = #{prepayOcc.prepayOccSeqNo}
-	</update>
-	
-	
-	<insert id="insertPrepayTransHistory">
-    INSERT INTO TBLPY_PREPAY_TRANS_HIST
-    (
-        SO_ID
-      , PREPAY_OCC_SEQ_NO
-      , PREPAY_TRANS_SEQ_NO
-      , TRANS_PROC_DTTM
-      , PREPAY_REPL_TP
-      , TRANS_PROC_AMT
-      , PROC_MEMO
-      , WON_REPL_PROC_AMT
-      , CRNCY_CD
-      , EXRATE
-      , EXRATE_APLY_DT
-      , REGR_ID
-      , REG_DATE
-      , APPR_REQR_ID
-      , APPR_REQ_DTTM
-      , DCSN_PROC_STAT
-      , APPRR_ID
-      , APPR_DTTM
-      , CNCL_YN
-      , CNCL_DTTM
-      , BAL_AMT
-    )
-    VALUES
-    (
-        #{prepayTransHistory.soId, jdbcType=VARCHAR}
-      , #{prepayTransHistory.prepayOccSeqNo, jdbcType=VARCHAR}
-      , #{prepayTransHistory.prepayTransSeqNo, jdbcType=VARCHAR}
-      , #{prepayTransHistory.transProcDttm, jdbcType=VARCHAR}
-      , #{prepayTransHistory.prepayReplTp, jdbcType=VARCHAR}
-      , #{prepayTransHistory.transProcAmt, jdbcType=DOUBLE}
-      , #{prepayTransHistory.procMemo, jdbcType=VARCHAR}
-      , #{prepayTransHistory.wonReplProcAmt, jdbcType=DOUBLE}
-      , #{prepayTransHistory.crncyCd, jdbcType=VARCHAR}
-      , #{prepayTransHistory.exrate, jdbcType=DOUBLE}
-      , #{prepayTransHistory.exrateAplyDt, jdbcType=VARCHAR}
-      , #{prepayTransHistory.regrId, jdbcType=VARCHAR}
-      , #{prepayTransHistory.regDate, jdbcType=DATE}
-      , #{prepayTransHistory.apprReqrId, jdbcType=VARCHAR}
-      , #{prepayTransHistory.apprReqDttm, jdbcType=VARCHAR}
-      , #{prepayTransHistory.dcsnProcStat, jdbcType=VARCHAR}
-      , #{prepayTransHistory.apprrId, jdbcType=VARCHAR}
-      , #{prepayTransHistory.apprDttm, jdbcType=VARCHAR}
-      , #{prepayTransHistory.cnclYn, jdbcType=VARCHAR}
-      , #{prepayTransHistory.cnclDttm, jdbcType=VARCHAR}
-      , #{prepayTransHistory.balAmt, jdbcType=DOUBLE}
-    )
-	</insert>
+    <update id="updatePrepayOccCancel">
+        UPDATE TBLPY_PREPAY_OCC 
+        SET    CNCL_YN = 'Y'
+             , CNCL_DTTM = #{cnclDttm}
+             , CHGR_ID   = #{chgrId}
+             , CHG_DATE  = #{chgDate}
+        WHERE  PREPAY_OCC_TGT_SEQ_NO = #{prepayOccTgtSeqNo}
+    </update>
+
+
+
+    <select id="getPrepayOccSeqNoFromPrepayTransHistory" resultType="String">
+        SELECT PREPAY_OCC_SEQ_NO
+        FROM   TBLPY_PREPAY_TRANS_HIST
+        WHERE  PREPAY_TRANS_SEQ_NO = #{prepayTransSeqNo}
+    </select>
+    
+    <update id="updatePrepayTransStat">
+        UPDATE TBLPY_PREPAY_OCC 
+        SET    PREPAY_TRANS_AMT = PREPAY_TRANS_AMT - #{payObjAmt}
+             , PREPAY_BAL       = PREPAY_BAL + #{payObjAmt}
+             , PREPAY_PROC_STAT = CASE WHEN PREPAY_PROC_STAT = '2' THEN PREPAY_PROC_STAT ELSE '1' END
+             , TRANS_CMPL_YN    = 'N'
+             , CHGR_ID   = #{chgrId}
+             , CHG_DATE  = #{chgDate}
+        WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+    </update>
+
+    <select id="getPrepayAmount" resultType="PrepayOcc">
+        SELECT PREPAY_OCC_AMT
+             , PREPAY_TRANS_AMT
+             , PREPAY_BAL
+        FROM   TBLPY_PREPAY_OCC
+        WHERE  PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+    </select>
+    
+    
+    <select id="getBillSeqNoCheck" resultType="String">
+        SELECT BILL_SEQ_NO
+        FROM   TBLIV_BILL_MAST
+        WHERE  BILL_SEQ_NO = #{billSeqNo}
+        AND    FULL_PAY_YN = 'N'
+    </select>
+
+    <select id="getPrepayOcc" resultType="PrepayOcc">
+        SELECT DPST_DT
+             , DPST_CL
+<!--             , DPST_PROC_DTTM -->
+             , DPST_PROC_DT
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , SO_ID
+             , PREPAY_BAL
+             , PREPAY_OCC_TGT_SEQ_NO
+             , PYM_ACNT_ID
+             , TRANS_DT
+        FROM TBLPY_PREPAY_OCC
+        WHERE PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+    </select>
+
+
+    <select id="getPrepayProcStat" resultType="String">
+        SELECT PREPAY_PROC_STAT
+        FROM   TBLPY_PREPAY_OCC
+        WHERE  PREPAY_OCC_SEQ_NO = #{prepayOccSeqNo}
+    </select>
+    
+    
+    <update id="updatePrepayOcc">
+        UPDATE TBLPY_PREPAY_OCC 
+        SET    PREPAY_TRANS_AMT  = PREPAY_TRANS_AMT + #{prepayOcc.prepayBal}
+             , PREPAY_BAL        = PREPAY_BAL - #{prepayOcc.prepayBal}
+             , PREPAY_PROC_STAT  = '3'
+             , TRANS_CMPL_YN     = CASE WHEN PREPAY_BAL - #{prepayOcc.prepayBal} = 0 THEN 'Y' ELSE 'N' END
+             , CHGR_ID           = #{prepayOcc.chgrId}
+             , CHG_DATE          = #{prepayOcc.chgDate}
+        WHERE  PREPAY_OCC_SEQ_NO = #{prepayOcc.prepayOccSeqNo}
+    </update>
+
+
+    <insert id="insertPrepayTransHistory">
+        INSERT INTO TBLPY_PREPAY_TRANS_HIST
+        (
+            SO_ID
+          , PREPAY_OCC_SEQ_NO
+          , PREPAY_TRANS_SEQ_NO
+          , TRANS_PROC_DTTM
+          , PREPAY_REPL_TP
+          , TRANS_PROC_AMT
+          , PROC_MEMO
+          , WON_REPL_PROC_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , APPR_REQR_ID
+          , APPR_REQ_DTTM
+          , DCSN_PROC_STAT
+          , APPRR_ID
+          , APPR_DTTM
+          , CNCL_YN
+          , CNCL_DTTM
+          , BAL_AMT
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{prepayTransHistory.soId, jdbcType=VARCHAR}
+          , #{prepayTransHistory.prepayOccSeqNo, jdbcType=VARCHAR}
+          , #{prepayTransHistory.prepayTransSeqNo, jdbcType=VARCHAR}
+          , #{prepayTransHistory.transProcDttm, jdbcType=VARCHAR}
+          , #{prepayTransHistory.prepayReplTp, jdbcType=VARCHAR}
+          , #{prepayTransHistory.transProcAmt, jdbcType=DOUBLE}
+          , #{prepayTransHistory.procMemo, jdbcType=VARCHAR}
+          , #{prepayTransHistory.wonReplProcAmt, jdbcType=DOUBLE}
+          , #{prepayTransHistory.crncyCd, jdbcType=VARCHAR}
+          , #{prepayTransHistory.exrate, jdbcType=DOUBLE}
+          , #{prepayTransHistory.exrateAplyDt, jdbcType=VARCHAR}
+          , #{prepayTransHistory.apprReqrId, jdbcType=VARCHAR}
+          , #{prepayTransHistory.apprReqDttm, jdbcType=VARCHAR}
+          , #{prepayTransHistory.dcsnProcStat, jdbcType=VARCHAR}
+          , #{prepayTransHistory.apprrId, jdbcType=VARCHAR}
+          , #{prepayTransHistory.apprDttm, jdbcType=VARCHAR}
+          , #{prepayTransHistory.cnclYn, jdbcType=VARCHAR}
+          , #{prepayTransHistory.cnclDttm, jdbcType=VARCHAR}
+          , #{prepayTransHistory.balAmt, jdbcType=DOUBLE}
+          , #{prepayTransHistory.regrId, jdbcType=VARCHAR}
+          , #{prepayTransHistory.regDate, jdbcType=DATE}
+          , #{prepayTransHistory.chgrId, jdbcType=VARCHAR}
+          , #{prepayTransHistory.chgDate, jdbcType=DATE}
+        )
+    </insert>
 </mapper>

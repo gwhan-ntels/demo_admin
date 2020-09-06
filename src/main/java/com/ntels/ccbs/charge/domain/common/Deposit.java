@@ -175,10 +175,6 @@ public class Deposit {
 	 */
 	private String payCnclYn;
 
-	/**
-	 * 등록일
-	 */
-	private Timestamp regDate;
 
 	/**
 	 * 선수금대상여부
@@ -189,6 +185,18 @@ public class Deposit {
 	 * 등록자ID
 	 */
 	private String regrId;
+	/**
+	 * 등록일
+	 */
+	private Timestamp regDate;
+	/**
+	 * 등록자ID
+	 */
+	private String chgrId;
+	/**
+	 * 등록일
+	 */
+	private Timestamp chgDate;
 	
 	private String fullPayYn;
 	
@@ -202,358 +210,269 @@ public class Deposit {
 	private String assrOccSeqNo;	
 	private String assrTgtYn;
 
-	public String getAssrTgtYn() {
-		return assrTgtYn;
-	}
-
-	public void setAssrTgtYn(String assrTgtYn) {
-		this.assrTgtYn = assrTgtYn;
-	}
-
-	public String getPrepayOccSeqNo() {
-		return prepayOccSeqNo;
-	}
-
-	public void setPrepayOccSeqNo(String prepayOccSeqNo) {
-		this.prepayOccSeqNo = prepayOccSeqNo;
-	}
-
-	public String getAmbgOccSeqNo() {
-		return ambgOccSeqNo;
-	}
-
-	public void setAmbgOccSeqNo(String ambgOccSeqNo) {
-		this.ambgOccSeqNo = ambgOccSeqNo;
-	}
-
-	public String getAssrOccSeqNo() {
-		return assrOccSeqNo;
-	}
-
-	public void setAssrOccSeqNo(String assrOccSeqNo) {
-		this.assrOccSeqNo = assrOccSeqNo;
-	}
-
 	public String getDpstSeqNo() {
 		return dpstSeqNo;
 	}
-
 	public void setDpstSeqNo(String dpstSeqNo) {
 		this.dpstSeqNo = dpstSeqNo;
 	}
-
 	public String getBillSeqNo() {
 		return billSeqNo;
 	}
-
 	public void setBillSeqNo(String billSeqNo) {
 		this.billSeqNo = billSeqNo;
 	}
-
 	public String getBillYymm() {
 		return billYymm;
 	}
-
 	public void setBillYymm(String billYymm) {
 		this.billYymm = billYymm;
 	}
-
-	/**
-	 * @return the billCycl
-	 */
 	public String getBillCycl() {
 		return billCycl;
 	}
-
-	/**
-	 * @param billCycl the billCycl to set
-	 */
 	public void setBillCycl(String billCycl) {
 		this.billCycl = billCycl;
 	}
-
-	/**
-	 * @return the billDt
-	 */
 	public String getBillDt() {
 		return billDt;
 	}
-
-	/**
-	 * @param billDt the billDt to set
-	 */
 	public void setBillDt(String billDt) {
 		this.billDt = billDt;
 	}
-
 	public String getTransDt() {
 		return transDt;
 	}
-
 	public void setTransDt(String transDt) {
 		this.transDt = transDt;
 	}
-
 	public String getDpstProcDt() {
 		return dpstProcDt;
 	}
-
 	public void setDpstProcDt(String dpstProcDt) {
 		this.dpstProcDt = dpstProcDt;
 	}
-
 	public String getSoId() {
 		return soId;
 	}
-
 	public void setSoId(String soId) {
 		this.soId = soId;
 	}
-
 	public String getGrpId() {
 		return grpId;
 	}
-
 	public void setGrpId(String grpId) {
 		this.grpId = grpId;
 	}
-
 	public String getPymAcntId() {
 		return pymAcntId;
 	}
-
 	public void setPymAcntId(String pymAcntId) {
 		this.pymAcntId = pymAcntId;
 	}
-
 	public String getCheckPymAcntId() {
 		return checkPymAcntId;
 	}
-
 	public void setCheckPymAcntId(String checkPymAcntId) {
 		this.checkPymAcntId = checkPymAcntId;
 	}
-
 	public String getCustId() {
 		return custId;
 	}
-
 	public void setCustId(String custId) {
 		this.custId = custId;
 	}
-
 	public String getCtrtId() {
 		return ctrtId;
 	}
-
 	public void setCtrtId(String ctrtId) {
 		this.ctrtId = ctrtId;
 	}
-
 	public String getDpstDt() {
 		return dpstDt;
 	}
-
 	public void setDpstDt(String dpstDt) {
 		this.dpstDt = dpstDt;
 	}
-
 	public String getDpstTp() {
 		return dpstTp;
 	}
-
 	public void setDpstTp(String dpstTp) {
 		this.dpstTp = dpstTp;
 	}
-
 	public String getDpstCl() {
 		return dpstCl;
 	}
-
 	public void setDpstCl(String dpstCl) {
 		this.dpstCl = dpstCl;
 	}
-
 	public String getDpstTpSeqNo() {
 		return dpstTpSeqNo;
 	}
-
 	public void setDpstTpSeqNo(String dpstTpSeqNo) {
 		this.dpstTpSeqNo = dpstTpSeqNo;
 	}
-
 	public String getPayCorpTp() {
 		return payCorpTp;
 	}
-
 	public void setPayCorpTp(String payCorpTp) {
 		this.payCorpTp = payCorpTp;
 	}
-
 	public String getPayCorpCd() {
 		return payCorpCd;
 	}
-
 	public void setPayCorpCd(String payCorpCd) {
 		this.payCorpCd = payCorpCd;
 	}
-
 	public String getAcntCardNo() {
 		return acntCardNo;
 	}
-
 	public void setAcntCardNo(String acntCardNo) {
 		this.acntCardNo = acntCardNo;
 	}
-
 	public double getDpstAmt() {
 		return dpstAmt;
 	}
-
 	public void setDpstAmt(double dpstAmt) {
 		this.dpstAmt = dpstAmt;
 	}
-
 	public double getRcptAmt() {
 		return rcptAmt;
 	}
-
 	public void setRcptAmt(double rcptAmt) {
 		this.rcptAmt = rcptAmt;
 	}
-
 	public String getDpstBnkAcntCd() {
 		return dpstBnkAcntCd;
 	}
-
 	public void setDpstBnkAcntCd(String dpstBnkAcntCd) {
 		this.dpstBnkAcntCd = dpstBnkAcntCd;
 	}
-
 	public double getFeeAmt() {
 		return feeAmt;
 	}
-
 	public void setFeeAmt(double feeAmt) {
 		this.feeAmt = feeAmt;
 	}
-
 	public String getPayProcYn() {
 		return payProcYn;
 	}
-
 	public void setPayProcYn(String payProcYn) {
 		this.payProcYn = payProcYn;
 	}
-
 	public String getPayProcDt() {
 		return payProcDt;
 	}
-
 	public void setPayProcDt(String payProcDt) {
 		this.payProcDt = payProcDt;
 	}
-
 	public String getAmbgTgtYn() {
 		return ambgTgtYn;
 	}
-
 	public void setAmbgTgtYn(String ambgTgtYn) {
 		this.ambgTgtYn = ambgTgtYn;
 	}
-
 	public double getWonDpstAmt() {
 		return wonDpstAmt;
 	}
-
 	public void setWonDpstAmt(double wonDpstAmt) {
 		this.wonDpstAmt = wonDpstAmt;
 	}
-
 	public String getCrncyCd() {
 		return crncyCd;
 	}
-
 	public void setCrncyCd(String crncyCd) {
 		this.crncyCd = crncyCd;
 	}
-
 	public double getExrate() {
 		return exrate;
 	}
-
 	public void setExrate(double exrate) {
 		this.exrate = exrate;
 	}
-
 	public String getExrateAplyDt() {
 		return exrateAplyDt;
 	}
-
 	public void setExrateAplyDt(String exrateAplyDt) {
 		this.exrateAplyDt = exrateAplyDt;
 	}
-
 	public String getCnclYn() {
 		return cnclYn;
 	}
-
 	public void setCnclYn(String cnclYn) {
 		this.cnclYn = cnclYn;
 	}
-
 	public String getPayCnclYn() {
 		return payCnclYn;
 	}
-
 	public void setPayCnclYn(String payCnclYn) {
 		this.payCnclYn = payCnclYn;
 	}
-
-	public Timestamp getRegDate() {
-		return regDate;
-	}
-
-	public void setRegDate(Timestamp regDate) {
-		this.regDate = regDate;
-	}
-
 	public String getPrepayTgtYn() {
 		return prepayTgtYn;
 	}
-
 	public void setPrepayTgtYn(String prepayTgtYn) {
 		this.prepayTgtYn = prepayTgtYn;
 	}
-
 	public String getRegrId() {
 		return regrId;
 	}
-
 	public void setRegrId(String regrId) {
 		this.regrId = regrId;
 	}
-
+	public Timestamp getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Timestamp regDate) {
+		this.regDate = regDate;
+	}
+	public String getChgrId() {
+		return chgrId;
+	}
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
 	public String getFullPayYn() {
 		return fullPayYn;
 	}
-
 	public void setFullPayYn(String fullPayYn) {
 		this.fullPayYn = fullPayYn;
 	}
-
-	/**
-	 * @return the billAmt
-	 */
 	public double getBillAmt() {
 		return billAmt;
 	}
-
-	/**
-	 * @param billAmt the billAmt to set
-	 */
 	public void setBillAmt(double billAmt) {
 		this.billAmt = billAmt;
+	}
+	public String getPrepayOccSeqNo() {
+		return prepayOccSeqNo;
+	}
+	public void setPrepayOccSeqNo(String prepayOccSeqNo) {
+		this.prepayOccSeqNo = prepayOccSeqNo;
+	}
+	public String getAmbgOccSeqNo() {
+		return ambgOccSeqNo;
+	}
+	public void setAmbgOccSeqNo(String ambgOccSeqNo) {
+		this.ambgOccSeqNo = ambgOccSeqNo;
+	}
+	public String getAssrOccSeqNo() {
+		return assrOccSeqNo;
+	}
+	public void setAssrOccSeqNo(String assrOccSeqNo) {
+		this.assrOccSeqNo = assrOccSeqNo;
+	}
+	public String getAssrTgtYn() {
+		return assrTgtYn;
+	}
+	public void setAssrTgtYn(String assrTgtYn) {
+		this.assrTgtYn = assrTgtYn;
 	}
 
 }

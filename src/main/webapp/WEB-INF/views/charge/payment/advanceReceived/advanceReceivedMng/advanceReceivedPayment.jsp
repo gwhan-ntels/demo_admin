@@ -119,7 +119,8 @@ $(document).ready(function() {
 		    { label: 'soId', name: 'soId', width : 100, align:"center", hidden:true},
 		    
 			{ label: '<spring:message code="LAB.M06.LAB00134" />', name: 'prepayOccSeqNo', width : 90, align:"center"}, 	//발생일련번호
-			{ label: '<spring:message code="LAB.M06.LAB00133" />', name: 'prepayOccNm', width : 100, align:"center"}, 	//발생구분
+			{ label: '<spring:message code="LAB.M06.LAB00133" />', name: 'prepayOccTpNm', width : 100, align:"left"}, 	//발생구분
+			{ label: '<spring:message code="LAB.M06.LAB00136" />', name: 'prepayOccResnNm', width : 100, align:"left"}, 	//발생사유
 			{ label: '<spring:message code="LAB.M02.LAB00006" />', name: 'pymAcntId', width : 100, align:"center"}, 	//납부계정ID
 			{ label: '<spring:message code="LAB.M02.LAB00008" />', name: 'acntNm', width : 130, align:"center"}, 	//납부계정명
 			{ label: '<spring:message code="LAB.M07.LAB00344" />', name: 'prepayOccDttm', width : 120, formatter:stringTypeFormatterYYYYMMDDHH24MISS, align:"center"}, 	//선수금발생일시
@@ -130,7 +131,6 @@ $(document).ready(function() {
 			{ label: '<spring:message code="LAB.M09.LAB00040" />', name: 'prepayBal', width : 100, formatter: 'integer', align:"right"}, 	//잔액
 			{ label: '<spring:message code="LAB.M10.LAB00096" />', name: 'prepayProcStatNm', width : 100, align:"center"}, 	//처리상태
 			{ label: '<spring:message code="LAB.M08.LAB00166" />', name: 'dpstClNm', width : 100, align:"center"}, 	//입금구분
-			{ label: '<spring:message code="LAB.M06.LAB00136" />', name: 'prepayOccResnNm', width : 100, align:"center"}, 	//발생사유
 			{ label: '<spring:message code="LAB.M03.LAB00084" />', name: 'regrId', width : 100, align:"center"}, 	//등록자명
 			{ label: '<spring:message code="LAB.M03.LAB00079" />', name: 'regDate', formatter:dateTypeFormatterYYYYMMDDHH24MISS, width : 120, align:"center"}, 	//등록일
 			{ label: '<spring:message code="LAB.M10.LAB00103" />', name: 'chgrId', width : 100, align:"center"}, 	//최종수정자명
@@ -628,8 +628,8 @@ function insertAction(param){
 			<td>
 				<select id="searchDpstCl" name="searchDpstCl" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${depositTp}" var="depositTp" varStatus="status">
-						<option value="${depositTp.commonCd}">${depositTp.commonCdNm}</option>
+					<c:forEach items="${dpstCl}" var="dpstCl" varStatus="status">
+						<option value="${dpstCl.commonCd}">${dpstCl.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>
@@ -639,8 +639,8 @@ function insertAction(param){
 			<td>
 				<select id="searchPrepayOccTp" name="searchPrepayOccTp" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${advanceReceivedTp}" var="advanceReceivedTp" varStatus="status">
-						<option value="${advanceReceivedTp.commonCd}">${advanceReceivedTp.commonCdNm}</option>
+					<c:forEach items="${prepayOccTp}" var="prepayOccTp" varStatus="status">
+						<option value="${prepayOccTp.commonCd}">${prepayOccTp.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>
@@ -668,8 +668,8 @@ function insertAction(param){
 			<td>
 				<select id="searchprepayProcStat" name="searchprepayProcStat" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${traetStat}" var="traetStat" varStatus="status">
-						<option value="${traetStat.commonCd}">${traetStat.commonCdNm}</option>
+					<c:forEach items="${prepayOccStat}" var="prepayOccStat" varStatus="status">
+						<option value="${prepayOccStat.commonCd}">${prepayOccStat.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>

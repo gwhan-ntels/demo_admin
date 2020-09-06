@@ -21,7 +21,7 @@ public interface AmbgService {
 	 */
 	int insertAmbgOcc(AmbgOcc ambgOcc);
 
-	int updateAmbgCancel(String dpstSeqNo);
+	int updateAmbgCancel(String dpstSeqNo, String chgrId);
 
 	/**
 	 * 불명금대체이력및 불명금발생내역를 수정한다.
@@ -31,7 +31,7 @@ public interface AmbgService {
 	 * @param payObjAmt
 	 * @return
 	 */
-	int updateAmbg(String dpstSeqNo, String ambgTransSeqNo, double payObjAmt);
+	int updateAmbg(String dpstSeqNo, String ambgTransSeqNo, double payObjAmt, String chgrId);
 	
 //	
 //	/**

@@ -1,6 +1,8 @@
 package com.ntels.ccbs.charge.service.payment.payment.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -66,7 +68,7 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 	public int getPrepayOccCount(AdvanceReceivedVO advanceReceivedVO) {
 		return advanceReceivedMapper.getPrepayOccCount(advanceReceivedVO);
 	}
-	private String prepayOccSeq = null;
+	private String prepayOccSeqNo = null;
 	
 	private double prepayAplyAmt;
 
@@ -101,7 +103,6 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 	public int getRefundAppliedCnt(String seqNo) {
 		return advanceReceivedMapper.getRefundAppliedCnt(seqNo);
 	}
-	
 
 	@Override
 	public int insertAction(PrepayOcc prepayOcc) {
@@ -112,8 +113,8 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 
 		String[] billSeqArray = null;
 		List<Bill> billSeqNoInfoList = null;
-		String pymAcntId = null; 
-		
+		String pymAcntId = null;
+
 		SessionUser session = CommonUtil.getSessionManager();
 		String userId = session.getUserId();
 
@@ -121,17 +122,15 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 		if (prepayOcc.getTransTp().equals("03")) {
 			throw new RuntimeException("kb 에서는 사용하지 않는 건입니다.");
 		} else {
-
 			prepayAplyAmt = 0;
-			
+
 			prepayBal = prepayOcc.getPrepayBal();
-			prepayOccSeq = prepayOcc.getPrepayOccSeqNo();
-			pymAcntId = prepayOcc.getPymAcntId(); 
+			prepayOccSeqNo = prepayOcc.getPrepayOccSeqNo();
+			pymAcntId = prepayOcc.getPymAcntId();
 
 			// billSeqNo 을 prepayOcc에 set 하기 위함.
 			if (StringUtils.isNullOrEmpty(prepayOcc.getBillSeqNo()) == true) {
-				// 납부계정에 대한 전체미납대체처리 시 billSeqNo == null 이므로 미납대상 billSeqNo를
-				// 구한다.
+				// 납부계정에 대한 전체미납대체처리 시 billSeqNo == null 이므로 미납대상 billSeqNo를 구한다.
 				billSeqNoInfoList = paymentService_1.getBillSeqNo(prepayOcc.getSoId(), prepayOcc.getPymAcntId());
 				length = billSeqNoInfoList.size();
 
@@ -143,7 +142,6 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 				prepayOcc.setBillSeqArray(billSeqArray);
 			} else {
 				billSeqArray = new String[1];
-
 				billSeqArray[0] = prepayOcc.getBillSeqNo();
 
 				prepayOcc.setBillSeqArray(billSeqArray);
@@ -153,7 +151,7 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 
 			// 실제 로직 처리부분 시작
 			for (int i = 0; i < loopCnt; i++) {
-				PrepayOcc prepayAmount = prepayService.getPrepayAmount(prepayOccSeq);
+				PrepayOcc prepayAmount = prepayService.getPrepayAmount(prepayOccSeqNo);
 
 				if (i == 0) {
 					if (prepayAmount.getPrepayBal().doubleValue() != prepayBal.doubleValue()) {
@@ -163,7 +161,7 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 				}
 
 				String billSeqNo = prepayOcc.getBillSeqArray()[i];
-
+				// 해당 billSeqNo 에 미납금액이 존재하는지 체크
 				List<String> billSeqNoList = prepayService.getBillSeqNoCheck(billSeqNo);
 
 				if (billSeqNoList.size() <= 0) {
@@ -171,44 +169,45 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 				}
 
 				String pymSeqNo = sequenceService.createNewSequence(Consts.SEQ_CODE.MOD_ID_PYM, 10);
-				
 
-				PaymentResult result = paymentService_1.processPayment(billSeqNo, pymSeqNo, prepayBal, new ProcessPaymentCallback() {					
+				PaymentResult result = paymentService_1.processPayment(billSeqNo, pymSeqNo, prepayBal, userId, new ProcessPaymentCallback() {
 					@Override
-					public Receipt getReceipt() {						
-						PrepayOcc prepayOcc = prepayService.getPrepayOcc(prepayOccSeq); 
-						
+					public Receipt getReceipt() {
+						PrepayOcc prepayOcc = prepayService.getPrepayOcc(prepayOccSeqNo);
+
 						Receipt receipt = new Receipt();
+						receipt.setSoId(prepayOcc.getSoId());
 						receipt.setPymAcntId(prepayOcc.getPymAcntId());
 						receipt.setDpstProcDt(prepayOcc.getDpstProcDt());
 						receipt.setDpstDt(prepayOcc.getDpstDt());
-						receipt.setDpstCl("16"); // 선수금대체 
+						receipt.setDpstCl("16"); // 선수금대체
 						receipt.setDpstSeqNo(prepayOcc.getPrepayOccTgtSeqNo());
 						receipt.setCrncyCd(prepayOcc.getCrncyCd());
 						receipt.setExrate(prepayOcc.getExrate());
 						receipt.setExrateAplyDt(prepayOcc.getExrateAplyDt());
 						receipt.setCnclYn(prepayOcc.getCnclYn());
 						receipt.setTransDt(prepayOcc.getTransDt());
-						receipt.setSoId(prepayOcc.getSoId());
 						receipt.setRegrId(prepayOcc.getRegrId());
+						receipt.setRegDate(new Timestamp(new Date().getTime()));
+
 						return receipt;
 					}
 				});
-				
+
 				Receipt receipt = result.getReceiptList().get(0);
 				String prepayTransSeqNo = "";
 
 				if (receipt.getRcptAmt() > 0.0) {
 					PrepayOcc updatePrepayOcc = new PrepayOcc();
-					
+
 					updatePrepayOcc.setSoId(receipt.getSoId());
-					updatePrepayOcc.setPrepayOccSeqNo(prepayOccSeq);
+					updatePrepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
 					updatePrepayOcc.setPrepayBal(receipt.getRcptAmt());
 					updatePrepayOcc.setRegrId(userId);
-					
-					// 1. TBLPY_PREPAY_OCC PREPAY_TRANS_AMT, PREPAY_BAL, PREPAY_PROC_STAT = '3', TRANS_CMPL_YN update
+
+					// 1. TBLPY_PREPAY_OCC prepay_trans_amt, prepay_bal,, prepay_proc_stat = '3', trans_cmpl_yn update
 					prepayService.updatePrepayOcc(updatePrepayOcc);
-					
+
 					if (result.getPymAcntId().equals(pymAcntId) == true) {
 						receipt.setPayTp("2");
 						updatePrepayOcc.setPrepayOccTp("02");
@@ -216,19 +215,20 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 						receipt.setPayTp("3");
 						updatePrepayOcc.setPrepayOccTp("03");
 					}
-					//2. TBLPY_PREPAY_TRANS_HIST insert
+					// 2. TBLPY_PREPAY_TRANS_HIST insert
 					prepayTransSeqNo = prepayService.insertPrepayTransHistory(updatePrepayOcc);
 				}
-				
+
 				List<CBillComm> updateBillMastList = new ArrayList<>();
-				
+
+				// 3. TBLIV_BILL_MAST rcpt_amt, unpay_amt, full_pay_yn update
 				updateBillMastList.add(result.getUpdateBillMast());
 				int update = paymentService_1.updateBillMastRcptAmt(updateBillMastList);
 
 				List<CBillComm> updateBillList = result.getUpdateBillList();
 
 				for (CBillComm bill : updateBillList) {
-					// 5. TBLIV_BILL rcpt_amt, full_pay_yn update
+					// 4. TBLIV_BILL rcpt_amt, full_pay_yn update
 					if ("Y".equals(result.getFullPayYn()) == true) {
 						update = paymentService_1.updateFullPayBill(bill);
 					} else {
@@ -240,37 +240,39 @@ public class AdvanceReceivedServiceImpl implements AdvanceReceivedService {
 					logger.debug("청구내역에 대한 수납금액 반영 결과 : " + update);
 				}
 
-				
 				result.getReceiptList().get(0).setPrepayTransSeqNo(prepayTransSeqNo);
 
-				// 6. TBLPY_RCPT insert
+				// 5. TBLPY_RCPT insert
 				receiptService.insertReceipt(result.getReceiptList());
-				
-				// 7. TBLPY_RCPT_DTL insert
+
+				// 6. TBLPY_RCPT_DTL insert
 				receiptService.insertReceiptDetail(result.getReceiptDetailList());
 
 				prepayAplyAmt = result.getRemainAmt();
 
-//				if (prepayAplyAmt > 0.0 || "Y".equals(prepayGubun) == true) { // 2020.09.04 수정  아래 내용으로 수정
+				// if (prepayAplyAmt > 0.0 || "Y".equals(prepayGubun) == true) { // 2020.09.04 수정 아래 내용으로 수정
 				if (prepayAplyAmt > 0.0) {
-					
-					PrepayOcc updateprepayOcc = new PrepayOcc();
-					updateprepayOcc.setPrepayOccSeqNo(prepayOccSeq);
-					updateprepayOcc.setPrepayBal(prepayAplyAmt);
-					updateprepayOcc.setRegrId(userId);
-					
-					prepayService.updatePrepayOcc(updateprepayOcc);
-					
-					updateprepayOcc.setPrepayOccTp("05");
-					prepayTransSeqNo = prepayService.insertPrepayTransHistory(updateprepayOcc);
 
-					updateprepayOcc.setPrepayOccTgtSeqNo(prepayTransSeqNo);
-					prepayService.insertNewPrepayOccFromPrepayOcc(updateprepayOcc);
+					PrepayOcc updatePrepayOcc = new PrepayOcc();
+					updatePrepayOcc.setSoId(prepayOcc.getSoId());
+					updatePrepayOcc.setPrepayOccSeqNo(prepayOccSeqNo);
+					updatePrepayOcc.setPrepayBal(prepayAplyAmt);
+					updatePrepayOcc.setRegrId(userId);
+
+					// 7. TBLPY_PREPAY_OCC prepay_trans_amt, prepay_bal, prepay_proc_stat=3, trans_cmpl_yn update
+					prepayService.updatePrepayOcc(updatePrepayOcc);
+
+					// 8. TBLPY_PREPAY_TRANS_HIST insert
+					updatePrepayOcc.setPrepayOccTp("05");
+					prepayTransSeqNo = prepayService.insertPrepayTransHistory(updatePrepayOcc);
+
+					// 9. TBLPY_PREPAY_OCC insert
+					updatePrepayOcc.setPrepayOccTgtSeqNo(prepayTransSeqNo);
+					prepayService.insertNewPrepayOccFromPrepayOcc(updatePrepayOcc);
 				}
 			}
-			
+
 		}
-		
 
 		return returnFlag;
 	}

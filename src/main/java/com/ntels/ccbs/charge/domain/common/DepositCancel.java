@@ -151,15 +151,30 @@ public class DepositCancel {
 	 */
 	private String cnclResn;
 
-	/**
-	 * 등록일
-	 */
-	private Timestamp regDate;
 
 	/**
 	 * 등록자ID
 	 */
 	private String regrId;
+	private Timestamp regDate;
+	private String chgrId;
+	private Timestamp chgDate;
+
+	public String getChgrId() {
+		return chgrId;
+	}
+
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
 
 	public String getDpstSeqNo() {
 		return dpstSeqNo;

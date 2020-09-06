@@ -1,5 +1,7 @@
 package com.ntels.ccbs.charge.mapper.common;
 
+import java.sql.Timestamp;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +23,11 @@ public interface DepositMapper {
 
 	Deposit getDepositForRcpt(@Param("dpstSeqNo") String dpstSeqNo);
 
-	int updatePayProcDt(@Param("dpstSeqNo") String dpstSeqNo, @Param("payProcDt") String payProcDt);
+	int updatePayProcDt(@Param("dpstSeqNo") String dpstSeqNo, @Param("payProcDt") String payProcDt,  @Param("chgrId") String chgrId,  @Param("chgDate") Timestamp chgDate);
 
 	Deposit getDepositForCancel(@Param("dpstSeqNo") String dpstSeqNo);
 
-	int updateCnclYn(@Param("cnclYn") String cnclYn, @Param("dpstSeqNo") String dpstSeqNo);
+	int updateCnclYn(@Param("cnclYn") String cnclYn, @Param("dpstSeqNo") String dpstSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 
 	DepositCancel getDepositCancelInfo(@Param("dpstSeqNo") String dpstSeqNo);
 

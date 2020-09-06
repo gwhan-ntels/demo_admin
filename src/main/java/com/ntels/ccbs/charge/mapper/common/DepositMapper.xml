@@ -4,326 +4,338 @@
  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ntels.ccbs.charge.mapper.common.DepositMapper">
 
-	<!-- 건별입금등록를 건별입금내역에 등록한다. -->
-	<insert id="insertEachDeposit">
-		INSERT INTO TBLPY_EACH_DPST
-		(
-		    EACH_DPST_SEQ
-		    , DPST_CL
-		    , CASH_DPST_CL
-		    , DPST_DT
-		    , DPST_AMT
-		    , DPST_FEE_TP
-		    , FEE_AMT
-		    , BILL_SEQ_NO
-		    , SO_ID
-		    , GRP_ID
-		    , PYM_ACNT_ID
-		    , CUST_ID
-		    , CTRT_ID
-		    , SMRY
-		    , DPST_BNK_ACNT_CD
-		    , TRANS_DT
-		    , DPST_PROC_DT
-		    , DPST_SEQ_NO
-		    , WON_DPST_AMT
-		    , RCPT_EMP_ID
-		    , RCPT_BILL_EMP_ID
-		    , CRNCY_CD
-		    , EXRATE
-		    , EXRATE_APLY_DT
-		    , REGR_ID
-		    , REG_DATE
-		)
-		VALUES
-		(
-			#{eachDeposit.eachDpstSeq}
-			, #{eachDeposit.dpstCl}
-			, #{eachDeposit.cashDpstCl}
-			, #{eachDeposit.dpstDt}
-			, #{eachDeposit.dpstAmt}
-			, #{eachDeposit.dpstFeeTp}
-			, #{eachDeposit.feeAmt}
-			, #{eachDeposit.billSeqNo}
-			, #{eachDeposit.soId}
-			, #{eachDeposit.grpId}
-			, #{eachDeposit.pymAcntId}
-			, #{eachDeposit.custId}
-			, #{eachDeposit.ctrtId}
-			, #{eachDeposit.smry}
-			, #{eachDeposit.dpstBnkAcntCd}
-			, #{eachDeposit.transDt}
-			, '00000000'
-			, #{eachDeposit.dpstSeqNo}
-			, #{eachDeposit.wonDpstAmt}
-			, #{eachDeposit.rcptEmpId}
-			, #{eachDeposit.rcptBillEmpId}
-			, #{eachDeposit.crncyCd}
-			, #{eachDeposit.exrate}
-			, #{eachDeposit.exrateAplyDt}
-			, #{eachDeposit.regrId}
-			, #{eachDeposit.regDate}
-		)
-	</insert>
-	 
-	<select id="getEachDeposit" resultType="EachDeposit">
-		SELECT
-		     BILL_SEQ_NO
-		     , TRANS_DT
-		     , SO_ID
-		     , GRP_ID
-		     , PYM_ACNT_ID
-		     , CUST_ID
-		     , CTRT_ID
-		     , DPST_DT
-		     , DPST_CL
-		     , EACH_DPST_SEQ
-		     , DPST_AMT
-		     , DPST_BNK_ACNT_CD
-		     , FEE_AMT
-		     , WON_DPST_AMT
-		     , CRNCY_CD
-		     , EXRATE
-		     , EXRATE_APLY_DT
-		     , REGR_ID
-		FROM
-		     TBLPY_EACH_DPST
-		WHERE EACH_DPST_SEQ = #{eachDeposit.eachDpstSeq}
-	</select>
+    <!-- 건별입금등록를 건별입금내역에 등록한다. -->
+    <insert id="insertEachDeposit">
+        INSERT INTO TBLPY_EACH_DPST
+        (
+            SO_ID
+          , EACH_DPST_SEQ
+          , DPST_CL
+          , CASH_DPST_CL
+          , DPST_DT
+          , DPST_AMT
+          , DPST_FEE_TP
+          , FEE_AMT
+          , BILL_SEQ_NO
+          , GRP_ID
+          , PYM_ACNT_ID
+          , CUST_ID
+          , CTRT_ID
+          , SMRY
+          , DPST_BNK_ACNT_CD
+          , TRANS_DT
+          , DPST_PROC_DT
+          , DPST_SEQ_NO
+          , WON_DPST_AMT
+          , RCPT_EMP_ID
+          , RCPT_BILL_EMP_ID
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{eachDeposit.soId}
+          , #{eachDeposit.eachDpstSeq}
+          , #{eachDeposit.dpstCl}
+          , #{eachDeposit.cashDpstCl}
+          , #{eachDeposit.dpstDt}
+          , #{eachDeposit.dpstAmt}
+          , #{eachDeposit.dpstFeeTp}
+          , #{eachDeposit.feeAmt}
+          , #{eachDeposit.billSeqNo}
+          , #{eachDeposit.grpId}
+          , #{eachDeposit.pymAcntId}
+          , #{eachDeposit.custId}
+          , #{eachDeposit.ctrtId}
+          , #{eachDeposit.smry}
+          , #{eachDeposit.dpstBnkAcntCd}
+          , #{eachDeposit.transDt}
+          , '00000000'
+          , #{eachDeposit.dpstSeqNo}
+          , #{eachDeposit.wonDpstAmt}
+          , #{eachDeposit.rcptEmpId}
+          , #{eachDeposit.rcptBillEmpId}
+          , #{eachDeposit.crncyCd}
+          , #{eachDeposit.exrate}
+          , #{eachDeposit.exrateAplyDt}
+          , #{eachDeposit.regrId}
+          , #{eachDeposit.regDate}
+          , #{eachDeposit.chgrId}
+          , #{eachDeposit.chgDate}
+        )
+    </insert>
 
+    <select id="getEachDeposit" resultType="EachDeposit">
+        SELECT BILL_SEQ_NO
+             , TRANS_DT
+             , SO_ID
+             , GRP_ID
+             , PYM_ACNT_ID
+             , CUST_ID
+             , CTRT_ID
+             , DPST_DT
+             , DPST_CL
+             , EACH_DPST_SEQ
+             , DPST_AMT
+             , DPST_BNK_ACNT_CD
+             , FEE_AMT
+             , WON_DPST_AMT
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , REGR_ID
+        FROM   TBLPY_EACH_DPST
+        WHERE  EACH_DPST_SEQ = #{eachDeposit.eachDpstSeq}
+    </select>
+    
+    
+    <insert id="insertDeposit">
+        INSERT INTO TBLPY_DPST
+        (
+            SO_ID
+          , DPST_SEQ_NO
+          , BILL_SEQ_NO
+          , TRANS_DT
+          , DPST_PROC_DT
+          , GRP_ID
+          , PYM_ACNT_ID
+          , CUST_ID
+          , CTRT_ID
+          , DPST_DT
+          , DPST_TP
+          , DPST_CL
+          , DPST_TP_SEQ_NO
+          , PAY_CORP_TP
+          , PAY_CORP_CD
+          , ACNT_CARD_NO
+          , DPST_AMT
+          , DPST_BNK_ACNT_CD
+          , FEE_AMT
+          , PAY_PROC_YN
+          , PAY_PROC_DT
+          , AMBG_TGT_YN
+          , WON_DPST_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , CNCL_YN
+          , PAY_CNCL_YN
+          , PREPAY_TGT_YN
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{deposit.soId,jdbcType=VARCHAR}
+          , #{deposit.dpstSeqNo,jdbcType=VARCHAR}
+          , #{deposit.billSeqNo,jdbcType=VARCHAR}
+          , #{deposit.transDt,jdbcType=VARCHAR}
+          , #{deposit.dpstProcDt,jdbcType=VARCHAR}
+          , #{deposit.grpId,jdbcType=VARCHAR}
+          , #{deposit.pymAcntId,jdbcType=VARCHAR}
+          , #{deposit.custId,jdbcType=VARCHAR}
+          , #{deposit.ctrtId,jdbcType=VARCHAR}
+          , #{deposit.dpstDt,jdbcType=VARCHAR}
+          , #{deposit.dpstTp,jdbcType=VARCHAR}
+          , #{deposit.dpstCl,jdbcType=VARCHAR}
+          , #{deposit.dpstTpSeqNo,jdbcType=VARCHAR}
+          , #{deposit.payCorpTp,jdbcType=VARCHAR}
+          , #{deposit.payCorpCd,jdbcType=VARCHAR}
+          , #{deposit.acntCardNo,jdbcType=VARCHAR}
+          , #{deposit.dpstAmt,jdbcType=DOUBLE}
+          , #{deposit.dpstBnkAcntCd,jdbcType=VARCHAR}
+          , #{deposit.feeAmt,jdbcType=DOUBLE}
+          , #{deposit.payProcYn,jdbcType=VARCHAR}
+          , #{deposit.payProcDt,jdbcType=VARCHAR}
+          , #{deposit.ambgTgtYn,jdbcType=VARCHAR}
+          , #{deposit.wonDpstAmt,jdbcType=DOUBLE}
+          , #{deposit.crncyCd,jdbcType=VARCHAR}
+          , #{deposit.exrate,jdbcType=DOUBLE}
+          , #{deposit.exrateAplyDt,jdbcType=VARCHAR}
+          , #{deposit.cnclYn,jdbcType=VARCHAR}
+          , #{deposit.payCnclYn,jdbcType=VARCHAR}
+          , #{deposit.prepayTgtYn,jdbcType=VARCHAR}
+          , #{deposit.regrId,jdbcType=VARCHAR}
+          , #{deposit.regDate,jdbcType=DATE}
+          , #{deposit.chgrId,jdbcType=VARCHAR}
+          , #{deposit.chgDate,jdbcType=DATE}
+        )
+    </insert>
 
-	<insert id="insertDeposit">
-		INSERT INTO TBLPY_DPST
-		(
-		     DPST_SEQ_NO
-		     , BILL_SEQ_NO
-		     , TRANS_DT
-		     , DPST_PROC_DT
-		     , SO_ID
-		     , GRP_ID
-		     , PYM_ACNT_ID
-		     , CUST_ID
-		     , CTRT_ID
-		     , DPST_DT
-		     , DPST_TP
-		     , DPST_CL
-		     , DPST_TP_SEQ_NO
-		     , PAY_CORP_TP
-		     , PAY_CORP_CD
-		     , ACNT_CARD_NO
-		     , DPST_AMT
-		     , DPST_BNK_ACNT_CD
-		     , FEE_AMT
-		     , PAY_PROC_YN
-		     , PAY_PROC_DT
-		     , AMBG_TGT_YN
-		     , WON_DPST_AMT
-		     , CRNCY_CD
-		     , EXRATE
-		     , EXRATE_APLY_DT
-		     , CNCL_YN
-		     , PAY_CNCL_YN
-		     , REG_DATE
-		     , PREPAY_TGT_YN
-		     , REGR_ID
-		)
-		VALUES
-		(
-		     #{deposit.dpstSeqNo,jdbcType=VARCHAR}
-		     , #{deposit.billSeqNo,jdbcType=VARCHAR}
-		     , #{deposit.transDt,jdbcType=VARCHAR}
-		     , #{deposit.dpstProcDt,jdbcType=VARCHAR}
-		     , #{deposit.soId,jdbcType=VARCHAR}
-		     , #{deposit.grpId,jdbcType=VARCHAR}
-		     , #{deposit.pymAcntId,jdbcType=VARCHAR}
-		     , #{deposit.custId,jdbcType=VARCHAR}
-		     , #{deposit.ctrtId,jdbcType=VARCHAR}
-		     , #{deposit.dpstDt,jdbcType=VARCHAR}
-		     , #{deposit.dpstTp,jdbcType=VARCHAR}
-		     , #{deposit.dpstCl,jdbcType=VARCHAR}
-		     , #{deposit.dpstTpSeqNo,jdbcType=VARCHAR}
-		     , #{deposit.payCorpTp,jdbcType=VARCHAR}
-		     , #{deposit.payCorpCd,jdbcType=VARCHAR}
-		     , #{deposit.acntCardNo,jdbcType=VARCHAR}
-		     , #{deposit.dpstAmt,jdbcType=DOUBLE}
-		     , #{deposit.dpstBnkAcntCd,jdbcType=VARCHAR}
-		     , #{deposit.feeAmt,jdbcType=DOUBLE}
-		     , #{deposit.payProcYn,jdbcType=VARCHAR}
-		     , #{deposit.payProcDt,jdbcType=VARCHAR}
-		     , #{deposit.ambgTgtYn,jdbcType=VARCHAR}
-		     , #{deposit.wonDpstAmt,jdbcType=DOUBLE}
-		     , #{deposit.crncyCd,jdbcType=VARCHAR}
-		     , #{deposit.exrate,jdbcType=DOUBLE}
-		     , #{deposit.exrateAplyDt,jdbcType=VARCHAR}
-		     , #{deposit.cnclYn,jdbcType=VARCHAR}
-		     , #{deposit.payCnclYn,jdbcType=VARCHAR}
-		     , #{deposit.regDate,jdbcType=DATE}
-		     , #{deposit.prepayTgtYn,jdbcType=VARCHAR}
-		     , #{deposit.regrId,jdbcType=VARCHAR}
-		)
-	</insert>
-
-	<update id="updateEachDeposit">
-		UPDATE TBLPY_EACH_DPST
-		<set>
-			<if test="eachDeposit.dpstProcDt != null">
-				DPST_PROC_DT = #{eachDeposit.dpstProcDt},
-			</if>
-		</set> 
-		WHERE  EACH_DPST_SEQ = #{eachDeposit.eachDpstSeq}
-	</update>
-	
-	
-	<select id="getDpstAmt" resultType="double">
-		SELECT DPST_AMT
-		FROM TBLPY_DPST
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-	</select>
-
-	
-	<select id="getDepositForRcpt" resultType="Deposit">
-		SELECT
-			DPST_SEQ_NO
-			, PYM_ACNT_ID
-			, DPST_PROC_DT
-			, DPST_DT
-			, DPST_CL
-			, CRNCY_CD
-			, EXRATE
-			, EXRATE_APLY_DT
-			, CNCL_YN
-			, TRANS_DT
-			, SO_ID
-			, REGR_ID
-		FROM TBLPY_DPST
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-	</select>
-	
-	
-	
-	<update id="updatePayProcDt">
-		UPDATE TBLPY_DPST SET
-			PAY_PROC_YN = 'Y'
-			, PAY_PROC_DT = #{payProcDt}
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-	</update>
-	
-	
-	<select id="getDepositForCancel" resultType="Deposit">
-		SELECT
-		     DPST_TP
-		     , PAY_PROC_YN
-		     , CNCL_YN
-		FROM TBLPY_DPST
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-	</select>
-	
-	<update id="updateCnclYn">
-		UPDATE TBLPY_DPST SET CNCL_YN = #{cnclYn}
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-	</update>
-
-	<!-- TBLPY_DPST_CNCL에 등록할 데이터를 조회한다. -->
-	<select id="getDepositCancelInfo" resultType="DepositCancel">
-		SELECT
-		     DPST_SEQ_NO
-		     , BILL_SEQ_NO
-		     , TRANS_DT
-		     , DPST_PROC_DT
-		     , SO_ID
-		     , GRP_ID
-		     , PYM_ACNT_ID
-		     , CUST_ID
-		     , CTRT_ID
-		     , DPST_DT
-		     , DPST_TP
-		     , DPST_CL
-		     , DPST_TP_SEQ_NO
-		     , PAY_CORP_TP
-		     , PAY_CORP_CD
-		     , ACNT_CARD_NO
-		     , DPST_AMT
-		     , FEE_AMT
-		     , PAY_PROC_YN
-		     , PAY_PROC_DT
-		     , AMBG_TGT_YN
-		     , WON_DPST_AMT
-		     , CRNCY_CD
-		     , EXRATE
-		     , EXRATE_APLY_DT
-		     , REGR_ID
-		FROM TBLPY_DPST
-		WHERE DPST_SEQ_NO = #{dpstSeqNo}
-		     AND CNCL_YN = 'Y'
-	</select>
-	
-	
-	<insert id="insertDepositCancel">
-		INSERT INTO TBLPY_DPST_CNCL
-		(
-		     DPST_SEQ_NO
-		     , BILL_SEQ_NO
-		     , TRANS_DT
-		     , DPST_PROC_DT
-		     , SO_ID
-		     , GRP_ID
-		     , PYM_ACNT_ID
-		     , CUST_ID
-		     , CTRT_ID
-		     , DPST_DT
-		     , DPST_TP
-		     , DPST_CL
-		     , DPST_TP_SEQ_NO
-		     , PAY_CORP_TP
-		     , PAY_CORP_CD
-		     , ACNT_CARD_NO
-		     , DPST_AMT
-		     , FEE_AMT
-		     , PAY_PROC_YN
-		     , PAY_PROC_DT
-		     , AMBG_TGT_YN
-		     , WON_DPST_AMT
-		     , CRNCY_CD
-		     , EXRATE
-		     , EXRATE_APLY_DT
-		     , CNCLR_ID
-		     , CNCL_DTTM
-		     , CNCL_RESN
-		     , REG_DATE
-		     , REGR_ID
-		)
-		VALUES
-		(
-		     #{depositCancel.dpstSeqNo,jdbcType=VARCHAR}
-		     , #{depositCancel.billSeqNo,jdbcType=VARCHAR}
-		     , #{depositCancel.transDt,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstProcDt,jdbcType=VARCHAR}
-		     , #{depositCancel.soId,jdbcType=VARCHAR}
-		     , #{depositCancel.grpId,jdbcType=VARCHAR}
-		     , #{depositCancel.pymAcntId,jdbcType=VARCHAR}
-		     , #{depositCancel.custId,jdbcType=VARCHAR}
-		     , #{depositCancel.ctrtId,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstDt,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstTp,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstCl,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstTpSeqNo,jdbcType=VARCHAR}
-		     , #{depositCancel.payCorpTp,jdbcType=VARCHAR}
-		     , #{depositCancel.payCorpCd,jdbcType=VARCHAR}
-		     , #{depositCancel.acntCardNo,jdbcType=VARCHAR}
-		     , #{depositCancel.dpstAmt}
-		     , #{depositCancel.feeAmt}
-		     , #{depositCancel.payProcYn,jdbcType=VARCHAR}
-		     , #{depositCancel.payProcDt,jdbcType=VARCHAR}
-		     , #{depositCancel.ambgTgtYn,jdbcType=VARCHAR}
-		     , #{depositCancel.wonDpstAmt}
-		     , #{depositCancel.crncyCd,jdbcType=VARCHAR}
-		     , #{depositCancel.exrate}
-		     , #{depositCancel.exrateAplyDt,jdbcType=VARCHAR}
-		     , #{depositCancel.cnclrId,jdbcType=VARCHAR}
-		     , #{depositCancel.cnclDttm,jdbcType=VARCHAR}
-		     , #{depositCancel.cnclResn,jdbcType=VARCHAR}
-		     , #{depositCancel.regDate}
-		     , #{depositCancel.regrId,jdbcType=VARCHAR}
-		)
-	</insert>
+    <update id="updateEachDeposit">
+        UPDATE TBLPY_EACH_DPST
+        <set>
+            <if test="eachDeposit.dpstProcDt != null">
+               DPST_PROC_DT = #{eachDeposit.dpstProcDt},
+            </if>
+               CHGR_ID  = #{eachDeposit.chgrId,jdbcType=VARCHAR},
+               CHG_DATE = #{eachDeposit.chgDate,jdbcType=DATE}
+        </set>
+        WHERE  EACH_DPST_SEQ = #{eachDeposit.eachDpstSeq}
+    </update>
+    
+    
+    <select id="getDpstAmt" resultType="double">
+        SELECT DPST_AMT
+        FROM   TBLPY_DPST
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </select>
+    
+    
+    <select id="getDepositForRcpt" resultType="Deposit">
+        SELECT SO_ID
+             , DPST_SEQ_NO
+             , PYM_ACNT_ID
+             , DPST_PROC_DT
+             , DPST_DT
+             , DPST_CL
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , CNCL_YN
+             , TRANS_DT
+             , REGR_ID
+        FROM   TBLPY_DPST
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </select>
+    
+    <update id="updatePayProcDt">
+        UPDATE TBLPY_DPST
+        SET    PAY_PROC_YN = 'Y'
+             , PAY_PROC_DT = #{payProcDt}
+             , CHGR_ID     = #{chgrId}
+             , CHG_DATE    = #{chgDate}
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </update>
+    
+    
+    <select id="getDepositForCancel" resultType="Deposit">
+        SELECT DPST_TP
+             , PAY_PROC_YN
+             , CNCL_YN
+        FROM   TBLPY_DPST
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </select>
+    
+    <update id="updateCnclYn">
+        UPDATE TBLPY_DPST
+        SET    CNCL_YN     = #{cnclYn}
+             , CHGR_ID     = #{chgrId}
+             , CHG_DATE    = #{chgDate}
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+    </update>
+    
+    <!-- TBLPY_DPST_CNCL에 등록할 데이터를 조회한다. -->
+    <select id="getDepositCancelInfo" resultType="DepositCancel">
+        SELECT SO_ID
+             , DPST_SEQ_NO
+             , BILL_SEQ_NO
+             , TRANS_DT
+             , DPST_PROC_DT
+             , GRP_ID
+             , PYM_ACNT_ID
+             , CUST_ID
+             , CTRT_ID
+             , DPST_DT
+             , DPST_TP
+             , DPST_CL
+             , DPST_TP_SEQ_NO
+             , PAY_CORP_TP
+             , PAY_CORP_CD
+             , ACNT_CARD_NO
+             , DPST_AMT
+             , FEE_AMT
+             , PAY_PROC_YN
+             , PAY_PROC_DT
+             , AMBG_TGT_YN
+             , WON_DPST_AMT
+             , CRNCY_CD
+             , EXRATE
+             , EXRATE_APLY_DT
+             , REGR_ID
+        FROM   TBLPY_DPST
+        WHERE  DPST_SEQ_NO = #{dpstSeqNo}
+        AND    CNCL_YN = 'Y'
+    </select>
+    
+    
+    <insert id="insertDepositCancel">
+        INSERT INTO TBLPY_DPST_CNCL
+        (
+            SO_ID
+          , DPST_SEQ_NO
+          , BILL_SEQ_NO
+          , TRANS_DT
+          , DPST_PROC_DT
+          , GRP_ID
+          , PYM_ACNT_ID
+          , CUST_ID
+          , CTRT_ID
+          , DPST_DT
+          , DPST_TP
+          , DPST_CL
+          , DPST_TP_SEQ_NO
+          , PAY_CORP_TP
+          , PAY_CORP_CD
+          , ACNT_CARD_NO
+          , DPST_AMT
+          , FEE_AMT
+          , PAY_PROC_YN
+          , PAY_PROC_DT
+          , AMBG_TGT_YN
+          , WON_DPST_AMT
+          , CRNCY_CD
+          , EXRATE
+          , EXRATE_APLY_DT
+          , CNCLR_ID
+          , CNCL_DTTM
+          , CNCL_RESN
+          , REGR_ID
+          , REG_DATE
+          , CHGR_ID
+          , CHG_DATE
+        )
+        VALUES
+        (
+            #{depositCancel.soId,jdbcType=VARCHAR}
+          , #{depositCancel.dpstSeqNo,jdbcType=VARCHAR}
+          , #{depositCancel.billSeqNo,jdbcType=VARCHAR}
+          , #{depositCancel.transDt,jdbcType=VARCHAR}
+          , #{depositCancel.dpstProcDt,jdbcType=VARCHAR}
+          , #{depositCancel.grpId,jdbcType=VARCHAR}
+          , #{depositCancel.pymAcntId,jdbcType=VARCHAR}
+          , #{depositCancel.custId,jdbcType=VARCHAR}
+          , #{depositCancel.ctrtId,jdbcType=VARCHAR}
+          , #{depositCancel.dpstDt,jdbcType=VARCHAR}
+          , #{depositCancel.dpstTp,jdbcType=VARCHAR}
+          , #{depositCancel.dpstCl,jdbcType=VARCHAR}
+          , #{depositCancel.dpstTpSeqNo,jdbcType=VARCHAR}
+          , #{depositCancel.payCorpTp,jdbcType=VARCHAR}
+          , #{depositCancel.payCorpCd,jdbcType=VARCHAR}
+          , #{depositCancel.acntCardNo,jdbcType=VARCHAR}
+          , #{depositCancel.dpstAmt}
+          , #{depositCancel.feeAmt}
+          , #{depositCancel.payProcYn,jdbcType=VARCHAR}
+          , #{depositCancel.payProcDt,jdbcType=VARCHAR}
+          , #{depositCancel.ambgTgtYn,jdbcType=VARCHAR}
+          , #{depositCancel.wonDpstAmt}
+          , #{depositCancel.crncyCd,jdbcType=VARCHAR}
+          , #{depositCancel.exrate}
+          , #{depositCancel.exrateAplyDt,jdbcType=VARCHAR}
+          , #{depositCancel.cnclrId,jdbcType=VARCHAR}
+          , #{depositCancel.cnclDttm,jdbcType=VARCHAR}
+          , #{depositCancel.cnclResn,jdbcType=VARCHAR}
+          , #{depositCancel.regrId,jdbcType=VARCHAR}
+          , #{depositCancel.regDate}
+          , #{depositCancel.chgrId,jdbcType=VARCHAR}
+          , #{depositCancel.chgDate}
+        )
+    </insert>
 </mapper>

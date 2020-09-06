@@ -176,7 +176,6 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 
 		// 수납코드 정의
 		// 1: 정상수납, 2: 선수금수납, 3: 상이납자수납, 4: 미확인입금수납(불명금), 7: (-)매출수납, 9: 대체손각
-
 		if ("1".equals(payTp) == true || "3".equals(payTp) == true) {
 			if (payObjAmt != 0.0) {
 				// 선수금 발생내역에 등록
@@ -204,24 +203,29 @@ public class ReceiptCancelServiceImpl implements ReceiptCancelService {
 				newPrepayOcc.setCrncyCd(receipt.getCrncyCd());
 				newPrepayOcc.setExrate(receipt.getExrate());
 				newPrepayOcc.setExrateAplyDt(receipt.getExrateAplyDt());
-				newPrepayOcc.setRegrId(userId);
-				newPrepayOcc.setRegDate(new Timestamp(new Date().getTime()));
 				newPrepayOcc.setCnclYn("N");
 				newPrepayOcc.setCnclDttm("");
-				newPrepayOcc.setChgDate(new Timestamp(new Date().getTime()));
 				newPrepayOcc.setTransDt(receipt.getTransDt());
+				newPrepayOcc.setRegrId(userId);
+				newPrepayOcc.setRegDate(new Timestamp(new Date().getTime()));
+				newPrepayOcc.setChgrId(userId);
+				newPrepayOcc.setChgDate(new Timestamp(new Date().getTime()));
 
 				// 3. TBLPY_PREPAY_OCC insert
 				prepayService.insertPrepayOcc(newPrepayOcc);
 			}
 		} else if ("2".equals(payTp) == true) {
-			prepayService.updatePrepayTransHistory(pymSeqNo, receipt.getPrepayTransSeqNo(), payObjAmt);
+			// 4-1. TBLPY_PREPAY_TRANS_HIST cncl_yn. cncl_dttm. proc_memo update
+			// 4-1. TBLPY_PREPAY_OCC  prepay_trans_amt, prepay_bal, trans_cmpl_yn update 
+			prepayService.updatePrepayTransHistory(pymSeqNo, receipt.getPrepayTransSeqNo(), payObjAmt, userId);
 		} else if ("8".equals(payTp) == true) {
 			// kb 없음
 			// assrService.updateAssrOcc(pymSeqNo, receipt.getAssrTransSeqNo(), payObjAmt);
 		} else if ("4".equals(payTp) == true) {
 			// kb 없음
-			ambgService.updateAmbg(receipt.getDpstSeqNo(), receipt.getAmbgTransSeqNo(), payObjAmt);
+			// 4-2. TBLPY_AMBG_TRANS_HIST cncl_yn, cncl_dttm update 
+			// 4-2. TBLPY_AMBG_OCC ambg_trans_amt, ambg_bal, trans_cmpl_yn update
+			ambgService.updateAmbg(receipt.getDpstSeqNo(), receipt.getAmbgTransSeqNo(), payObjAmt, userId);
 		} else {
 			logger.debug(String.format("receipt type was wrong with the code value[%s]", payTp));
 		}

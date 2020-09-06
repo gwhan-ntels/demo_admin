@@ -109,23 +109,23 @@ $(document).ready(function() {
 			{ label: '<spring:message code="LAB.M10.LAB00040" />', name: 'billDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},             //청구일자
 			{ label: '<spring:message code="LAB.M10.LAB00039" />', name: 'billSeqNo', width : 150, align:"center"},                                                 //청구일련번호
 			{ label: '<spring:message code="LAB.M07.LAB00245" />', name: 'cncl', width : 100, align:"center"},                                                      //취소여부
-			{ label: '<spring:message code="LAB.M10.LAB00095" />', name: 'cnclEmpId', width : 150, align:"center"},                                                 //취소자명
-			{ label: '<spring:message code="LAB.M10.LAB00094" />', name: 'cnclDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},             //취소일자
+			{ label: '<spring:message code="LAB.M10.LAB00095" />', name: 'cnclrId', width : 120, align:"center"},                                                   //취소자명
+			{ label: '<spring:message code="LAB.M10.LAB00094" />', name: 'cnclDttm', formatter:stringTypeFormatterYYYYMMDDHH24MISS, width : 150, align:"center"},   //취소일시
 			{ label: '<spring:message code="LAB.M02.LAB00006" />', name: 'pymAcntId', width : 100, align:"center"},                                                 //납부계정ID
-			{ label: '<spring:message code="LAB.M02.LAB00018" />', name: 'acntNm', width : 200, align:"center"},                                                    //납부계정명
+			{ label: '<spring:message code="LAB.M02.LAB00018" />', name: 'acntNm', width : 120, align:"center"},                                                    //납부계정명
 			{ label: '<spring:message code="LAB.M08.LAB00173" />', name: 'dpstDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},             //입금일자
 			{ label: '<spring:message code="LAB.M08.LAB00128" />', name: 'transDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},            //이체일
 			{ label: '<spring:message code="LAB.M08.LAB00175" />', name: 'dpstProcDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},         //입금처리일자
 			{ label: '<spring:message code="LAB.M07.LAB00243" />', name: 'payProcDt', formatter:stringTypeFormatterYYYYMMDD, width : 100, align:"center"},          //수납처리일자
 			{ label: '<spring:message code="LAB.M08.LAB00166" />', name: 'dpstClNm', width : 100, align:"center"},                                                  //입금구분
 			{ label: '<spring:message code="LAB.M07.LAB00236" />', name: 'payTpNm', width : 100, align:"center"},                                                   //수납구분
-			{ label: '<spring:message code="LAB.M10.LAB00031" />', name: 'billAmt', formatter:'number', width : 100, align:"right"},                  //청구금액
-			{ label: '<spring:message code="LAB.M08.LAB00125" />', name: 'preRcptAmt', formatter:'number', width : 150, align:"right"},               //이전수납금액
-			{ label: '<spring:message code="LAB.M07.LAB00237" />', name: 'rcptAmt', formatter:'number', width : 100, align:"right"},                  //수납금액
-			{ label: '<spring:message code="LAB.M03.LAB00083" />', name: 'regrId', width : 100, align:"center"},                                                 //등록자ID
-			{ label: '<spring:message code="LAB.M03.LAB00080" />', name: 'regDate', formatter:dateTypeFormatterYYYYMMDDHH24MISS, width : 150, align:"center"},   //등록일
+			{ label: '<spring:message code="LAB.M10.LAB00031" />', name: 'billAmt', formatter:'number', width : 100, align:"right"},                                //청구금액
+			{ label: '<spring:message code="LAB.M08.LAB00125" />', name: 'preRcptAmt', formatter:'number', width : 100, align:"right"},                             //이전수납금액
+			{ label: '<spring:message code="LAB.M07.LAB00237" />', name: 'rcptAmt', formatter:'number', width : 100, align:"right"},                                //수납금액
+			{ label: '<spring:message code="LAB.M03.LAB00083" />', name: 'regrId', width : 100, align:"center"},                                                    //등록자ID
+			{ label: '<spring:message code="LAB.M03.LAB00080" />', name: 'regDate', formatter:dateTypeFormatterYYYYMMDDHH24MISS, width : 150, align:"center"},      //등록일
 			{ label: '<spring:message code="LAB.M08.LAB00172" />', name: 'pymSeqNo', hidden:true, width : 0},
-			{ label: '<spring:message code="LAB.M07.LAB00010" />' , name: 'soId', hidden:true, width : 0},
+			{ label: '<spring:message code="LAB.M07.LAB00010" />', name: 'soId', hidden:true, width : 0},
 			
 			//{ label: 'itemTpCd' , name: 'itemTpCd', hidden:true,width : 0}
 		],

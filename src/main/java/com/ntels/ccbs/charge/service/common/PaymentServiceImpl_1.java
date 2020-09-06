@@ -62,7 +62,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 	
 
 	@Override
-	public PaymentResult processPayment(String billSeqNo, String pymSeqNo, double dpstAmt, ProcessPaymentCallback callback) {
+	public PaymentResult processPayment(String billSeqNo, String pymSeqNo, double dpstAmt, String userId, ProcessPaymentCallback callback) {
 		PaymentResult paymentResult = new PaymentResult();
 		
 		// 완납여부 체크를 하기위해 청구 마스터 테이블에서 납부 대상금액(미납금액)을 조회한다.
@@ -99,6 +99,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 
 			for (CBillComm bill : billList) {
 				ReceiptDetail receiptDetail = new ReceiptDetail();
+				receiptDetail.setSoId(bill.getSoId());
 				receiptDetail.setPymSeqNo(pymSeqNo);
 				receiptDetail.setProdCmpsId(bill.getProdCmpsId());
 				receiptDetail.setSvcCmpsId(bill.getSvcCmpsId());
@@ -107,7 +108,6 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				receiptDetail.setPreRcptAmt(bill.getRcptAmt());
 				receiptDetail.setRcptAmt(bill.getBillAmt());
 				receiptDetail.setPreSoId(bill.getSoId());
-				receiptDetail.setSoId(bill.getSoId());
 				receiptDetail.setGrpId(bill.getGrpId());
 				receiptDetail.setCustId(bill.getCustId());
 				receiptDetail.setCtrtId(bill.getCtrtId());
@@ -116,7 +116,10 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				receiptDetail.setExrateAplyDt(bill.getExrateAplyDt());
 				receiptDetail.setUseYymm(bill.getUseYymm());
 				receiptDetail.setBillSeqNo(bill.getBillSeqNo());
+				receiptDetail.setRegrId(userId);
 				receiptDetail.setRegDate(new Timestamp(new Date().getTime()));
+				receiptDetail.setChgrId(userId);
+				receiptDetail.setChgDate(new Timestamp(new Date().getTime()));
 
 				paymentResult.addReceiptDetail(receiptDetail);
 
@@ -135,6 +138,7 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 			// TBLIV_BILL테이블에 완납된 청구번호에 해당하는 모든 데이터를 완납처리함
 			CBillComm updateBill = new CBillComm();
 			updateBill.setBillSeqNo(billSeqNo);
+			updateBill.setChgrId(userId);
 			updateBill.setChgDate(new Timestamp(new Date().getTime()));
 			paymentResult.addUpdateBill(updateBill);
 
@@ -158,9 +162,12 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 //			receipt.setPrepayTransSeqNo("");
 //			receipt.setAmbgTransSeqNo("");
 //			receipt.setAssrTransSeqNo("");
-			receipt.setRegDate(new Timestamp(new Date().getTime()));
 			receipt.setRcptAmt(sumRcptAmt);
 			receipt.setCnclYn("N");
+			receipt.setRegrId(userId);
+			receipt.setRegDate(new Timestamp(new Date().getTime()));
+			receipt.setChgrId(userId);
+			receipt.setChgDate(new Timestamp(new Date().getTime()));
 
 			paymentResult.addReceipt(receipt);
 		} else {
@@ -223,11 +230,12 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 
 				CBillComm updateBill = new CBillComm();
 				updateBill.setRcptAmt(rcptAmt);
-				updateBill.setChgDate(new Timestamp(new Date().getTime()));
 				updateBill.setBillSeqNo(bill.getBillSeqNo());
 				updateBill.setProdCmpsId(bill.getProdCmpsId());
 				updateBill.setSvcCmpsId(bill.getSvcCmpsId());
 				updateBill.setChrgItmCd(bill.getChrgItmCd());
+				updateBill.setChgrId(userId);
+				updateBill.setChgDate(new Timestamp(new Date().getTime()));
 
 				paymentResult.addUpdateBill(updateBill);
 
@@ -250,7 +258,10 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 				receiptDetail.setExrateAplyDt(bill.getExrateAplyDt());
 				receiptDetail.setUseYymm(bill.getUseYymm());
 				receiptDetail.setBillSeqNo(bill.getBillSeqNo());
+				receiptDetail.setRegrId(userId);
 				receiptDetail.setRegDate(new Timestamp(new Date().getTime()));
+				receiptDetail.setChgrId(userId);
+				receiptDetail.setChgDate(new Timestamp(new Date().getTime()));
 
 				paymentResult.addReceiptDetail(receiptDetail);
 
@@ -287,9 +298,12 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 			receipt.setPrepayTransSeqNo("");
 			receipt.setAmbgTransSeqNo("");
 			receipt.setAssrTransSeqNo("");
-			receipt.setRegDate(new Timestamp(new Date().getTime()));
 			receipt.setRcptAmt(sumRcptAmt);
 			receipt.setCnclYn("N");
+			receipt.setRegrId(userId);
+			receipt.setRegDate(new Timestamp(new Date().getTime()));
+			receipt.setChgrId(userId);
+			receipt.setChgDate(new Timestamp(new Date().getTime()));
 
 			paymentResult.addReceipt(receipt);
 		}
@@ -298,10 +312,11 @@ public class PaymentServiceImpl_1 implements PaymentService_1 {
 
 		updateBill.setBillSeqNo(billSeqNo);
 		updateBill.setRcptAmt(payAmt);
-		updateBill.setChgDate(new Timestamp(new Date().getTime()));
 		updateBill.setFullPayYn(paymentResult.getFullPayYn());
+		updateBill.setChgrId(userId);
+		updateBill.setChgDate(new Timestamp(new Date().getTime()));
+		
 		paymentResult.setUpdateBillMast(updateBill);
-
 		paymentResult.setPymAcntId(pymAcntId);
 
 //		clogService.writeLog("수납처리 완료");

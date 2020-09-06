@@ -261,6 +261,8 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 
 				updateDeposit.setAmbgTgtYn("Y");
 				updateDeposit.setAmbgOccSeqNo(ambgOccSeqNo);
+				updateDeposit.setChgrId(userId);
+				updateDeposit.setChgDate(new Timestamp(new Date().getTime()));
 
 				// 4-2. TBLPY_DPST ambg_tgt_yn = Y, ambg_occ_seq_no update
 				paymentService_1.updateDpstProc(updateDeposit);
@@ -272,13 +274,14 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 				// 납부계정ID 존재시 수납 처리
 				final String paramDpstSeqNo = dpstSeqNo;
 
-				PaymentResult result = paymentService_1.processPayment(billSeqNo, pymSeqNo, dpstAmt, new ProcessPaymentCallback() {
+				PaymentResult result = paymentService_1.processPayment(billSeqNo, pymSeqNo, dpstAmt, userId, new ProcessPaymentCallback() {
 
 					@Override
 					public Receipt getReceipt() {
 						Deposit deposit = depositService.getDepositForRcpt(paramDpstSeqNo);
 
 						Receipt receipt = new Receipt();
+						receipt.setSoId(deposit.getSoId());
 						receipt.setPymAcntId(deposit.getPymAcntId());
 						receipt.setDpstProcDt(deposit.getDpstProcDt());
 						receipt.setDpstDt(deposit.getDpstDt());
@@ -289,9 +292,8 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 						receipt.setExrateAplyDt(deposit.getExrateAplyDt());
 						receipt.setCnclYn(deposit.getCnclYn());
 						receipt.setTransDt(deposit.getTransDt());
-						receipt.setSoId(deposit.getSoId());
-						receipt.setRegrId(deposit.getRegrId());
 						receipt.setPayTp("1");
+						receipt.setRegrId(deposit.getRegrId());
 						return receipt;
 					}
 				});
@@ -329,7 +331,7 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 
 				if (insert > 0) {
 					// 8. TBLPY_DPST pay_prc_yn, pay_proc_dt update
-					depositService.updatePayProcDt(dpstSeqNo, DateUtil.getDateStringYYYYMMDD(0));
+					depositService.updatePayProcDt(dpstSeqNo, DateUtil.getDateStringYYYYMMDD(0), userId);
 				}
 
 				// 수납처리 후 남은 금액
@@ -367,11 +369,13 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 			prepayOcc.setCrncyCd(lastReceipt.getCrncyCd());
 			prepayOcc.setExrate(lastReceipt.getExrate());
 			prepayOcc.setExrateAplyDt(lastReceipt.getExrateAplyDt());
-			prepayOcc.setRegrId(userId);
-			prepayOcc.setRegDate(new Timestamp(new Date().getTime()));
 			prepayOcc.setCnclYn("N");
 			prepayOcc.setCnclDttm("");
 			prepayOcc.setTransDt(lastReceipt.getTransDt());
+			prepayOcc.setRegrId(userId);
+			prepayOcc.setRegDate(new Timestamp(new Date().getTime()));
+			prepayOcc.setChgrId(userId);
+			prepayOcc.setChgDate(new Timestamp(new Date().getTime()));
 
 			// 9-1. TBLPY_PREPAY_OCC insert
 			prepayService.insertPrepayOcc(prepayOcc);
@@ -380,6 +384,8 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 			updateDeposit.setPrepayTgtYn("Y");
 			updateDeposit.setPayProcYn("Y");
 			updateDeposit.setPrepayOccSeqNo(prepayOccSeqNo); // 2020.09.01 추가
+			updateDeposit.setChgrId(userId);
+			updateDeposit.setChgDate(new Timestamp(new Date().getTime()));
 
 			// 9-2. TBLPY_DPST PAY_PROC_DT, PREPAY_TGT_YN, PAY_PROC_YN
 			paymentService_1.updateDpstProc(updateDeposit);
@@ -388,6 +394,8 @@ public class NewSinglePaymentServiceImpl implements NewSinglePaymentService {
 			// 선수금 발생없이 수납처리만 되었음!
 			updateDeposit.setPayProcDt(DateUtil.getDateStringYYYYMMDD(0));
 			updateDeposit.setPayProcYn("Y");
+			updateDeposit.setChgrId(userId);
+			updateDeposit.setChgDate(new Timestamp(new Date().getTime()));
 
 			// 9. TBLPY_DPST PAY_PROC_DT, PAY_PROC_YN
 			paymentService_1.updateDpstProc(updateDeposit);

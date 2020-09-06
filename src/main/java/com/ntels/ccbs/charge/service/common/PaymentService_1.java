@@ -39,7 +39,7 @@ public interface PaymentService_1 {
 	 * @param dpstAmt
 	 * @return
 	 */
-	PaymentResult processPayment(String billSeqNo, String pymSeqNo, double dpstAmt, ProcessPaymentCallback callback);
+	PaymentResult processPayment(String billSeqNo, String pymSeqNo, double dpstAmt, String userId, ProcessPaymentCallback callback);
 	
 
 	int updateBillMastRcptAmt(List<CBillComm> billList);

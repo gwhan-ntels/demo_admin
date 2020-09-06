@@ -42,9 +42,9 @@ public class AdvanceReceivedController {
 	public String advanceReceivedSearch(Model model, AdvanceReceivedVO advanceReceivedVO, HttpServletRequest request) throws Exception {
 
 		String lng = (String)request.getSession().getAttribute("sessionLanguage");
-		model.addAttribute("traetStat", commonDataService.getCommonCodeList("BL00084", lng));
-		model.addAttribute("advanceReceivedTp", commonDataService.getCommonCodeList("BL00071", lng));
-		model.addAttribute("depositTp", commonDataService.getCommonCodeList("BL00067", lng));
+		model.addAttribute("prepayOccStat", commonDataService.getCommonCodeList("BL00084", lng));
+		model.addAttribute("prepayOccTp", commonDataService.getCommonCodeList("BL00071", lng));
+		model.addAttribute("dpstCl", commonDataService.getCommonCodeList("BL00067", lng));
 		model.addAttribute("dtTp", commonDataService.getCommonCodeList("BL00095", lng));
 		
 		return URL + "/advanceReceivedSearch";
@@ -85,9 +85,9 @@ public class AdvanceReceivedController {
 	public String advanceReceivedPayment(Model model, AdvanceReceivedVO advanceReceivedVO, HttpServletRequest request) throws Exception {
 
 		String lng = (String)request.getSession().getAttribute("sessionLanguage");
-		model.addAttribute("traetStat", commonDataService.getCommonCodeList("BL00084", lng));
-		model.addAttribute("advanceReceivedTp", commonDataService.getCommonCodeList("BL00071", lng));
-		model.addAttribute("depositTp", commonDataService.getCommonCodeList("BL00067", lng));
+		model.addAttribute("prepayOccStat", commonDataService.getCommonCodeList("BL00084", lng));
+		model.addAttribute("prepayOccTp", commonDataService.getCommonCodeList("BL00071", lng));
+		model.addAttribute("dpstCl", commonDataService.getCommonCodeList("BL00067", lng));   // 한광욱 수정 해야 할 
 		model.addAttribute("dtTp", commonDataService.getCommonCodeList("BL00095", lng));
 
 		model.addAttribute("transTp", commonDataService.getCommonCodeList("BL00099", lng));
@@ -134,20 +134,7 @@ public class AdvanceReceivedController {
 
 		//return URL + "/prepayTransMngList";
 	}
-	
-	/**
-	 * <PRE>
-	 * 1. MethodName: insertAction
-	 * 2. ClassName : BillListSearchPopupController
-	 * 3. Comment   : 선수금 / 불명금 / 보증금의 대체수납신청 등록
-	 * 4. 작성자    : gwhan
-	 * 5. 작성일    : 2020. 03. 26. 오후 4:54:25
-	 * </PRE>
-	 *   @return String
-	 *   @param model
-	 *   @param billingStatisticsVO
-	 *   @return
-	 */
+
 	@RequestMapping(value = "insertAction", method = { RequestMethod.POST })
 	public String insertAction(Model model, PrepayOcc prepayOcc) {
 
@@ -157,15 +144,6 @@ public class AdvanceReceivedController {
 		model.addAttribute("result", result);
 		
 		return  URL + "/ajax/advanceReceivedPayment"; 
-		
-//
-//		try {
-//			advanceReceivedService.insertAction(billingStatisticsVO);
-//			model.addAttribute("success", true);
-//		} catch (Exception e) {
-//			model.addAttribute("success", false);
-//			model.addAttribute("message", e.getMessage());
-//		}
 	}
 
 }

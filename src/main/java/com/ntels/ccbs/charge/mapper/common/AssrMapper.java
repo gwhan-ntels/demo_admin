@@ -31,7 +31,7 @@ public interface AssrMapper {
 	 * @param dpstTpSeqNo
 	 * @return
 	 */
-	int updateAssrOccCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo);
+	int updateAssrOccCancel(@Param("cnclDttm") String cnclDttm, @Param("dpstTpSeqNo") String dpstTpSeqNo, @Param("chgrId") String chgrId, @Param("chgDate") Timestamp chgDate);
 	
 	/**
 	 * 보증금발생내역(취소여부, 취소일자)을 수정한다.

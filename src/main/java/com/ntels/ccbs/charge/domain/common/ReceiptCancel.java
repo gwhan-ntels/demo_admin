@@ -125,11 +125,6 @@ public class ReceiptCancel {
 	private String cnclResn;
 
 	/**
-	 * 등록일
-	 */
-	private Timestamp regDate;
-
-	/**
 	 * 이전수납금액
 	 */
 	private double preRcptAmt;
@@ -139,226 +134,186 @@ public class ReceiptCancel {
 	 * 요금조정신청을 함
 	 */
 	private String rcptId;
-
-	/**
-	 * 등록자ID
-	 */
+	
 	private String regrId;
+	private Timestamp regDate;
+	private String chgrId;
+	private Timestamp chgDate;
 
 	public String getPymSeqNo() {
 		return pymSeqNo;
 	}
-
 	public void setPymSeqNo(String pymSeqNo) {
 		this.pymSeqNo = pymSeqNo;
 	}
-
 	public String getBillSeqNo() {
 		return billSeqNo;
 	}
-
 	public void setBillSeqNo(String billSeqNo) {
 		this.billSeqNo = billSeqNo;
 	}
-
 	public String getBillYymm() {
 		return billYymm;
 	}
-
 	public void setBillYymm(String billYymm) {
 		this.billYymm = billYymm;
 	}
-
 	public String getBillCycl() {
 		return billCycl;
 	}
-
 	public void setBillCycl(String billCycl) {
 		this.billCycl = billCycl;
 	}
-
 	public String getBillDt() {
 		return billDt;
 	}
-
 	public void setBillDt(String billDt) {
 		this.billDt = billDt;
 	}
-
 	public String getPymAcntId() {
 		return pymAcntId;
 	}
-
 	public void setPymAcntId(String pymAcntId) {
 		this.pymAcntId = pymAcntId;
 	}
-
 	public String getPayProcDt() {
 		return payProcDt;
 	}
-
 	public void setPayProcDt(String payProcDt) {
 		this.payProcDt = payProcDt;
 	}
-
 	public String getDpstProcDt() {
 		return dpstProcDt;
 	}
-
 	public void setDpstProcDt(String dpstProcDt) {
 		this.dpstProcDt = dpstProcDt;
 	}
-
 	public String getDpstDt() {
 		return dpstDt;
 	}
-
 	public void setDpstDt(String dpstDt) {
 		this.dpstDt = dpstDt;
 	}
-
 	public String getDpstCl() {
 		return dpstCl;
 	}
-
 	public void setDpstCl(String dpstCl) {
 		this.dpstCl = dpstCl;
 	}
-
 	public double getPayObjAmt() {
 		return payObjAmt;
 	}
-
 	public void setPayObjAmt(double payObjAmt) {
 		this.payObjAmt = payObjAmt;
 	}
-
 	public double getPayAplyAmt() {
 		return payAplyAmt;
 	}
-
 	public void setPayAplyAmt(double payAplyAmt) {
 		this.payAplyAmt = payAplyAmt;
 	}
-
 	public double getPrepayAplyAmt() {
 		return prepayAplyAmt;
 	}
-
 	public void setPrepayAplyAmt(double prepayAplyAmt) {
 		this.prepayAplyAmt = prepayAplyAmt;
 	}
-
 	public String getPayTp() {
 		return payTp;
 	}
-
 	public void setPayTp(String payTp) {
 		this.payTp = payTp;
 	}
-
 	public String getPrepayTransSeqNo() {
 		return prepayTransSeqNo;
 	}
-
 	public void setPrepayTransSeqNo(String prepayTransSeqNo) {
 		this.prepayTransSeqNo = prepayTransSeqNo;
 	}
-
 	public String getAmbgTransSeqNo() {
 		return ambgTransSeqNo;
 	}
-
 	public void setAmbgTransSeqNo(String ambgTransSeqNo) {
 		this.ambgTransSeqNo = ambgTransSeqNo;
 	}
-
 	public String getDpstTpSeqNo() {
 		return dpstTpSeqNo;
 	}
-
 	public void setDpstTpSeqNo(String dpstTpSeqNo) {
 		this.dpstTpSeqNo = dpstTpSeqNo;
 	}
-
 	public String getCrncyCd() {
 		return crncyCd;
 	}
-
 	public void setCrncyCd(String crncyCd) {
 		this.crncyCd = crncyCd;
 	}
-
 	public double getExrate() {
 		return exrate;
 	}
-
 	public void setExrate(double exrate) {
 		this.exrate = exrate;
 	}
-
 	public String getExrateAplyDt() {
 		return exrateAplyDt;
 	}
-
 	public void setExrateAplyDt(String exrateAplyDt) {
 		this.exrateAplyDt = exrateAplyDt;
 	}
-
 	public String getCnclrId() {
 		return cnclrId;
 	}
-
 	public void setCnclrId(String cnclrId) {
 		this.cnclrId = cnclrId;
 	}
-
 	public String getCnclDttm() {
 		return cnclDttm;
 	}
-
 	public void setCnclDttm(String cnclDttm) {
 		this.cnclDttm = cnclDttm;
 	}
-
 	public String getCnclResn() {
 		return cnclResn;
 	}
-
 	public void setCnclResn(String cnclResn) {
 		this.cnclResn = cnclResn;
 	}
-
-	public Timestamp getRegDate() {
-		return regDate;
-	}
-
-	public void setRegDate(Timestamp regDate) {
-		this.regDate = regDate;
-	}
-
 	public double getPreRcptAmt() {
 		return preRcptAmt;
 	}
-
 	public void setPreRcptAmt(double preRcptAmt) {
 		this.preRcptAmt = preRcptAmt;
 	}
-
 	public String getRcptId() {
 		return rcptId;
 	}
-
 	public void setRcptId(String rcptId) {
 		this.rcptId = rcptId;
 	}
-
 	public String getRegrId() {
 		return regrId;
 	}
-
 	public void setRegrId(String regrId) {
 		this.regrId = regrId;
 	}
+	public Timestamp getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Timestamp regDate) {
+		this.regDate = regDate;
+	}
+	public String getChgrId() {
+		return chgrId;
+	}
+	public void setChgrId(String chgrId) {
+		this.chgrId = chgrId;
+	}
+	public Timestamp getChgDate() {
+		return chgDate;
+	}
+	public void setChgDate(Timestamp chgDate) {
+		this.chgDate = chgDate;
+	}
+
 
 }

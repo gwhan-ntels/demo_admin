@@ -41,40 +41,40 @@ $(document).ready(function() {
 	});
 	
 	$("#advanceReceivedGrid").jqGrid({
-		url:'getPrepayOccInfoListAction.json?',
+		url:'/charge/payment/advanceReceived/advanceReceivedMng/getPrepayOccInfoListAction.json?',
 		datatype: "local",
 		mtype:"POST",
 		postData: {},
 		colModel: [
 			//차후 안쓰는 필드는 hidden처리
 			{ label: '<spring:message code="LAB.M06.LAB00134" />', name: 'prepayOccSeqNo', width : 100, align:"center"}, 	//발생일련번호
-			{ label: '<spring:message code="LAB.M06.LAB00133" />', name: 'prepayOccNm', width : 100, align:"center"}, 	//발생구분
+			{ label: '<spring:message code="LAB.M06.LAB00133" />', name: 'prepayOccTpNm', width : 130, align:"left"}, 	//발생구분
+			{ label: '<spring:message code="LAB.M06.LAB00136" />', name: 'prepayOccResnNm', width : 130, align:"left"}, 	//발생사유
 			{ label: '<spring:message code="LAB.M02.LAB00006" />', name: 'pymAcntId', width : 100, align:"center"}, 	//납부계정ID
 			{ label: '<spring:message code="LAB.M02.LAB00008" />', name: 'acntNm', width : 150, align:"center"}, 	//납부계정명
 			{ label: '<spring:message code="LAB.M07.LAB00344" />', name: 'prepayOccDttm', width : 120, formatter:stringTypeFormatterYYYYMMDDHH24MISS, align:"center"}, 	//선수금발생일시
 			{ label: '<spring:message code="LAB.M08.LAB00173" />', name: 'dpstDt', width : 100, formatter:stringTypeFormatterYYYYMMDD, align:"center"}, 	//입금일자
 			{ label: '<spring:message code="LAB.M08.LAB00127" />', name: 'transDt', width : 100, formatter:stringTypeFormatterYYYYMMDD, align:"center"}, 	//이체일
-			{ label: '<spring:message code="LAB.M06.LAB00135" />', name: 'prepayOccAmt', width : 100, formatter: 'number', align:"center"}, 	//발생금액
-			{ label: '<spring:message code="LAB.M03.LAB00088" />', name: 'prepayTransAmt', width : 100, formatter: 'number', align:"center"}, 	//대체금액
-			{ label: '<spring:message code="LAB.M09.LAB00040" />', name: 'prepayBal', width : 100, formatter: 'number', align:"center"}, 	//잔액
+			{ label: '<spring:message code="LAB.M06.LAB00135" />', name: 'prepayOccAmt', width : 100, formatter: 'number', align:"right"}, 	//발생금액
+			{ label: '<spring:message code="LAB.M03.LAB00088" />', name: 'prepayTransAmt', width : 100, formatter: 'number', align:"right"}, 	//대체금액
+			{ label: '<spring:message code="LAB.M09.LAB00040" />', name: 'prepayBal', width : 100, formatter: 'number', align:"right"}, 	//잔액
 			{ label: '<spring:message code="LAB.M10.LAB00096" />', name: 'prepayProcStatNm', width : 100, align:"center"}, 	//처리상태
 			{ label: '<spring:message code="LAB.M08.LAB00166" />', name: 'dpstClNm', width : 100, align:"center"}, 	//입금구분
-			{ label: '<spring:message code="LAB.M06.LAB00136" />', name: 'prepayOccResnNm', width : 100, align:"center"}, 	//발생사유
 			{ label: '<spring:message code="LAB.M03.LAB00084" />', name: 'regrId', width : 100, align:"center"}, 	//등록자명
-			{ label: '<spring:message code="LAB.M03.LAB00079" />', name: 'regDate', width : 120, align:"center"}, 	//등록일
+			{ label: '<spring:message code="LAB.M03.LAB00079" />', name: 'regDate', formatter:dateTypeFormatterYYYYMMDDHH24MISS, width : 130, align:"center"}, 	//등록일
 			{ label: '<spring:message code="LAB.M10.LAB00103" />', name: 'chgrId', width : 100, align:"center"}, 	//최종수정자명
-			{ label: '<spring:message code="LAB.M10.LAB00104" />', name: 'chgDate', width : 100, align:"center"}, 	//최종수정일
-			{ label: '<spring:message code="LAB.M06.LAB00137" />', name: 'prepayOccTp', width : 100, align:"center"}, 	//발생구분코드
+			{ label: '<spring:message code="LAB.M10.LAB00104" />', name: 'chgDate', formatter:dateTypeFormatterYYYYMMDDHH24MISS, width : 130, align:"center"}, 	//최종수정일
+/* 			{ label: '<spring:message code="LAB.M06.LAB00137" />', name: 'prepayOccTp', width : 100, align:"center"}, 	//발생구분코드
 			{ label: '<spring:message code="LAB.M10.LAB00105" />', name: 'prepayProcStat', width : 100, align:"center"}, 	//처리상태코드
 			{ label: '<spring:message code="LAB.M08.LAB00202" />', name: 'dpstCl', width : 100, align:"center"}, 	//입금구분코드
 			{ label: '<spring:message code="LAB.M06.LAB00138" />', name: 'prepayOccResn', width : 100, align:"center"}, 	//발생사유코드
 			{ label: '<spring:message code="LAB.M03.LAB00083" />', name: 'regrId', width : 100, align:"center"}, 	//등록자ID
-			{ label: '<spring:message code="LAB.M10.LAB00106" />', name: 'chgrId', width : 100, align:"center"} 	//최종수정자ID
+			{ label: '<spring:message code="LAB.M10.LAB00106" />', name: 'chgrId', width : 100, align:"center"} 	//최종수정자ID */
 			
 		],
 		sortable:true,
 		viewrecords: true,
-		height: 450,
+		height: 400,
 		rowNum:10,                   //한번에 노출되는 row 수
 		rowList:[5,10,20,30,50],    //선택시 노출되는 row 수
 		pager: '#advanceReceivedGridPager',
@@ -196,8 +196,8 @@ function searchGridList(){
 			<td>
 				<select id="searchDpstCl" name="searchDpstCl" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${depositTp}" var="depositTp" varStatus="status">
-						<option value="${depositTp.commonCd}">${depositTp.commonCdNm}</option>
+					<c:forEach items="${dpstCl}" var="dpstCl" varStatus="status">
+						<option value="${dpstCl.commonCd}">${dpstCl.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>
@@ -207,8 +207,8 @@ function searchGridList(){
 			<td>
 				<select id="searchPrepayOccTp" name="searchPrepayOccTp" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${advanceReceivedTp}" var="advanceReceivedTp" varStatus="status">
-						<option value="${advanceReceivedTp.commonCd}">${advanceReceivedTp.commonCdNm}</option>
+					<c:forEach items="${prepayOccTp}" var="prepayOccTp" varStatus="status">
+						<option value="${prepayOccTp.commonCd}">${prepayOccTp.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>
@@ -236,8 +236,8 @@ function searchGridList(){
 			<td>
 				<select id="searchprepayProcStat" name="searchprepayProcStat" class="w100p">
 					<option value=""><spring:message code="LAB.M15.LAB00002"/></option>
-					<c:forEach items="${traetStat}" var="traetStat" varStatus="status">
-						<option value="${traetStat.commonCd}">${traetStat.commonCdNm}</option>
+					<c:forEach items="${prepayOccStat}" var="prepayOccStat" varStatus="status">
+						<option value="${prepayOccStat.commonCd}">${prepayOccStat.commonCdNm}</option>
 					</c:forEach>
 				</select>
 			</td>
