@@ -1,7 +1,5 @@
 package com.ntels.ccbs.charge.service.common;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +15,7 @@ import com.ntels.ccbs.charge.domain.common.PrepayOcc;
 import com.ntels.ccbs.charge.domain.common.PrepayTransHistory;
 import com.ntels.ccbs.charge.mapper.common.PrepayMapper;
 import com.ntels.ccbs.common.consts.Consts;
+import com.ntels.ccbs.common.util.CUtil;
 import com.ntels.ccbs.common.util.DateUtil;
 import com.ntels.ccbs.system.service.common.service.SequenceService;
 
@@ -231,7 +230,7 @@ public class PrepayServiceImpl implements PrepayService {
 
 		PrepayOcc oldPrepayOcc = getPrepayOcc(prepayOcc.getPrepayOccSeqNo());
 		PrepayOcc newPrepayOcc = new PrepayOcc();
-		copyObjectValue(oldPrepayOcc, newPrepayOcc);
+		CUtil.copyObjectValue(oldPrepayOcc, newPrepayOcc);
 
 		newPrepayOcc.setPrepayOccSeqNo(newPrepayOccSeqNo);
 		// newPrepayOcc.setPymAcntId(prepayOcc.getPymAcntId());
@@ -257,36 +256,5 @@ public class PrepayServiceImpl implements PrepayService {
 		prepayMapper.insertPrepayOcc(newPrepayOcc);
 
 		return newPrepayOccSeqNo;
-	}
-
-	public static void copyObjectValue(Object src, Object dest) {
-		Field[] bFields = dest.getClass().getDeclaredFields();
-
-		for (Field field : bFields) {
-			String name = field.getName();
-			// name = name.substring(0, 1).toUpperCase() + name.substring(1,
-			// name.length());
-
-			if (Character.isUpperCase(name.charAt(1))) {
-				name = name.substring(0);
-			} else {
-				name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			}
-
-			try {
-				Method get = src.getClass().getDeclaredMethod("get" + name);
-				Object value = get.invoke(src);
-
-				if (value == null) {
-					continue;
-				}
-
-				Method set = dest.getClass().getDeclaredMethod("set" + name, get.getReturnType());
-
-				set.invoke(dest, value);
-			} catch (Exception e) {
-				// 에러 무시
-			}
-		}
 	}
 }
