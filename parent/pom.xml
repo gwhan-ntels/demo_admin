@@ -26,7 +26,7 @@
 		<javax.validation-version>1.1.0.Final</javax.validation-version>
 		<org.hibernate-version>5.0.3.Final</org.hibernate-version>
 		<bouncycastle-version>136</bouncycastle-version>
-		<org.apache.poi-version>3.14</org.apache.poi-version>
+		<org.apache.poi-version>4.1.2</org.apache.poi-version>
 		<cglib-version>2.2.2</cglib-version>
 		<java.mail-version>1.4.5</java.mail-version>
 		<!--
