@@ -22,7 +22,7 @@
 		<net.sf.ehcache-version>2.7.2</net.sf.ehcache-version>
 		<org.tuckey-version>4.0.4</org.tuckey-version>
 		<org.codehaus.jackson-version>1.9.12</org.codehaus.jackson-version>
-		<com.thoughtworks.xstream-version>1.4.4</com.thoughtworks.xstream-version>
+		<com.thoughtworks.xstream-version>1.4.16</com.thoughtworks.xstream-version>
 		<javax.validation-version>1.1.0.Final</javax.validation-version>
 		<org.hibernate-version>5.0.3.Final</org.hibernate-version>
 		<bouncycastle-version>136</bouncycastle-version>
