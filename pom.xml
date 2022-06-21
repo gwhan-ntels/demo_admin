@@ -72,7 +72,7 @@
 	<properties>
 		<tiles.version>3.0.1</tiles.version>
 		<oracle.version>11.1.0.7.0</oracle.version>
-		<mysql.version>5.1.22</mysql.version>
+		<mysql.version>8.0.28</mysql.version>
 	</properties>
     <repositories>
         <repository>
